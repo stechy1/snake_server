@@ -1,14 +1,14 @@
 #compiler
 CC=g++
 #compiler options
-OPTS=-Wall -pedantic
+OPTS=-Wall -pedantic -g -std=c++11
 #source files
-SOURCES=$(wildcard *.cpp src/*.cpp )
+SOURCES=$(wildcard src/*.cpp src/network/*.cpp)
 #object files
 OBJECTS=$(SOURCES:.cpp=.o)
 #sdl-config or any other library here. 
 #``- ensures that the command between them is executed, and the result is put into LIBS
-LIBS=`-pthread`
+LIBS=-pthread
 #executable filename
 EXECUTABLE=server.out
 #Special symbols used:

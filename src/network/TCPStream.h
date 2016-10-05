@@ -3,41 +3,56 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <string>
  
-using namespace std
+using namespace std;
 
-namespace SnakeServer::Network {
+namespace SnakeServer {
+	
+	namespace Network {
 
-	class TCPStream {
-		int     m_sd;        // Identifikátor, zda-li se jedná o clienta, nebo o server
-		string  m_peerIP;    // IP adresa peeru
-		int     m_peerPort;  // Port peeru
+		class TCPStream {
+			int     m_sd;        // Identifikátor, zda-li se jedná o clienta, nebo o server
+			string  m_peerIP;    // IP adresa peeru
+			int     m_peerPort;  // Port peeru
 
-		public:
-			friend class TCPAcceptor;  // Přiřazení "přátelské" třídy pro přístup k privátnímu konstruktoru
-			friend class TCPConnector; // Přiřazení "přátelské" třídy pro přístup k privátnímu konstruktoru
+			public:
+				friend class TCPAcceptor;  // Přiřazení "přátelské" třídy pro přístup k privátnímu konstruktoru
+				friend class TCPConnector; // Přiřazení "přátelské" třídy pro přístup k privátnímu konstruktoru
 
-			~TCPStream();
+				virtual ~TCPStream();
 
-			// Odešle zadaný buffer do internetu
-			ssize_t send(char* buffer, size_t len);
-			// Přijme data z internetu
-			ssize_t receive(char* buffer, size_t len);
+				// Odešle zadaný buffer do internetu
+				ssize_t send(char* buffer, size_t len);
+				// Přijme data z internetu
+				ssize_t receive(char* buffer, size_t len, int timeout=0);
 
-			// Getter pro IP adresu peeru
-			string getPeerIP( void );
-			// Getter pro Port peeru
-			int getPeerPort( void );
+				// Getter pro IP adresu peeru
+				string getPeerIP( void );
+				// Getter pro Port peeru
+				int getPeerPort( void );
 
-		private:
-			// sd - Socket descriptor; address - reference na strukturu sockaddr_in
-			TCPStream(int sd, struct sockaddr_in* address); // Jediný používaný konstruktor
-			TCPStream(); // Prázdný konstruktor
-			TCPStream(const TCPStream& stream); // Copy konstructor
-	}; // end class
+				enum {
+			        connectionClosed = 0,
+			        connectionReset = -1,
+			        connectionTimedOut = -2
+				};
 
-} // end namespace
+			private:
+				// sd - Socket descriptor; address - reference na strukturu sockaddr_in
+				TCPStream(int sd, struct sockaddr_in* address); // Jediný používaný konstruktor
+				TCPStream(); // Prázdný konstruktor
+				TCPStream(const TCPStream& stream); // Copy konstructor
+
+				bool waitForReadEvent(int timeout);
+		}; // end class
+
+	} // end namespace Network
+
+} // end namespace SnakeServer
 
 #endif
