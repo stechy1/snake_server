@@ -24,8 +24,10 @@ namespace SnakeServer {
 				TCPAcceptor(int port);
 				~TCPAcceptor();
 
-				int        start();
+				int start();
 				TCPStream* accept();
+
+				int getMySocketDescriptor();
 
 			private:
 				TCPAcceptor();

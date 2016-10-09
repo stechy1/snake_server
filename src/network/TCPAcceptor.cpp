@@ -6,6 +6,7 @@
 #include "TCPAcceptor.h"
 
 namespace SnakeServer {
+
 	namespace Network {
 
 		TCPAcceptor::TCPAcceptor(int port) 

@@ -39,6 +39,10 @@ namespace SnakeServer {
 			return m_peerPort;
 		}
 
+		int TCPStream::getSocketDescriptor (void ) {
+			return m_sd;
+		}
+
 		bool TCPStream::waitForReadEvent(int timeout) {
 		    fd_set sdset;
 		    struct timeval tv;
