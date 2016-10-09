@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include "Vector2D.h"
 
 // Socket libraries
 #include <sys/socket.h>

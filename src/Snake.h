@@ -1,15 +1,17 @@
-#ifndef SNAKE_WORLD
-#define SNAKE_WORLD
+#ifndef SNAKE_SNAKE
+#define SNAKE_SNAKE
 
 namespace SnakeServer {
 
-	class World {
+	class Snake {
 		public:
 			// Variables
 			//const unsigned int size = 1000;
 			// Methods
-			World();
-			virtual ~World();
+			Snake();
+			virtual ~Snake();
+
+			
 		protected:
 			// Variables
 			// Methods
@@ -20,6 +22,6 @@ namespace SnakeServer {
 
 	}; // end class
 
-}// end namespace
+} // end namespace
 
 #endif

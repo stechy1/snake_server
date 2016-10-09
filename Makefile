@@ -1,7 +1,7 @@
 #compiler
 CC=g++
 #compiler options
-OPTS=-Wall -pedantic -g -std=c++11
+CXXFLAGS=-Wall -pedantic -g -std=c++11
 #source files
 SOURCES=$(wildcard src/*.cpp src/network/*.cpp)
 #object files
@@ -18,8 +18,8 @@ EXECUTABLE=server.out
 all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	@echo Building project $(OBJECTS)
-	$(LINK.o) $^ -o $@ $(LIBS)
+	@echo Building project...
+	$(LINK.o) $^ -o $@ $(CXXFLAGS) $(LIBS)
 	@echo Build completed!
 
 clean:
