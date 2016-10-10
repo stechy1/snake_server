@@ -14,9 +14,9 @@ namespace SnakeServer {
 
 		TCPAcceptor::TCPAcceptor(int port, unsigned int maxPlayers) 
 	    : _lsd(0), _port(port), _listening(false), _maxClients(maxPlayers) {
-	    	FD_ZERO(&_master_fds);
-			FD_ZERO(&_read_fds);
-			FD_ZERO(&_write_fds);
+	    	FD_ZERO(&_master_fsd);
+			FD_ZERO(&_read_fsd);
+			FD_ZERO(&_write_fsd);
 
 			_clients = new int[_maxClients];
 			for (unsigned int i = 0; i < _maxClients; ++i) {
@@ -74,7 +74,7 @@ namespace SnakeServer {
 	    		return false;
 	    	}
 
-	    	FD_SET(_lsd, &_master_fds);
+	    	FD_SET(_lsd, &_master_fsd);
 			_fdMax = _lsd; // Nastavení maximální ho offsetu socketů
 			_fdMin = _lsd; // Nastavení minimálního offsetu socketů
 
@@ -85,12 +85,12 @@ namespace SnakeServer {
 		void TCPAcceptor::start( void ) {
 			for(;;) {
 				// Zkopírování hlavního seznamu do čtecího a zapisovacího
-			    memcpy(&_read_fds, &_master_fds, sizeof(_master_fds));
-			    memcpy(&_write_fds, &_master_fds, sizeof(_master_fds));
+			    memcpy(&_read_fsd, &_master_fsd, sizeof(_master_fsd));
+			    memcpy(&_write_fsd, &_master_fsd, sizeof(_master_fsd));
 
 			    std::cout << "Smyčka" << std::endl;
 
-			    if (select(_fdMax + 1, &_read_fds, &_write_fds, NULL, NULL) == -1) {
+			    if (select(_fdMax + 1, &_read_fsd, &_write_fsd, NULL, NULL) == -1) {
 			    	close(_lsd);
 			    	perror("Chyba v selectu");
 			    	exit(1);
@@ -100,7 +100,7 @@ namespace SnakeServer {
 
 			    // Proiteruj všechny sockety
 			    for(int i = _fdMin; i <= _fdMax; i++) {
-			    	if (FD_ISSET(i, &_read_fds)) { // Pokud je socket[i] čtecího typu
+			    	if (FD_ISSET(i, &_read_fsd)) { // Pokud je socket[i] čtecího typu
 			    		if (i == _lsd) { // Pokud je ten čtecí socket můj hlavní socket
 			    			// Jsem připraven přijmout do své náruče nového klienta
 			    			std::cout << "Jsem připraven přijmout do své náruče nového klienta." << std::endl;
@@ -115,7 +115,7 @@ namespace SnakeServer {
 	    					std::cout << "Jsem připraven číst data od klienta" << std::endl;
 	    					break;
 			    		}
-			    	} else if (FD_ISSET(i, &_write_fds)) {
+			    	} else if (FD_ISSET(i, &_write_fsd)) {
 			    		// Jsem připraven poslat data tomuto klientovi
 			    		std::cout << "Jsem připraven poslat data klientovi" << std::endl;
 			    		break;
@@ -141,7 +141,11 @@ namespace SnakeServer {
 		        return NULL;
 		    }
 
+	    	_clients[sd] = (int)ConnectionStatus::CONNECTED;
+	    	FD_SET(sd, &_master_fsd);
 
+	    	if (sd > _fdMax) _fdMax = sd;
+	    	if (sd < _fdMin) _fdMin = sd;
 		    
 		    return new TCPStream(sd, &address);
 		}

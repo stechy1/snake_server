@@ -16,9 +16,9 @@ namespace SnakeServer {
 	namespace Network {
 
 		class TCPStream {
-			int     m_sd;        // Socket file discriptor
-			string  m_peerIP;    // IP adresa peeru
-			int     m_peerPort;  // Port peeru
+			int     _sd;        // Socket file discriptor
+			string  _peerIP;    // IP adresa peeru
+			int     _peerPort;  // Port peeru
 
 			public:
 				friend class TCPAcceptor;  // Přiřazení "přátelské" třídy pro přístup k privátnímu konstruktoru
@@ -35,8 +35,6 @@ namespace SnakeServer {
 				string getPeerIP( void );
 				// Getter pro Port peeru
 				int getPeerPort( void );
-
-				int getSocketDescriptor( void );
 
 				enum {
 			        connectionClosed = 0,

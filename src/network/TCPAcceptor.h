@@ -26,9 +26,9 @@ namespace SnakeServer {
 			bool   _listening;  // True, pokud poslouchám, jinak false
 			unsigned int    _maxClients; // Maximální počet připojitelných klientů
 
-			fd_set _master_fds; // Master file descriptor list
-			fd_set _read_fds;   // File descriptor list for read events
-			fd_set _write_fds;  // File descriptor list for write events
+			fd_set _master_fsd; // Master file descriptor list
+			fd_set _read_fsd;   // File descriptor list for read events
+			fd_set _write_fsd;  // File descriptor list for write events
 
 			int _fdMax = 0;     // Nejmenší index socket file descriptoru
 			int _fdMin = 0;     // Největší index socket file descriptoru
