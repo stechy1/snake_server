@@ -26,21 +26,20 @@ void error(const char *msg) {
 
 int main(int argc, char *argv[])
 {
-	char *host, *port;
+	char *port;
 
-	if (argc < 3) {
-		cout << "Použití: ./server host port" << endl;
+	if (argc < 2) {
+		cout << "Použití: ./server port" << endl;
 		exit(1);
 	}
 
-	host = argv[1];
-	port = argv[2];
+	port = argv[1];
 
 	if (!Commons::isInteger(port)) {
 		error("Port musí být číslo!");
 	}
 
-	cout << "Host: " << host << ":" << port << endl;
+	cout << "Host: localhost:" << port << endl;
 
 	ServerSettings serverSettings;
 	serverSettings.port = atoi(port);

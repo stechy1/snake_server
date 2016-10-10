@@ -8,7 +8,7 @@ namespace SnakeServer {
 
 	namespace Network {
 
-		TCPStream::TCPStream() {}
+		TCPStream::TCPStream( void ) {}
 
 		TCPStream::TCPStream(int sd, struct sockaddr_in* address) : m_sd(sd) {
 		    char ip[50];
@@ -17,7 +17,7 @@ namespace SnakeServer {
 		    m_peerPort = ntohs(address->sin_port);
 		}
 
-		TCPStream::~TCPStream() {
+		TCPStream::~TCPStream( void ) {
 		    close(m_sd);
 		}
 

@@ -15,19 +15,35 @@ namespace SnakeServer {
 	namespace Network {
 
 		class TCPAcceptor {
+
+			enum class ConnectionStatus	{
+				NOT_CONNECTED = -1, CONNECTED = 0, LOST_CONNECTION = 1
+			};
+
 			static const unsigned int BACKLOG = 10; // Počet uživatelů maximálně čekajících na obsloužení
-			int    m_lsd;       // Listenning socket descriptor
-			int    m_port;      // Port peeru
-			bool   m_listening; // True, pokud poslouchám, jinak false
+			int    _lsd;        // Listenning socket descriptor
+			int    _port;       // Port peeru
+			bool   _listening;  // True, pokud poslouchám, jinak false
+			unsigned int    _maxClients; // Maximální počet připojitelných klientů
+
+			fd_set _master_fds; // Master file descriptor list
+			fd_set _read_fds;   // File descriptor list for read events
+			fd_set _write_fds;  // File descriptor list for write events
+
+			int _fdMax = 0;     // Nejmenší index socket file descriptoru
+			int _fdMin = 0;     // Největší index socket file descriptoru
+
+			int *_clients;      // Klienti
 
 			public:
-				TCPAcceptor(int port);
+				TCPAcceptor(int, unsigned int);
 				~TCPAcceptor();
 
-				int start();
-				TCPStream* accept();
+				bool openPort( void );     // Pokusí se otevřít naslouchací port
+				void start( void );        // Spustí komunikační proces s příchozími klienty
 
-				int getMySocketDescriptor();
+			protected:
+				TCPStream* accept( void ); // Vytvoří nový TCP stream s klientem
 
 			private:
 				TCPAcceptor();

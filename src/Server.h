@@ -16,24 +16,10 @@ namespace SnakeServer {
 		unsigned int maxPlayers;
 	}; // end struct
 
-	enum class ConnectionStatus	{
-		NOT_CONNECTED = -1, CONNECTED = 0, LOST_CONNECTION = 1
-	};
-
 	class Server {
 
 		unsigned int _port;
 		unsigned int _maxPlayers;
-
-		fd_set _master_fds; // Master file descriptor list
-		fd_set _read_fds;   // File descriptor list for read events
-		fd_set _write_fds;  // File descriptor list for write events
-
-		int _fdMax = 0; // Nejmenší index socket file descriptoru
-		int _fdMin = 0; // Největší index socket file descriptoru
-		// Klienti
-		int *_clients;
-		//std::vector<Network::TCPStream*> _clients;
 
 		//World world;
 

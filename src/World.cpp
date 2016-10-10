@@ -2,7 +2,7 @@
 
 namespace SnakeServer {
 	
-	World::World() {}
+	World::World( void ) {}
 
-	World::~World() {}
+	World::~World( void ) {}
 }
