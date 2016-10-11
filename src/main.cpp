@@ -26,23 +26,29 @@ void error(const char *msg) {
 
 int main(int argc, char *argv[])
 {
-	char *port;
+	char *port, *maxPlayers;
 
 	if (argc < 2) {
-		cout << "Použití: ./server port" << endl;
+		cout << "Použití: ./server <port> <maxPlayers>" << endl;
 		exit(1);
 	}
 
 	port = argv[1];
+	maxPlayers = argv[2];
 
 	if (!Commons::isInteger(port)) {
 		error("Port musí být číslo!");
+	}
+
+	if (!Commons::isInteger(maxPlayers)) {
+		error("Počet hráčů musí být číslo!");
 	}
 
 	cout << "Host: localhost:" << port << endl;
 
 	ServerSettings serverSettings;
 	serverSettings.port = atoi(port);
+	serverSettings.maxPlayers = atoi(maxPlayers);
 
 	Server server;
 	server.init(serverSettings);

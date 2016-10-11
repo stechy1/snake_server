@@ -4,11 +4,15 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include <iostream>
+
+using namespace std;
+
 namespace SnakeServer {
 
 	namespace Network {
 
-		TCPStream::TCPStream( void ) {}
+		TCPStream::TCPStream() {}
 
 		TCPStream::TCPStream(int sd, struct sockaddr_in* address) : _sd(sd) {
 		    char ip[50];
@@ -17,41 +21,30 @@ namespace SnakeServer {
 		    _peerPort = ntohs(address->sin_port);
 		}
 
-		TCPStream::~TCPStream( void ) {
+		TCPStream::~TCPStream() {
 		    close(_sd);
 		}
 
-		ssize_t TCPStream::receive(char* buffer, size_t len, int timeout) {
-		    if (timeout <= 0) return read(_sd, buffer, len);
+		ssize_t TCPStream::receive(char* buffer, size_t len) {
+			char tmp[2048];
+		    ssize_t received = recv(_sd, tmp, 2048 - 1, 0);
 
-		    if (waitForReadEvent(timeout) == true)
-		    {
-		        return read(_sd, buffer, len);
+		    if (received == -1) {
+		    	printf("Ups on socket: %i\n", _sd);
+		    	exit(1);
 		    }
-		    return connectionTimedOut;
+
+		    std::cout << "Received: " << tmp << std::endl;
+
+		    return 0;
 		}
 
-		string TCPStream::getPeerIP( void ) {
+		string TCPStream::getPeerIP() {
 			return _peerIP;
 		}
 
-		int TCPStream::getPeerPort( void ) {
+		int TCPStream::getPeerPort() {
 			return _peerPort;
-		}
-
-		bool TCPStream::waitForReadEvent(int timeout) {
-		    fd_set sdset;
-		    struct timeval tv;
-
-		    tv.tv_sec = timeout;
-		    tv.tv_usec = 0;
-		    FD_ZERO(&sdset);
-		    FD_SET(_sd, &sdset);
-		    if (select(_sd+1, &sdset, NULL, NULL, &tv) > 0) {
-		        return true;
-		    }
-		    
-		    return false;
 		}
 
 	} // endnamespace Network

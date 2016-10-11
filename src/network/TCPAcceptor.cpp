@@ -18,21 +18,28 @@ namespace SnakeServer {
 			FD_ZERO(&_read_fsd);
 			FD_ZERO(&_write_fsd);
 
-			_clients = new int[_maxClients];
-			for (unsigned int i = 0; i < _maxClients; ++i) {
-				*(_clients + i) = (int)ConnectionStatus::NOT_CONNECTED;
-			}
+			std::cout << "Konstruktor TCPAcceptor. " << _maxClients << std::endl;
+			_clients = new TCPStream[_maxClients];
+			//memset(_clients, 0, sizeof(TCPStream));
+			// for (unsigned int i = 0; i < _maxClients; ++i) {
+			// 	*(_clients + i) = (int)ConnectionStatus::NOT_CONNECTED;
+			// }
 	    }
 
-		TCPAcceptor::~TCPAcceptor( void ) {
+		TCPAcceptor::~TCPAcceptor() {
 		    if (_lsd > 0) {
 		        close(_lsd);
 		    }
+			for (unsigned int i = 0; i < _maxClients; ++i) {
+				//if (*(_clients + i) != NULL) {
+					delete (_clients + i);
+				//}
+			}
 
 		    delete _clients;
 		}
 
-		bool TCPAcceptor::openPort( void ) {
+		bool TCPAcceptor::openPort() {
 			// Pokud už poslouchám, tak nic provádět nebudu
 			if (_listening) {
 				return false;
@@ -44,12 +51,12 @@ namespace SnakeServer {
 				perror("Socket()");
 			}
 
-			int optval = 1; // Nastavení socketu na neblokující
-			if (ioctl(_lsd, FIONBIO, (char *)&optval) < 0) {
-				close(_lsd);
-				perror("ioctl nonblock");
-				return false;
-			}
+			 int optval = 1; // Nastavení socketu na neblokující
+			// if (ioctl(_lsd, FIONBIO, (char *)&optval) < 0) {
+			// 	close(_lsd);
+			// 	perror("ioctl nonblock");
+			// 	return false;
+			// }
 
 			optval = 1;
 			// Možnost permanentního znovupoužití stejného serveru
@@ -82,7 +89,8 @@ namespace SnakeServer {
 	    	return true;
 		}
 
-		void TCPAcceptor::start( void ) {
+		void TCPAcceptor::start() {
+			char buffer[1];
 			for(;;) {
 				// Zkopírování hlavního seznamu do čtecího a zapisovacího
 			    memcpy(&_read_fsd, &_master_fsd, sizeof(_master_fsd));
@@ -104,29 +112,40 @@ namespace SnakeServer {
 			    		if (i == _lsd) { // Pokud je ten čtecí socket můj hlavní socket
 			    			// Jsem připraven přijmout do své náruče nového klienta
 			    			std::cout << "Jsem připraven přijmout do své náruče nového klienta." << std::endl;
-			    			TCPStream *client = this->accept();
+			    			TCPStream* client = this->accept();
 			    			if (client != NULL) {
 			    				std::cout << "Přijal jsem nového klienta" << std::endl;
-			    				delete client;
+			    				//delete client;
 			    			}
 			    			break;
 			    		} else {
 	    					// Jsem připraven číst data od klienta
 	    					std::cout << "Jsem připraven číst data od klienta" << std::endl;
+	    					TCPStream* client = (_clients + i);
+
+	    					client->receive(buffer, 4096);
+	    					// if (received == -1) {
+	    					// 	perror("error receive()");
+	    					// 	exit(1);
+	    					// }
+
+	    					// std::cout << "Received: " << buffer << "; bytes received: " << received << std::endl;
+
 	    					break;
 			    		}
-			    	} else if (FD_ISSET(i, &_write_fsd)) {
+			    	} 
+			    	if (FD_ISSET(i, &_write_fsd)) {
 			    		// Jsem připraven poslat data tomuto klientovi
-			    		std::cout << "Jsem připraven poslat data klientovi" << std::endl;
+			    		//std::cout << "Jsem připraven poslat data klientovi" << std::endl;
 			    		break;
 			    	}
 			    }
-			    std::cout << "Cycle" << std::endl;
-			    exit(1);
+			    //std::cout << "Cycle" << std::endl;
+			    //exit(1);
 			}
 		}
 
-		TCPStream* TCPAcceptor::accept( void ) {
+		TCPStream* TCPAcceptor::accept() {
 		    if (!_listening) {
 		        return NULL;
 		    }
@@ -141,13 +160,14 @@ namespace SnakeServer {
 		        return NULL;
 		    }
 
-	    	_clients[sd] = (int)ConnectionStatus::CONNECTED;
+		    TCPStream *client = new TCPStream(sd, &address);
+	    	_clients[sd] = *client;
 	    	FD_SET(sd, &_master_fsd);
 
 	    	if (sd > _fdMax) _fdMax = sd;
 	    	if (sd < _fdMin) _fdMin = sd;
 		    
-		    return new TCPStream(sd, &address);
+		    return client;
 		}
 
 	} // end namespace Network

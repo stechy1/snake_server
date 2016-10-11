@@ -29,12 +29,12 @@ namespace SnakeServer {
 				// Odešle zadaný buffer do internetu
 				ssize_t send(char* buffer, size_t len);
 				// Přijme data z internetu
-				ssize_t receive(char* buffer, size_t len, int timeout=0);
+				ssize_t receive(char* buffer, size_t len);
 
 				// Getter pro IP adresu peeru
-				string getPeerIP( void );
+				string getPeerIP();
 				// Getter pro Port peeru
-				int getPeerPort( void );
+				int getPeerPort();
 
 				enum {
 			        connectionClosed = 0,

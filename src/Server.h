@@ -28,7 +28,7 @@ namespace SnakeServer {
 			// Inicializační metoda, nastaví potřebné proměnné serveru
 			virtual void init( ServerSettings serverSettings );
 			// Spuštění serveru
-			virtual void start( void );
+			virtual void start();
 			// Methods
 
 			Server();

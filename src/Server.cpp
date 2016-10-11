@@ -13,18 +13,18 @@ using namespace SnakeServer::Network;
 
 namespace SnakeServer {
 
-	Server::Server( void ) {
+	Server::Server() {
 		std::cout << "Konstruktor serveru" << std::endl;
 	}
 
-	Server::~Server( void ) {}
+	Server::~Server() {}
 
 	void Server::init(ServerSettings serverSettings) {
 		_port = serverSettings.port;
 		_maxPlayers = serverSettings.maxPlayers;
 	}
 
-	void Server::start( void ) {
+	void Server::start() {
 		TCPAcceptor acceptor(_port, _maxPlayers);
 
 		std::cout << "Server started" << std::endl;

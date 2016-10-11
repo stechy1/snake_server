@@ -33,17 +33,17 @@ namespace SnakeServer {
 			int _fdMax = 0;     // Nejmenší index socket file descriptoru
 			int _fdMin = 0;     // Největší index socket file descriptoru
 
-			int *_clients;      // Klienti
+			TCPStream *_clients;      // Klienti
 
 			public:
 				TCPAcceptor(int, unsigned int);
 				~TCPAcceptor();
 
-				bool openPort( void );     // Pokusí se otevřít naslouchací port
-				void start( void );        // Spustí komunikační proces s příchozími klienty
+				bool openPort();     // Pokusí se otevřít naslouchací port
+				void start();        // Spustí komunikační proces s příchozími klienty
 
 			protected:
-				TCPStream* accept( void ); // Vytvoří nový TCP stream s klientem
+				TCPStream* accept(); // Vytvoří nový TCP stream s klientem
 
 			private:
 				TCPAcceptor();
