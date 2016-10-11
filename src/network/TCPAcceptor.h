@@ -8,8 +8,6 @@
 #include <stdlib.h>
 #include "TCPStream.h"
  
-using namespace std;
-
 namespace SnakeServer {
 	
 	namespace Network {

@@ -13,9 +13,6 @@
 #include "Server.h"
 #include "commons.h"
 
-using namespace std;
-using namespace SnakeServer;
-
 /**
  * Funkce, která vypíše chybovu hlášku a ukončí program
  */
@@ -29,7 +26,7 @@ int main(int argc, char *argv[])
 	char *port, *maxPlayers;
 
 	if (argc < 2) {
-		cout << "Použití: ./server <port> <maxPlayers>" << endl;
+		std::cout << "Použití: ./server <port> <maxPlayers>" << std::endl;
 		exit(1);
 	}
 
@@ -44,13 +41,13 @@ int main(int argc, char *argv[])
 		error("Počet hráčů musí být číslo!");
 	}
 
-	cout << "Host: localhost:" << port << endl;
+	std::cout << "Host: localhost:" << port << std::endl;
 
-	ServerSettings serverSettings;
+	SnakeServer::ServerSettings serverSettings;
 	serverSettings.port = atoi(port);
 	serverSettings.maxPlayers = atoi(maxPlayers);
 
-	Server server;
+	SnakeServer::Server server;
 	server.init(serverSettings);
 	server.start();
 

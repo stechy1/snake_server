@@ -9,8 +9,6 @@
 
 #include <iostream>
 
-using namespace SnakeServer::Network;
-
 namespace SnakeServer {
 
 	Server::Server() {
@@ -25,7 +23,7 @@ namespace SnakeServer {
 	}
 
 	void Server::start() {
-		TCPAcceptor acceptor(_port, _maxPlayers);
+		Network::TCPAcceptor acceptor(_port, _maxPlayers);
 
 		std::cout << "Server started" << std::endl;
 

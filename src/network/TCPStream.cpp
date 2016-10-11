@@ -6,8 +6,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 namespace SnakeServer {
 
 	namespace Network {
@@ -39,7 +37,7 @@ namespace SnakeServer {
 		    return 0;
 		}
 
-		string TCPStream::getPeerIP() {
+		std::string TCPStream::getPeerIP() {
 			return _peerIP;
 		}
 

@@ -6,8 +6,6 @@
 #include <tuple>
 #include <cmath>
 
-using namespace std;
-
 namespace SnakeServer {
 
 	template<class T>

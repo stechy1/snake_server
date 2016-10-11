@@ -8,8 +8,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string>
- 
-using namespace std;
 
 namespace SnakeServer {
 	
@@ -17,7 +15,7 @@ namespace SnakeServer {
 
 		class TCPStream {
 			int     _sd;        // Socket file discriptor
-			string  _peerIP;    // IP adresa peeru
+			std::string  _peerIP;    // IP adresa peeru
 			int     _peerPort;  // Port peeru
 
 			public:
@@ -32,7 +30,7 @@ namespace SnakeServer {
 				ssize_t receive(char* buffer, size_t len);
 
 				// Getter pro IP adresu peeru
-				string getPeerIP();
+				std::string getPeerIP();
 				// Getter pro Port peeru
 				int getPeerPort();
 
