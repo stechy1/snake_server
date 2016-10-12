@@ -139,7 +139,7 @@ namespace SnakeServer {
                 throw std::runtime_error("sdfsdf");
             }
 
-            m_clients[sd] = std::unique_ptr<TCPStream>(new TCPStream(sd, &address));
+            m_clients[sd] = std::make_unique<TCPStream>(sd, &address);
             FD_SET(sd, &m_master_read_fds);
 
             if (sd > m_fdMax) m_fdMax = sd;
