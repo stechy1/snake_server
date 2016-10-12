@@ -10,7 +10,7 @@ namespace SnakeServer {
 
     Server::~Server() {}
 
-    void Server::init(ServerSettings serverSettings) {
+    void Server::init(const ServerSettings serverSettings) {
         _port = serverSettings.port;
         _maxPlayers = serverSettings.maxPlayers;
     }

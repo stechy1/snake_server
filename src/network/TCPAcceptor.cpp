@@ -12,7 +12,7 @@ namespace SnakeServer {
 
     namespace Network {
 
-        TCPAcceptor::TCPAcceptor(int t_port)
+        TCPAcceptor::TCPAcceptor(const int t_port)
                 : m_lsd(0), m_port(t_port), m_listening(false) {
             FD_ZERO(&m_master_read_fds);
             FD_ZERO(&m_master_write_fds);

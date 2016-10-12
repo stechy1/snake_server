@@ -8,11 +8,11 @@ namespace SnakeServer {
 
         TCPStream::TCPStream() {}
 
-        TCPStream::TCPStream(int t_sd, struct sockaddr_in *t_address) : _sd(t_sd) {
+        TCPStream::TCPStream(const int t_sd, const struct sockaddr_in *t_address) : m_sd(t_sd) {
             char ip[50];
             inet_ntop(PF_INET, (struct in_addr *) &(t_address->sin_addr.s_addr), ip, sizeof(ip) - 1);
-            _peerIP = *ip;
-            _peerPort = ntohs(t_address->sin_port);
+            m_peerIP = *ip;
+            m_peerPort = ntohs(t_address->sin_port);
         }
 
         TCPStream::~TCPStream() {
@@ -21,7 +21,7 @@ namespace SnakeServer {
 
         std::string TCPStream::receive() {
             char buff[BUFFER_SIZE];
-            ssize_t received = recv(_sd, buff, BUFFER_SIZE - 1, 0);
+            ssize_t received = recv(m_sd, buff, BUFFER_SIZE - 1, 0);
 
             if (received == -1) {
                 if (errno != EWOULDBLOCK) {
@@ -36,15 +36,15 @@ namespace SnakeServer {
         }
 
         std::string TCPStream::getPeerIP() {
-            return _peerIP;
+            return m_peerIP;
         }
 
         int TCPStream::getPeerPort() {
-            return _peerPort;
+            return m_peerPort;
         }
 
         void TCPStream::closeStream() {
-            ::close(_sd);
+            ::close(m_sd);
         }
 
     } // endnamespace Network

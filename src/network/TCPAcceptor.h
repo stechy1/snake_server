@@ -38,7 +38,7 @@ namespace SnakeServer {
             std::map<int, std::unique_ptr<TCPStream>> m_clients; // Mapa klientů, kde klíč = fds; value = TCPStream
 
         public:
-            TCPAcceptor(int t_port); // Konstruktor s portem jako parametr
+            TCPAcceptor(const int t_port); // Konstruktor s portem jako parametr
 
             ~TCPAcceptor();
 
