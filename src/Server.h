@@ -9,44 +9,43 @@
 
 namespace SnakeServer {
 
-	// Struktura obsahující informaci o portu serveru a maximálním počtu hráčů
-	struct ServerSettings
-	{
-		unsigned int port;
-		unsigned int maxPlayers;
-	}; // end struct
+    // Struktura obsahující informaci o portu serveru a maximálním počtu hráčů
+    struct ServerSettings {
+        unsigned int port;
+        unsigned int maxPlayers;
+    }; // end struct
 
-	class Server {
+    class Server {
 
-		unsigned int _port;
-		unsigned int _maxPlayers;
+        unsigned int _port;
+        unsigned int _maxPlayers;
 
-		//World world;
+        //World world;
 
-		public:
-			// Variables
-			// Inicializační metoda, nastaví potřebné proměnné serveru
-			virtual void init( ServerSettings serverSettings );
-			// Spuštění serveru
-			virtual void start();
-			// Methods
+    public:
+        // Variables
+        // Inicializační metoda, nastaví potřebné proměnné serveru
+        virtual void init(ServerSettings serverSettings);
 
-			Server();
-			virtual ~Server();
+        // Spuštění serveru
+        virtual void start();
+        // Methods
 
+        Server();
 
-		protected:
-			// Variables
-
-			// Methods
+        virtual ~Server();
 
 
-		private:
-			// Methods
-			void acceptClient(Network::TCPAcceptor*);
+    protected:
+        // Variables
+
+        // Methods
 
 
-	}; // end class
+    private:
+        // Methods
+
+    }; // end class
 
 } // end namespace
 #endif

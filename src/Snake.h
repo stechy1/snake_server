@@ -3,24 +3,25 @@
 
 namespace SnakeServer {
 
-	class Snake {
-		public:
-			// Variables
-			//const unsigned int size = 1000;
-			// Methods
-			Snake();
-			virtual ~Snake();
+    class Snake {
+    public:
+        // Variables
+        //const unsigned int size = 1000;
+        // Methods
+        Snake();
 
-			
-		protected:
-			// Variables
-			// Methods
-		private:
-			// Variables
-			
-			// Methods
+        virtual ~Snake();
 
-	}; // end class
+
+    protected:
+        // Variables
+        // Methods
+    private:
+        // Variables
+
+        // Methods
+
+    }; // end class
 
 } // end namespace
 

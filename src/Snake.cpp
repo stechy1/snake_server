@@ -2,8 +2,8 @@
 
 namespace SnakeServer {
 
-	Snake::Snake() {}
+    Snake::Snake() {}
 
-	Snake::~Snake() {}
+    Snake::~Snake() {}
 
 } // end namespace
