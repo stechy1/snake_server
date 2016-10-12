@@ -6,6 +6,11 @@
 #include <tuple>
 #include <cmath>
 
+// Kvůli překladu ve woknech
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 namespace SnakeServer {
 
     template<class T>
@@ -14,7 +19,7 @@ namespace SnakeServer {
         // Konstruktor se souřadnicemi X a Y
         Vector2D<T>() : x(T(0)), y(T(0)) {}
 
-        Vector2D<T>(const T &vx, const T &vy) : x(vx), x(vy) {}
+        Vector2D<T>(const T &vx, const T &vy) : x(vx), y(vy) {}
 
         ~Vector2D<T>();
 
@@ -61,7 +66,7 @@ namespace SnakeServer {
         friend bool operator<=(const Vector2D<T> &L, const Vector2D<T> &R) { return !(R < L); }
 
         // Negativní operátor - vrátí opačný vektor
-        Vector2D<T> &operator-() const { return Vector2D<T>(-x, -y); }
+        //Vector2D<T> &operator-() const { return Vector2D<T>(-x, -y); }
 
         // Skalární operace
         Vector2D<T> &operator*=(const T &s) {
@@ -86,36 +91,33 @@ namespace SnakeServer {
 
         T dist(const Vector2D<T> &other) {
             Vector2D temp(other);
-            temp -= this;
+            temp -= *this;
 
             return temp.mag();
         }
 
-        Vector2D<T> &normalize() { return this->mag() == 0 ? *this : this->div(this->mag()); }
+        Vector2D<T> &normalize() { return this->mag() == 0 ? *this : (Vector2D<T>(*this)/(*this->mag())); }
 
         Vector2D<T> &limit(const T max) {
             T mSq = this->magSq();
             if (mSq > max * max) {
-                this->div(sqrt(mSq));
-                this *= max;
+                this->normalize();
+                *this * max;
             }
 
             return *this;
         }
 
-        Vector2D<T> &setMag(const T n) { return *(this->normalize() *= n); }
+        Vector2D<T> &setMag(const T n) { return (this->normalize() *= n); }
 
         Vector2D<T> &rotate(const T degrees) { return rotateRad(degrees * M_PI / 180); }
 
         Vector2D<T> &rotateRad(const T radians) {
-            T _cos = (T) cos(radians);
-            T _sin = (T) sin(radians);
+            T cos = cos(radians);
+            T sin = sin(radians);
 
-            T newX = x * _cos - y * _sin;
-            T newY = y * _sin + y * _cos;
-
-            x = newX;
-            y = newY;
+            x = x * cos - y * sin;
+            y = y * sin + y * cos;
 
             return *this;
         }
