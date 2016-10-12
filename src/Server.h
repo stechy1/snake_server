@@ -3,6 +3,7 @@
 
 #include "network/TCPStream.h"
 #include "network/TCPAcceptor.h"
+#include "World.h"
 
 #include <sys/select.h>
 #include <vector>
@@ -20,7 +21,7 @@ namespace SnakeServer {
         unsigned int _port;
         unsigned int _maxPlayers;
 
-        //World world;
+        World world;
 
     public:
         // Variables

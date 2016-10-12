@@ -13,6 +13,8 @@ namespace SnakeServer {
 
     namespace Network {
 
+        unsigned int const BUFFER_SIZE = 2048;
+
         class TCPStream {
             int _sd;        // Socket file discriptor
             std::string _peerIP;    // IP adresa peeru
@@ -20,15 +22,18 @@ namespace SnakeServer {
 
         public:
             friend class TCPAcceptor;  // Přiřazení "přátelské" třídy pro přístup k privátnímu konstruktoru
-            friend class TCPConnector; // Přiřazení "přátelské" třídy pro přístup k privátnímu konstruktoru
+            //friend class TCPConnector; // Přiřazení "přátelské" třídy pro přístup k privátnímu konstruktoru
 
             virtual ~TCPStream();
 
             // Odešle zadaný buffer do internetu
-            ssize_t send(char *buffer, size_t len);
+            //int send(char *buffer, size_t len);
 
             // Přijme data z internetu
-            ssize_t receive(char *buffer, size_t len);
+            std::string receive();
+
+            // Ukončí spojení s klientem
+            void closeStream();
 
             // Getter pro IP adresu peeru
             std::string getPeerIP();
@@ -36,15 +41,9 @@ namespace SnakeServer {
             // Getter pro Port peeru
             int getPeerPort();
 
-            enum {
-                connectionClosed = 0,
-                connectionReset = -1,
-                connectionTimedOut = -2
-            };
-
         private:
             // sd - Socket descriptor; address - reference na strukturu sockaddr_in
-            TCPStream(int sd, struct sockaddr_in *address); // Jediný používaný konstruktor
+            TCPStream(int t_sd, struct sockaddr_in *t_address); // Jediný používaný konstruktor
             TCPStream(); // Prázdný konstruktor
             TCPStream(const TCPStream &stream); // Copy konstructor
         }; // end class

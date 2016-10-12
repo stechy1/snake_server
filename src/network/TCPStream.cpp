@@ -8,29 +8,31 @@ namespace SnakeServer {
 
         TCPStream::TCPStream() {}
 
-        TCPStream::TCPStream(int sd, struct sockaddr_in *address) : _sd(sd) {
+        TCPStream::TCPStream(int t_sd, struct sockaddr_in *t_address) : _sd(t_sd) {
             char ip[50];
-            inet_ntop(PF_INET, (struct in_addr *) &(address->sin_addr.s_addr), ip, sizeof(ip) - 1);
+            inet_ntop(PF_INET, (struct in_addr *) &(t_address->sin_addr.s_addr), ip, sizeof(ip) - 1);
             _peerIP = *ip;
-            _peerPort = ntohs(address->sin_port);
+            _peerPort = ntohs(t_address->sin_port);
         }
 
         TCPStream::~TCPStream() {
-            close(_sd);
+            closeStream();
         }
 
-        ssize_t TCPStream::receive(char *buffer, size_t len) {
-            char tmp[2048];
-            ssize_t received = recv(_sd, tmp, 2048 - 1, 0);
+        std::string TCPStream::receive() {
+            char buff[BUFFER_SIZE];
+            ssize_t received = recv(_sd, buff, BUFFER_SIZE - 1, 0);
 
             if (received == -1) {
-                printf("Ups on socket: %i\n", _sd);
-                exit(1);
+                if (errno != EWOULDBLOCK) {
+                    closeStream();
+                    throw new std::runtime_error("connection_lost");
+                }
+
+                return "";
             }
 
-            std::cout << "Received: " << tmp << std::endl;
-
-            return 0;
+            return std::string(buff, received);
         }
 
         std::string TCPStream::getPeerIP() {
@@ -39,6 +41,10 @@ namespace SnakeServer {
 
         int TCPStream::getPeerPort() {
             return _peerPort;
+        }
+
+        void TCPStream::closeStream() {
+            ::close(_sd);
         }
 
     } // endnamespace Network

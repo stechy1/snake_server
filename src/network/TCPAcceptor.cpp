@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/select.h>
+#include <sys/ioctl.h>
 #include <arpa/inet.h>
 #include "TCPAcceptor.h"
 #include <iostream>
@@ -11,162 +12,138 @@ namespace SnakeServer {
 
     namespace Network {
 
-        TCPAcceptor::TCPAcceptor(int port, unsigned int maxPlayers)
-                : _lsd(0), _port(port), _listening(false), _maxClients(maxPlayers) {
-            FD_ZERO(&_master_fsd);
-            FD_ZERO(&_read_fsd);
-            FD_ZERO(&_write_fsd);
+        TCPAcceptor::TCPAcceptor(int t_port)
+                : m_lsd(0), m_port(t_port), m_listening(false) {
+            FD_ZERO(&m_master_read_fds);
+            FD_ZERO(&m_master_write_fds);
+            FD_ZERO(&m_read_fds);
+            FD_ZERO(&m_write_fds);
 
-            std::cout << "Konstruktor TCPAcceptor. " << _maxClients << std::endl;
-            _clients = new TCPStream[_maxClients];
-            //memset(_clients, 0, sizeof(TCPStream));
-            // for (unsigned int i = 0; i < _maxClients; ++i) {
-            // 	*(_clients + i) = (int)ConnectionStatus::NOT_CONNECTED;
-            // }
+            std::cout << "Konstruktor TCPAcceptor. " << m_maxClients << std::endl;
         }
 
         TCPAcceptor::~TCPAcceptor() {
-            if (_lsd > 0) {
-                close(_lsd);
+            if (m_lsd > 0) {
+                close(m_lsd);
             }
-            for (unsigned int i = 0; i < _maxClients; ++i) {
-                //if (*(_clients + i) != NULL) {
-                delete (_clients + i);
-                //}
-            }
-
-            delete _clients;
         }
 
         bool TCPAcceptor::openPort() {
             // Pokud už poslouchám, tak nic provádět nebudu
-            if (_listening) {
+            if (m_listening) {
                 return false;
             }
 
             // Vytvoření nového socketu
-            _lsd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-            if (_lsd < 0) {
+            m_lsd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+            if (m_lsd < 0) {
                 perror("Socket()");
+                return false;
             }
 
             int optval = 1; // Nastavení socketu na neblokující
-            // if (ioctl(_lsd, FIONBIO, (char *)&optval) < 0) {
-            // 	close(_lsd);
-            // 	perror("ioctl nonblock");
-            // 	return false;
-            // }
+            if (ioctl(m_lsd, FIONBIO, (char *) &optval) < 0) {
+                close(m_lsd);
+                perror("ioctl nonblock");
+                return false;
+            }
 
             optval = 1;
             // Možnost permanentního znovupoužití stejného serveru
-            setsockopt(_lsd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
+            setsockopt(m_lsd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
 
             struct ::sockaddr_in address;
             memset(&address, 0, sizeof(address));
             address.sin_family = PF_INET;
-            address.sin_port = htons(_port);
+            address.sin_port = htons(m_port);
             address.sin_addr.s_addr = htonl(INADDR_ANY); // Poslouchám na jekémkoliv interfacu
 
             // Propojení adresy a socket descriptoru
-            int result = bind(_lsd, (struct sockaddr *) &address, sizeof(address));
+            int result = bind(m_lsd, (struct sockaddr *) &address, sizeof(address));
             if (result < 0) {
                 perror("bind() failed");
                 return false;
             }
 
-            result = listen(_lsd, BACKLOG);
+            result = listen(m_lsd, BACKLOG);
             if (result < 0) {
                 perror("listen() failed");
                 return false;
             }
 
-            FD_SET(_lsd, &_master_fsd);
-            _fdMax = _lsd; // Nastavení maximální ho offsetu socketů
-            _fdMin = _lsd; // Nastavení minimálního offsetu socketů
+            FD_SET(m_lsd, &m_master_read_fds);
+            m_fdMax = m_lsd; // Nastavení maximální ho offsetu socketů
+            m_fdMin = m_lsd; // Nastavení minimálního offsetu socketů
 
-            _listening = true;
+            m_listening = true;
             return true;
         }
 
         void TCPAcceptor::start() {
-            char buffer[1];
             for (;;) {
-                // Zkopírování hlavního seznamu do čtecího a zapisovacího
-                memcpy(&_read_fsd, &_master_fsd, sizeof(_master_fsd));
-                memcpy(&_write_fsd, &_master_fsd, sizeof(_master_fsd));
+                // Zkopírování seznamů
+                memcpy(&m_read_fds, &m_master_read_fds, sizeof(m_master_read_fds));
+                memcpy(&m_write_fds, &m_master_write_fds, sizeof(m_master_write_fds));
 
-                std::cout << "Smyčka" << std::endl;
-
-                if (select(_fdMax + 1, &_read_fsd, &_write_fsd, NULL, NULL) == -1) {
-                    close(_lsd);
+                if (select(m_fdMax + 1, &m_read_fds, &m_write_fds, NULL, NULL) == -1) {
+                    close(m_lsd);
                     perror("Chyba v selectu");
                     exit(1);
                 }
 
-                std::cout << "Select is OK" << std::endl;
-
                 // Proiteruj všechny sockety
-                for (int i = _fdMin; i <= _fdMax; i++) {
-                    if (FD_ISSET(i, &_read_fsd)) { // Pokud je socket[i] čtecího typu
-                        if (i == _lsd) { // Pokud je ten čtecí socket můj hlavní socket
+                for (int i = m_fdMin; i <= m_fdMax; i++) {
+                    if (FD_ISSET(i, &m_read_fds)) { // Pokud je socket[i] čtecího typu
+                        if (i == m_lsd) { // Pokud je ten čtecí socket můj hlavní socket
                             // Jsem připraven přijmout do své náruče nového klienta
                             std::cout << "Jsem připraven přijmout do své náruče nového klienta." << std::endl;
-                            TCPStream *client = this->accept();
-                            if (client != NULL) {
-                                std::cout << "Přijal jsem nového klienta" << std::endl;
-                                //delete client;
+                            try {
+                                this->accept();
+                            } catch (std::exception e) {
+                                std::cout << "Vyskytla se chyba s připojením uživatele" << std::endl;
                             }
-                            break;
                         } else {
                             // Jsem připraven číst data od klienta
                             std::cout << "Jsem připraven číst data od klienta" << std::endl;
-                            TCPStream *client = (_clients + i);
+                            try {
+                                auto data = m_clients[i]->receive();
+                                if (data != "") {
+                                    std::cout << "Received: " << data  << std::endl;
+                                }
 
-                            client->receive(buffer, 4096);
-                            // if (received == -1) {
-                            // 	perror("error receive()");
-                            // 	exit(1);
-                            // }
-
-                            // std::cout << "Received: " << buffer << "; bytes received: " << received << std::endl;
-
-                            break;
+                            } catch (std::runtime_error ex) {
+                                std::cout << "Chyba při přijímání dat od klienta" << std::endl;
+                            }
                         }
                     }
-                    if (FD_ISSET(i, &_write_fsd)) {
+                    if (FD_ISSET(i, &m_write_fds)) {
                         // Jsem připraven poslat data tomuto klientovi
-                        //std::cout << "Jsem připraven poslat data klientovi" << std::endl;
-                        break;
+                        std::cout << "Jsem připraven poslat data klientovi" << std::endl;
                     }
                 }
-                //std::cout << "Cycle" << std::endl;
-                //exit(1);
             }
         }
 
-        TCPStream *TCPAcceptor::accept() {
-            if (!_listening) {
-                return NULL;
+        void TCPAcceptor::accept() {
+            if (!m_listening) {
+                return;
             }
 
             struct sockaddr_in address;
             socklen_t len = sizeof(address);
 
             memset(&address, 0, sizeof(address));
-            int sd = ::accept(_lsd, (struct sockaddr *) &address, &len);
+            int sd = ::accept(m_lsd, (struct sockaddr *) &address, &len);
             if (sd < 0) {
                 perror("accept() failed");
-                return NULL;
+                throw std::runtime_error("sdfsdf");
             }
 
-            TCPStream *client = new TCPStream(sd, &address);
-            _clients[sd] = *client;
-            FD_SET(sd, &_master_fsd);
+            m_clients[sd] = std::unique_ptr<TCPStream>(new TCPStream(sd, &address));
+            FD_SET(sd, &m_master_read_fds);
 
-            if (sd > _fdMax) _fdMax = sd;
-            if (sd < _fdMin) _fdMin = sd;
-
-            return client;
+            if (sd > m_fdMax) m_fdMax = sd;
+            if (sd < m_fdMin) m_fdMin = sd;
         }
 
     } // end namespace Network

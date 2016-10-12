@@ -16,7 +16,7 @@ namespace SnakeServer {
     }
 
     void Server::start() {
-        Network::TCPAcceptor acceptor(_port, _maxPlayers);
+        Network::TCPAcceptor acceptor(_port);
 
         std::cout << "Server started" << std::endl;
 
