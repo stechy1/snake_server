@@ -18,15 +18,15 @@ namespace SnakeServer {
 
     class Server {
 
-        unsigned int _port;
-        unsigned int _maxPlayers;
+        unsigned int m_port;
+        unsigned int m_maxPlayers;
 
         World world;
 
     public:
         // Variables
         // Inicializační metoda, nastaví potřebné proměnné serveru
-        virtual void init(const ServerSettings serverSettings);
+        virtual void init(const ServerSettings t_serverSettings);
 
         // Spuštění serveru
         virtual void start();

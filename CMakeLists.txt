@@ -3,5 +3,5 @@ project(snake_server)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
-set(SOURCE_FILES src/main.cpp src/commons.h src/Server.cpp src/Server.h src/World.cpp src/World.h src/network/TCPAcceptor.cpp src/network/TCPAcceptor.h src/network/TCPStream.cpp src/network/TCPStream.h)
+set(SOURCE_FILES src/main.cpp src/commons.h src/Server.cpp src/Server.h src/World.cpp src/World.h src/network/TCPAcceptor.cpp src/network/TCPAcceptor.h src/network/TCPStream.cpp src/network/TCPStream.h src/BaseObject.cpp src/BaseObject.h src/IComponent.h src/InputComponent.h src/PhysicsComponent.h)
 add_executable(snake_server ${SOURCE_FILES})

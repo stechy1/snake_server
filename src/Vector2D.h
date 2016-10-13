@@ -5,6 +5,7 @@
 
 #include <tuple>
 #include <cmath>
+#include <random>
 
 // Kvůli překladu ve woknech
 #ifndef M_PI
@@ -155,6 +156,61 @@ namespace SnakeServer {
             return *this;
         }
 
+        static Vector2D<T> ZERO() {
+            return Vector2D<T>(0, 0);
+        }
+
+        static Vector2D<T> ONES() {
+            return Vector2D<T>(0, 0);
+        }
+
+        static Vector2D<T> LEFT() {
+            return Vector2D<T>(-1, 0);
+        }
+
+        static Vector2D<T> RIGHT() {
+            return Vector2D<T>(1, 0);
+        }
+
+        static Vector2D<T> UP() {
+            return Vector2D<T>(0, -1);
+        }
+
+        static Vector2D<T> DOWN() {
+            return Vector2D<T>(0, 1);
+        }
+
+        static Vector2D<T> RANDOM() {
+            static std::default_random_engine e{};
+            static std::uniform_int_distribution<int> randX{0, 3};
+
+            int res = randX(e);
+
+            switch(res) {
+                case 0:
+                    return UP();
+                case 1:
+                    return DOWN();
+                case 2:
+                    return LEFT();
+                default:
+                    return RIGHT();
+            }
+
+        }
+
+        static Vector2D<T> RANDOM(const T min, const T max) {
+            return RANDOM(min, min, max, max);
+        }
+
+        static Vector2D<T> RANDOM(const T minX, const T minY, const T maxX, const T maxY) {
+            static std::default_random_engine e{};
+            static std::uniform_int_distribution<double> randX{minX, maxX};
+            static std::uniform_int_distribution<double> randY{minY, maxY};
+            //7 return d(e);
+            return Vector2D<T>(randX(e), randY(e));
+        }
+
     private:
         T x;
         T y;
@@ -184,6 +240,8 @@ namespace SnakeServer {
 
     template<class T>
     Vector2D<T> operator/(const Vector2D<T> &v, const T &s) { return Vector2D<T>(v) /= s; }
+
+
 
 } // end namespace
 

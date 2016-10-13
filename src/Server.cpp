@@ -6,17 +6,18 @@ namespace SnakeServer {
 
     Server::Server() {
         std::cout << "Konstruktor serveru" << std::endl;
+        std::srand(time(NULL));
     }
 
     Server::~Server() {}
 
-    void Server::init(const ServerSettings serverSettings) {
-        _port = serverSettings.port;
-        _maxPlayers = serverSettings.maxPlayers;
+    void Server::init(const ServerSettings t_serverSettings) {
+        m_port = t_serverSettings.port;
+        m_maxPlayers = t_serverSettings.maxPlayers;
     }
 
     void Server::start() {
-        Network::TCPAcceptor acceptor(_port);
+        Network::TCPAcceptor acceptor(m_port);
 
         std::cout << "Server started" << std::endl;
 
