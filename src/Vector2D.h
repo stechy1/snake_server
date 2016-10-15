@@ -73,21 +73,21 @@ namespace SnakeServer {
             return *this;
         }
 
-        Vector2D operator+(const Vector2D &L, const Vector2D &R) { return Vector2D(L) += R; }
-
-        Vector2D operator-(const Vector2D &L, const Vector2D &R) { return Vector2D(L) -= R; }
-
-        Vector2D operator*(const Vector2D &L, const Vector2D &R) { return Vector2D(L) *= R; }
-
-        Vector2D operator/(const Vector2D &L, const Vector2D &R) { return Vector2D(L) /= R; }
-
-        Vector2D operator*(const double &s, const Vector2D &v) { return Vector2D(v) *= s; }
-
-        Vector2D operator*(const Vector2D &v, const double &s) { return Vector2D(v) *= s; }
-
-        Vector2D operator/(const double &s, const Vector2D &v) { return Vector2D(v) /= s; }
-
-        Vector2D operator/(const Vector2D &v, const double &s) { return Vector2D(v) /= s; }
+//        Vector2D operator+(const Vector2D &L, const Vector2D &R) { return Vector2D(L) += R; }
+//
+//        Vector2D operator-(const Vector2D &L, const Vector2D &R) { return Vector2D(L) -= R; }
+//
+//        Vector2D operator*(const Vector2D &L, const Vector2D &R) { return Vector2D(L) *= R; }
+//
+//        Vector2D operator/(const Vector2D &L, const Vector2D &R) { return Vector2D(L) /= R; }
+//
+//        Vector2D operator*(const double &s, const Vector2D &v) { return Vector2D(v) *= s; }
+//
+//        Vector2D operator*(const Vector2D &v, const double &s) { return Vector2D(v) *= s; }
+//
+//        Vector2D operator/(const double &s, const Vector2D &v) { return Vector2D(v) /= s; }
+//
+//        Vector2D operator/(const Vector2D &v, const double &s) { return Vector2D(v) /= s; }
 
         // Přetížení operátorů - porovnávací operace
         friend bool operator==(const Vector2D &L, const Vector2D &R) {

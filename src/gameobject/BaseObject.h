@@ -28,12 +28,15 @@ namespace SnakeServer {
 
             virtual ~BaseObject();
 
+            virtual void update() = 0;
+
             const std::unique_ptr<Vector2D> m_pos;
             const std::unique_ptr<Vector2D> m_dir;
             const std::unique_ptr<Vector2D> m_vel;
 
             const std::unique_ptr<InputComponent> m_inputComponent;
             const std::unique_ptr<PhysicsComponent> m_physicsComponent;
+
         private:
 
 

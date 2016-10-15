@@ -9,21 +9,26 @@
 #include <sys/select.h>
 #include <memory>
 #include <map>
+#include <thread>
 #include "TCPStream.h"
+#include "../Client.h"
 
 namespace SnakeServer {
 
     namespace Network {
 
-        class TCPAcceptor {
+        class IOHandler;
+        class TCPConnection {
 
             enum class ConnectionStatus {
                 NOT_CONNECTED = -1, CONNECTED = 0, LOST_CONNECTION = 1
             };
 
+            clientsMap_t m_clients;
+
             static const unsigned int BACKLOG = 10; // Počet uživatelů maximálně čekajících na obsloužení
             int m_lsd = -1;                // Listenning socket descriptor
-            int m_port = 0;                // Port peeru
+            unsigned int m_port = 0;                // Port peeru
             bool m_listening = false;      // True, pokud poslouchám, jinak false
             unsigned int m_maxClients = 0; // Maximální počet připojitelných klientů
 
@@ -35,23 +40,38 @@ namespace SnakeServer {
             int m_fdMax = 0;     // Nejmenší index socket file descriptoru
             int m_fdMin = 0;     // Největší index socket file descriptoru
 
-            std::map<int, std::unique_ptr<TCPStream>> m_clients; // Mapa klientů, kde klíč = fds; value = TCPStream
+
+            //std::map<int, std::unique_ptr<TCPStream>> m_clients; // Mapa klientů, kde klíč = fds; value = TCPStream
+
+            std::unique_ptr<IOHandler> m_ioHandler;
+
+            bool interupt = false;
 
         public:
-            TCPAcceptor(const int t_port); // Konstruktor s portem jako parametr
+            TCPConnection(clientsMap_t &t_clients, const unsigned int t_port,
+                        std::unique_ptr<IOHandler> t_ioHandler); // Konstruktor s portem jako parametr
 
-            ~TCPAcceptor();
+            ~TCPConnection();
 
             bool openPort();     // Pokusí se otevřít naslouchací port
-            void start();        // Spustí komunikační proces s příchozími klienty
+            void start();        // Spustí nové vlákno
+            void shutDown();     // Ukončí vlákno
 
         protected:
             void accept(); // Vytvoří nový TCP stream s klientem
+            void run();        // Spustí komunikační proces s příchozími klienty
 
         private:
-            //TCPAcceptor();
+            //TCPConnection();
 
-            TCPAcceptor(const TCPAcceptor &acceptor);
+            TCPConnection(const TCPConnection &acceptor);
+        };
+
+        class IOHandler {
+        public:
+            virtual void onReceived(int clientID, std::string data) = 0;
+
+            virtual ~IOHandler() {}
         };
         // end class
 

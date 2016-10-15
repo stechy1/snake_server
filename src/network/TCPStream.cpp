@@ -35,6 +35,10 @@ namespace SnakeServer {
             return std::string(buff, received);
         }
 
+        ssize_t TCPStream::send() {
+            return ::send(m_sd, NULL, 0, 0);
+        }
+
         std::string TCPStream::getPeerIP() {
             return m_peerIP;
         }

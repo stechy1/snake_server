@@ -5,30 +5,30 @@
 #include <sys/select.h>
 #include <sys/ioctl.h>
 #include <arpa/inet.h>
-#include "TCPAcceptor.h"
+#include "TCPConnection.h"
 #include <iostream>
 
 namespace SnakeServer {
 
     namespace Network {
 
-        TCPAcceptor::TCPAcceptor(const int t_port)
-                : m_lsd(0), m_port(t_port), m_listening(false) {
+        TCPConnection::TCPConnection(clientsMap_t &t_clients, const unsigned int t_port, std::unique_ptr<IOHandler> t_ioHandler)
+                : m_clients(t_clients), m_lsd(0), m_port(t_port), m_listening(false), m_ioHandler(std::move(t_ioHandler)) {
             FD_ZERO(&m_master_read_fds);
             FD_ZERO(&m_master_write_fds);
             FD_ZERO(&m_read_fds);
             FD_ZERO(&m_write_fds);
 
-            std::cout << "Konstruktor TCPAcceptor. " << m_maxClients << std::endl;
+            std::cout << "Konstruktor TCPConnection. " << std::endl;
         }
 
-        TCPAcceptor::~TCPAcceptor() {
+        TCPConnection::~TCPConnection() {
             if (m_lsd > 0) {
                 close(m_lsd);
             }
         }
 
-        bool TCPAcceptor::openPort() {
+        bool TCPConnection::openPort() {
             // Pokud už poslouchám, tak nic provádět nebudu
             if (m_listening) {
                 return false;
@@ -79,8 +79,16 @@ namespace SnakeServer {
             return true;
         }
 
-        void TCPAcceptor::start() {
-            for (;;) {
+        void TCPConnection::start() {
+            std::thread(&TCPConnection::run, this);
+        }
+
+        void TCPConnection::shutDown() {
+            interupt = true;
+        }
+
+        void TCPConnection::run() {
+            while(!interupt) {
                 // Zkopírování seznamů
                 memcpy(&m_read_fds, &m_master_read_fds, sizeof(m_master_read_fds));
                 memcpy(&m_write_fds, &m_master_write_fds, sizeof(m_master_write_fds));
@@ -96,19 +104,23 @@ namespace SnakeServer {
                     if (FD_ISSET(i, &m_read_fds)) { // Pokud je socket[i] čtecího typu
                         if (i == m_lsd) { // Pokud je ten čtecí socket můj hlavní socket
                             // Jsem připraven přijmout do své náruče nového klienta
-                            std::cout << "Jsem připraven přijmout do své náruče nového klienta." << std::endl;
+                            //std::cout << "Jsem připraven přijmout do své náruče nového klienta." << std::endl;
                             try {
                                 this->accept();
+                                std::cout << "Vytvorilo se nove spojeni s klientem: " << i << std::endl;
+                                //m_dataParser->onClientConnected(i);
                             } catch (std::exception e) {
                                 std::cout << "Vyskytla se chyba s připojením uživatele" << std::endl;
                             }
                         } else {
                             // Jsem připraven číst data od klienta
-                            std::cout << "Jsem připraven číst data od klienta" << std::endl;
+                            //std::cout << "Jsem připraven číst data od klienta" << std::endl;
                             try {
-                                auto data = m_clients[i]->receive();
+                                //auto data = m_clients[i]->receive();
+                                auto data = m_clients[i]->stream->receive();
                                 if (data != "") {
                                     std::cout << "Received: " << data  << std::endl;
+                                    m_ioHandler->onReceived(i, data);
                                 }
 
                             } catch (std::runtime_error ex) {
@@ -118,13 +130,14 @@ namespace SnakeServer {
                     }
                     if (FD_ISSET(i, &m_write_fds)) {
                         // Jsem připraven poslat data tomuto klientovi
-                        std::cout << "Jsem připraven poslat data klientovi" << std::endl;
+                        //std::cout << "Jsem připraven poslat data klientovi" << std::endl;
+                        m_clients[i]->stream->send();
                     }
                 }
             }
         }
 
-        void TCPAcceptor::accept() {
+        void TCPConnection::accept() {
             if (!m_listening) {
                 return;
             }
@@ -139,7 +152,9 @@ namespace SnakeServer {
                 throw std::runtime_error("sdfsdf");
             }
 
-            m_clients[sd] = std::make_unique<TCPStream>(sd, &address);
+            m_clients[sd] = std::make_unique<Client>();
+            m_clients[sd]->stream = std::make_unique<TCPStream>(sd, &address);
+
             FD_SET(sd, &m_master_read_fds);
 
             if (sd > m_fdMax) m_fdMax = sd;

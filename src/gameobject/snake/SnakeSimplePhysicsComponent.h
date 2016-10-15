@@ -15,7 +15,7 @@ namespace SnakeServer {
 
                 ~SnakeSimplePhysicsComponent();
 
-                virtual void handlePhysics(std::unique_ptr<BaseObject> &baseObject) override ;
+                virtual void handlePhysics(std::unique_ptr<BaseObject> &baseObject) ;
             }; // end class
 
         } // end namespace Snake

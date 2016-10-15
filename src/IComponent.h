@@ -6,14 +6,14 @@
 #define SNAKE_SERVER_ICOMPONENT_H
 
 #include <memory>
-#include "World.h"
 
 namespace SnakeServer {
 
+    class World;
     class IComponent {
 
     public:
-        virtual void init(std::unique_ptr<World> world) = 0;
+        virtual void init(std::unique_ptr<World> &world) = 0;
 
         virtual ~IComponent() {};
 

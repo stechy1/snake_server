@@ -21,7 +21,7 @@ namespace SnakeServer {
             int m_peerPort;  // Port peeru
 
         public:
-            friend class TCPAcceptor;  // Přiřazení "přátelské" třídy pro přístup k privátnímu konstruktoru
+            friend class TCPConnection;  // Přiřazení "přátelské" třídy pro přístup k privátnímu konstruktoru
 
             // sd - Socket descriptor; address - reference na strukturu sockaddr_in
             TCPStream(const int t_sd, const struct sockaddr_in *t_address); // Jediný používaný konstruktor
@@ -29,7 +29,7 @@ namespace SnakeServer {
             virtual ~TCPStream();
 
             // Odešle zadaný buffer do internetu
-            //int send(char *buffer, size_t len);
+            ssize_t send();
 
             // Přijme data z internetu
             std::string receive();

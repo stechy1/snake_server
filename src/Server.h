@@ -2,8 +2,9 @@
 #define SNAKE_SERVER
 
 #include "network/TCPStream.h"
-#include "network/TCPAcceptor.h"
+#include "network/TCPConnection.h"
 #include "World.h"
+#include "DataParser.h"
 
 #include <sys/select.h>
 #include <vector>
@@ -22,6 +23,8 @@ namespace SnakeServer {
 
         std::unique_ptr<World> m_world;
         std::unique_ptr<ServerSettings> m_settings;
+        std::unique_ptr<Network::TCPConnection> m_connection;
+        std::unique_ptr<DataParser> m_dataParser;
 
     public:
         // Variables
@@ -45,6 +48,7 @@ namespace SnakeServer {
 
     private:
         // Methods
+        clientsMap_t m_clients;
 
     }; // end class
 
