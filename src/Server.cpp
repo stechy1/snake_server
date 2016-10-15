@@ -11,13 +11,12 @@ namespace SnakeServer {
 
     Server::~Server() {}
 
-    void Server::init(const ServerSettings t_serverSettings) {
-        m_port = t_serverSettings.port;
-        m_maxPlayers = t_serverSettings.maxPlayers;
+    void Server::init(std::unique_ptr<ServerSettings> &t_serverSettings) {
+        m_settings = std::move(t_serverSettings);
     }
 
     void Server::start() {
-        Network::TCPAcceptor acceptor(m_port);
+        Network::TCPAcceptor acceptor(m_settings->port);
 
         std::cout << "Server started" << std::endl;
 

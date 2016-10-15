@@ -2,14 +2,16 @@
 #define SNAKE_SERVER_INPUTCOMPONENT_H
 
 #include "IComponent.h"
-#include "BaseObject.h"
 
 namespace SnakeServer {
 
-    class InputComponent : IComponent {
+    class BaseObject;
+    class InputComponent : public IComponent {
 
-        virtual void  handleInput(std::unique_ptr<BaseObject> baseObject) = 0;
+    public:
+        virtual void handleInput(std::unique_ptr<BaseObject> &baseObject) = 0;
 
+        virtual ~InputComponent() {}
     };
 }
 

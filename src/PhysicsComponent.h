@@ -2,13 +2,15 @@
 #define SNAKE_SERVER_PHYSICSCOMPONENT_H
 
 #include "IComponent.h"
-#include "BaseObject.h"
-
 namespace SnakeServer {
 
-    class PhysicsComponent : IComponent {
+    class BaseObject;
+    class PhysicsComponent : public IComponent {
 
-        virtual void handlePhysics(std::unique_ptr<BaseObject> baseObject) = 0;
+    public:
+        virtual void handlePhysics(std::unique_ptr<BaseObject> &baseObject) = 0;
+
+        virtual ~PhysicsComponent() {}
 
     }; // end class
 

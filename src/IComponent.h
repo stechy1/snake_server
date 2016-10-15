@@ -12,7 +12,10 @@ namespace SnakeServer {
 
     class IComponent {
 
-        virtual void init(std::unique_ptr <World> world) = 0;
+    public:
+        virtual void init(std::unique_ptr<World> world) = 0;
+
+        virtual ~IComponent() {};
 
     }; // end class
 

@@ -1,0 +1,28 @@
+#ifndef SNAKE_SERVER_SNAKESIMPLEINPUTCOMPONENT_H
+#define SNAKE_SERVER_SNAKESIMPLEINPUTCOMPONENT_H
+
+
+#include "../BaseObject.h"
+
+namespace SnakeServer {
+
+    namespace GameObject {
+
+        namespace Snake {
+
+            class SnakeSimpleInputComponent : public InputComponent {
+            public:
+                SnakeSimpleInputComponent();
+
+                virtual void handleInput(std::unique_ptr<BaseObject> &baseObject) override ;
+
+            }; // end class
+
+        } // end namespace Snake
+
+    } // end namespace GameObject
+
+} // end namespace SnakeServer
+
+
+#endif //SNAKE_SERVER_SNAKESIMPLEINPUTCOMPONENT_H
