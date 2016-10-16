@@ -70,13 +70,9 @@ int main(int argc, char *argv[]) {
 
     std::cout << "Program arguments parsed..." << std::endl;
 
-//    try {
-//        SnakeServer::Server server;
-//        server.init(settings);
-//        server.start();
-//    } catch (std::exception ex) {
-//        std::cout << ex.what() << std::endl;
-//    }
+    SnakeServer::Server server;
+    server.init(settings);
+    server.start();
 
     std::cout << "Unexpected exit" << std::endl;
     return 0;
