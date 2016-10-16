@@ -31,14 +31,20 @@ namespace SnakeServer {
             m_conditionVariable.wait(lk, [&] { return m_ready; });
             std::cout << "DataParser has some data" << std::endl;
 
+            int notReady = 0;
             for (auto client : *m_clients) {
                 if (!client.second->ready || client.second->cache->empty()) {
+                    ++notReady;
                     continue;
                 }
 
                 std::string data = client.second->cache->front();
                 client.second->cache->pop_front();
                 std::cout << "Naparsovana data: " << data << std::endl;
+            }
+
+            if (notReady == m_clients->size()) {
+                m_ready = false;
             }
         }
     }
