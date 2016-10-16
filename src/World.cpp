@@ -1,10 +1,13 @@
 #include <thread>
+#include <iostream>
 #include "World.h"
 
 namespace SnakeServer {
 
-    World::World(clientsMap_t &t_clients, const int t_width, const int t_height)
-            : m_clients(t_clients), m_width(t_width), m_height(t_height) {}
+    World::World(clientsMap_t *t_clients, const int t_width, const int t_height)
+            : m_clients(t_clients), m_width(t_width), m_height(t_height) {
+        std::cout << "World initialized" << std::endl;
+    }
 
     World::~World() {}
 
@@ -13,6 +16,7 @@ namespace SnakeServer {
     }
 
     std::thread World::start() {
+        std::cout << "World service running..." << std::endl;
         return std::thread(&World::run, this);
     }
 
@@ -35,7 +39,7 @@ namespace SnakeServer {
 
             if (!m_snakesToRemove.empty()) { // Pokud mám odebrat nějaké hady z mapy
                 for (auto removeID : m_snakesToRemove) {
-                    m_clients.erase(removeID);
+                    m_clients->erase(removeID);
                 }
 
                 m_snakesToRemove.clear();
@@ -45,8 +49,8 @@ namespace SnakeServer {
 
 
             // update logic
-            if (!m_clients.empty()) { // Pokud jsou nějací hadi ve světě
-                for(clientsMap_t::iterator it = m_clients.begin(); it != m_clients.end(); it++) {
+            if (!m_clients->empty()) { // Pokud jsou nějací hadi ve světě
+                for(clientsMap_t::iterator it = m_clients->begin(); it != m_clients->end(); it++) {
                     //it->second->update();
                     it->second->snake->update();
                 }
@@ -54,11 +58,12 @@ namespace SnakeServer {
 
             if (!m_snakesToAdd.empty()) { // Pokud chci nějaké hady odebrat
                 for(snakeMap::iterator it = m_snakesToAdd.begin(); it != m_snakesToAdd.end(); it++) {
-                    auto id = it->first;
-                    auto snake = std::move(it->second);
+//                    auto id = it->first;
+//                    auto snake = it->second;
 
                     //m_clients.insert(std::pair<int, std::unique_ptr<GameObject::Snake::Snake>>(id, std::move(snake)));
-                    m_clients[id]->snake = std::move(snake);
+//                    (*m_clients)[id]->snake = std::move(snake);
+                    (*m_clients)[it->first]->snake = it->second;
                 }
 
                 m_snakesToAdd.clear();

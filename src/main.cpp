@@ -4,15 +4,15 @@
 #include "Server.h"
 #include "commons.h"
 
-std::unique_ptr<SnakeServer::ServerSettings> parseArguments(int argc, char *argv[]) {
+std::unique_ptr<SnakeServer::ServerSettings> parseArguments(int argc, char argv[]) {
     std::unique_ptr<SnakeServer::ServerSettings> settings = std::make_unique<SnakeServer::ServerSettings>();
     int i = 0;
 
     while (i < argc) {
-        std::string param(argv[++i]);
+        std::string param(&argv[++i]);
 
         if (param == "-port") {
-            std::string port = argv[++i];
+            std::string port = &argv[++i];
 
             if (!Commons::isInteger(port)) {
                 perror("Port musí být číslo");
@@ -24,10 +24,11 @@ std::unique_ptr<SnakeServer::ServerSettings> parseArguments(int argc, char *argv
         }
 
         if (param == "-players") {
-            std::string playersCount = argv[++i];
+            std::string playersCount = &argv[++i];
 
             if (!Commons::isInteger(playersCount)) {
-                perror("Počet hráčů musí býr číslo");
+                perror("Počet hráčů musí být číslo");
+                exit(1);
             }
 
             settings->maxPlayers = std::stoi(playersCount);
@@ -35,10 +36,11 @@ std::unique_ptr<SnakeServer::ServerSettings> parseArguments(int argc, char *argv
         }
 
         if (param == "-w" || param == "-width") {
-            std::string width = argv[++i];
+            std::string width = &argv[++i];
 
             if (!Commons::isInteger(width)) {
-                perror("Šířka mapy musí býr číslo");
+                perror("Šířka mapy musí být číslo");
+                exit(1);
             }
 
             settings->width = std::stoi(width);
@@ -46,10 +48,11 @@ std::unique_ptr<SnakeServer::ServerSettings> parseArguments(int argc, char *argv
         }
 
         if (param == "-h" || param == "-height") {
-            std::string height = argv[++i];
+            std::string height = &argv[++i];
 
             if (!Commons::isInteger(height)) {
-                perror("Výška mapy musí býr číslo");
+                perror("Výška mapy musí být číslo");
+                exit(1);
             }
 
             settings->height = std::stoi(height);
@@ -69,16 +72,21 @@ int main(int argc, char *argv[]) {
     std::unique_ptr<SnakeServer::ServerSettings> settings;
 
     try {
-        settings = parseArguments(argc, argv);
+        settings = parseArguments(argc, *argv);
     } catch (std::runtime_error ex) {
-
         exit(1);
     }
 
+    std::cout << "Program arguments parsed..." << std::endl;
 
-    SnakeServer::Server server;
-    server.init(settings);
-    server.start();
+    try {
+        SnakeServer::Server server;
+        server.init(settings);
+        server.start();
+    } catch (std::exception ex) {
+        std::cout << ex.what() << std::endl;
+    }
 
-    return 0;
+    std::cout << "Unexpected exit" << std::endl;
+    //return 0;
 }

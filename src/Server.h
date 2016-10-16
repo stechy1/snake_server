@@ -24,7 +24,7 @@ namespace SnakeServer {
         std::unique_ptr<World> m_world;
         std::unique_ptr<ServerSettings> m_settings;
         std::unique_ptr<Network::TCPConnection> m_connection;
-        std::unique_ptr<DataParser> m_dataParser;
+        //std::unique_ptr<DataParser> m_dataParser;
 
     public:
         // Variables
@@ -48,7 +48,8 @@ namespace SnakeServer {
 
     private:
         // Methods
-        clientsMap_t m_clients;
+        clientsMap_t *m_clients;
+        DataParser *m_dataParser;
 
     }; // end class
 

@@ -12,14 +12,14 @@ namespace SnakeServer {
 
     namespace Network {
 
-        TCPConnection::TCPConnection(clientsMap_t &t_clients, const unsigned int t_port, std::unique_ptr<IOHandler> t_ioHandler)
-                : m_clients(t_clients), m_lsd(0), m_port(t_port), m_listening(false), m_ioHandler(std::move(t_ioHandler)) {
+        TCPConnection::TCPConnection(clientsMap_t *t_clients, const unsigned int t_port, IOHandler *t_ioHandler)
+                : m_clients(t_clients), m_lsd(0), m_port(t_port), m_listening(false), m_ioHandler(t_ioHandler) {
             FD_ZERO(&m_master_read_fds);
             FD_ZERO(&m_master_write_fds);
             FD_ZERO(&m_read_fds);
             FD_ZERO(&m_write_fds);
 
-            std::cout << "Konstruktor TCPConnection. " << std::endl;
+            std::cout << "TCPConnection initialized" << std::endl;
         }
 
         TCPConnection::~TCPConnection() {
@@ -79,8 +79,9 @@ namespace SnakeServer {
             return true;
         }
 
-        void TCPConnection::start() {
-            std::thread(&TCPConnection::run, this);
+        std::thread TCPConnection::start() {
+            std::cout << "TCPService running..." << std::endl;
+            return std::thread(&TCPConnection::run, this);
         }
 
         void TCPConnection::shutDown() {
@@ -117,7 +118,7 @@ namespace SnakeServer {
                             //std::cout << "Jsem připraven číst data od klienta" << std::endl;
                             try {
                                 //auto data = m_clients[i]->receive();
-                                auto data = m_clients[i]->stream->receive();
+                                auto data = (*m_clients)[i]->stream->receive();
                                 if (data != "") {
                                     std::cout << "Received: " << data  << std::endl;
                                     m_ioHandler->onReceived(i, data);
@@ -131,7 +132,7 @@ namespace SnakeServer {
                     if (FD_ISSET(i, &m_write_fds)) {
                         // Jsem připraven poslat data tomuto klientovi
                         //std::cout << "Jsem připraven poslat data klientovi" << std::endl;
-                        m_clients[i]->stream->send();
+                        (*m_clients)[i]->stream->send();
                     }
                 }
             }
@@ -152,8 +153,8 @@ namespace SnakeServer {
                 throw std::runtime_error("sdfsdf");
             }
 
-            m_clients[sd] = std::make_unique<Client>();
-            m_clients[sd]->stream = std::make_unique<TCPStream>(sd, &address);
+            (*m_clients)[sd] = std::make_shared<Client>();
+            (*m_clients)[sd]->stream = std::make_unique<TCPStream>(sd, &address);
 
             FD_SET(sd, &m_master_read_fds);
 

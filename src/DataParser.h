@@ -11,7 +11,7 @@ namespace SnakeServer {
     class DataParser : public Network::IOHandler {
 
     public:
-        DataParser(clientsMap_t &t_clients);
+        DataParser(clientsMap_t *t_clients);
         void onReceived(int clientID, std::string data);
         std::thread start();
         void run();
@@ -27,7 +27,7 @@ namespace SnakeServer {
         std::condition_variable m_conditionVariable;
         bool m_ready;
         bool m_interupt;
-        clientsMap_t m_clients;
+        clientsMap_t *m_clients;
 
         //cacheMap m_cache;
     }; // end class

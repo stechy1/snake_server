@@ -1,23 +1,18 @@
+#include <iostream>
 #include "DataParser.h"
 
 namespace SnakeServer {
 
-    DataParser::DataParser(clientsMap_t &t_clients)
+    DataParser::DataParser(clientsMap_t *t_clients)
             : m_clients(t_clients) {
-        printf("DataParser initialized");
+//        printf("DataParser initialized\n");
+        std::cout << "DataParser initialized" << std::endl;
     }
 
     DataParser::~DataParser() {}
 
     void DataParser::onReceived(int clientID, std::string data) {
-        m_clients.find(clientID)->second->cache->push_back(data);
-//        cache->push_back(data);
-//        if (m_cache.find(clientID) != m_cache.end()) { // Pokud už existuje klient v cachi
-//            m_cache[clientID]->push_back(data);
-//        } else { // Pokud klient ještě nemá záznam v cache, tak jej vytvořím
-//            std::unique_ptr<std::list<std::string>> cache(new std::list<std::string>);// = std::make_unique<std::list<std::string>>>();
-//            m_cache.insert(std::pair<int, std::unique_ptr<std::list<std::string>>>(clientID, std::move(cache)));
-//        }
+        m_clients->find(clientID)->second->cache->push_back(data);
 
         std::lock_guard<std::mutex> lk(m_mutex);
         m_ready = true;
@@ -25,28 +20,26 @@ namespace SnakeServer {
     }
 
     std::thread DataParser::start() {
+        printf("Data parsing service running...\n");
         return std::thread(&DataParser::run, this);
     }
 
     void DataParser::run() {
         while(!m_interupt) {
+            std::cout << "DataParser loop" << std::endl;
             std::unique_lock<std::mutex> lk(m_mutex);
             m_conditionVariable.wait(lk, [&] { return m_ready; });
+            std::cout << "DataParser has some data" << std::endl;
 
-            for (auto client : m_clients) {
-                if (client.second->cache->empty()) {
+            for (auto client : *m_clients) {
+                if (!client.second->ready || client.second->cache->empty()) {
                     continue;
                 }
 
-
+                std::string data = client.second->cache->front();
+                client.second->cache->pop_front();
+                std::cout << "Naparsovana data: " << data << std::endl;
             }
-//            for(clientsMap_titerator it = m_cache.begin(); it != m_cache.end(); it++) {
-//                if (it->second->empty()) {
-//                    continue;
-//                }
-//
-//
-//            }
         }
     }
 

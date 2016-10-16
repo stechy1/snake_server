@@ -17,14 +17,21 @@ namespace SnakeServer {
 
     namespace Network {
 
-        class IOHandler;
+        class IOHandler {
+        public:
+            virtual void onReceived(int clientID, std::string data) = 0;
+
+            virtual ~IOHandler() {}
+        };
+
+        //class IOHandler;
         class TCPConnection {
 
             enum class ConnectionStatus {
                 NOT_CONNECTED = -1, CONNECTED = 0, LOST_CONNECTION = 1
             };
 
-            clientsMap_t m_clients;
+            clientsMap_t *m_clients;
 
             static const unsigned int BACKLOG = 10; // Počet uživatelů maximálně čekajících na obsloužení
             int m_lsd = -1;                // Listenning socket descriptor
@@ -43,18 +50,18 @@ namespace SnakeServer {
 
             //std::map<int, std::unique_ptr<TCPStream>> m_clients; // Mapa klientů, kde klíč = fds; value = TCPStream
 
-            std::unique_ptr<IOHandler> m_ioHandler;
+            IOHandler *m_ioHandler;
 
             bool interupt = false;
 
         public:
-            TCPConnection(clientsMap_t &t_clients, const unsigned int t_port,
-                        std::unique_ptr<IOHandler> t_ioHandler); // Konstruktor s portem jako parametr
+            TCPConnection(clientsMap_t *t_clients, const unsigned int t_port,
+                        IOHandler *t_ioHandler); // Konstruktor s portem jako parametr
 
             ~TCPConnection();
 
             bool openPort();     // Pokusí se otevřít naslouchací port
-            void start();        // Spustí nové vlákno
+            std::thread start();        // Spustí nové vlákno
             void shutDown();     // Ukončí vlákno
 
         protected:
@@ -65,15 +72,7 @@ namespace SnakeServer {
             //TCPConnection();
 
             TCPConnection(const TCPConnection &acceptor);
-        };
-
-        class IOHandler {
-        public:
-            virtual void onReceived(int clientID, std::string data) = 0;
-
-            virtual ~IOHandler() {}
-        };
-        // end class
+        }; // end class
 
     } // end namespace Network
 

@@ -15,7 +15,7 @@ namespace SnakeServer {
     public:
         // Variables
         // Methods
-        World(clientsMap_t &t_clients, const int t_width, const int t_height);
+        World(clientsMap_t *t_clients, const int t_width, const int t_height);
 
         virtual ~World();
 
@@ -30,12 +30,12 @@ namespace SnakeServer {
         // Methods
     private:
         // Variables
-        clientsMap_t m_clients;
+        clientsMap_t *m_clients;
 
         typedef std::chrono::high_resolution_clock Time;
         typedef std::chrono::milliseconds ms;
         typedef std::chrono::duration<float> fsec;
-        typedef std::map<int, std::unique_ptr<GameObject::Snake::Snake>> snakeMap;
+        typedef std::map<int, std::shared_ptr<GameObject::Snake::Snake>> snakeMap;
 
         const int m_width = 600;
         const int m_height = 600;
