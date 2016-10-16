@@ -24,14 +24,13 @@ namespace SnakeServer {
         std::cout << "Server initialization..." << std::endl;
         m_settings = std::move(t_serverSettings);
         std::cout << "Server port: " << m_settings->port << std::endl;
-        //m_world = std::make_unique<World>(m_clients, m_settings->width, m_settings->height);
-        //m_dataParser = std::make_unique<DataParser>(m_clients);
+        m_world = std::make_unique<World>(m_clients, m_settings->width, m_settings->height);
         m_dataParser = new DataParser(m_clients);
         std::cout << "Server initialization done..." << std::endl;
     }
 
     void Server::start() {
-        std::cout << "Server started" << std::endl;
+        m_world->generate();
 
         m_connection = std::make_unique<Network::TCPConnection>(m_clients, m_settings->port, m_dataParser);
 
@@ -42,19 +41,19 @@ namespace SnakeServer {
 
         std::cout << "Port opened" << std::endl;
 
-        //std::thread parserThread = m_dataParser->start();
-        //m_connection->start();
+        std::cout << "Starting service threads..." << std::endl;
+        std::thread parserThread = m_dataParser->start();
+        std::thread worldThread = m_world->start();
+        std::thread connectionThread = m_connection->start();
+        std::cout << "Service threads started." << std::endl;
 
-        //m_world->generate();
-        //std::thread worldThread = m_world->start();
+        std::cout << "Server started" << std::endl;
 
-        //worldThread.join();
-        //parserThread.join();
-
-        m_connection->start().join();
+        worldThread.join();
+        parserThread.join();
+        connectionThread.join();
 
         perror("Server finished");
-        //exit(0);
     }
 
 } // end namespace
