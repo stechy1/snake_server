@@ -3,6 +3,8 @@
 namespace SnakeServer {
 
     namespace Event {
+        GameEvent::GameEvent() {}
+
         GameEvent::~GameEvent() {}
     } // end namespace Event
 

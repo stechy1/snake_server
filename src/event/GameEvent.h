@@ -11,6 +11,8 @@ namespace SnakeServer {
 
         public:
 
+            GameEvent();
+
             virtual ~GameEvent();
 
             std::string getBytes();
