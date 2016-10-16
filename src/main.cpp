@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     std::unique_ptr<SnakeServer::ServerSettings> settings = std::make_unique<SnakeServer::ServerSettings>();
     int i = 0;
 
-    while (i < argc) {
+    while (i < argc - 1) {
         std::string param(argv[++i]);
         std::cout << "Testuji argument: " << param << std::endl;
 
