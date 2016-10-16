@@ -58,11 +58,6 @@ namespace SnakeServer {
 
             if (!m_snakesToAdd.empty()) { // Pokud chci nějaké hady odebrat
                 for(snakeMap::iterator it = m_snakesToAdd.begin(); it != m_snakesToAdd.end(); it++) {
-//                    auto id = it->first;
-//                    auto snake = it->second;
-
-                    //m_clients.insert(std::pair<int, std::unique_ptr<GameObject::Snake::Snake>>(id, std::move(snake)));
-//                    (*m_clients)[id]->snake = std::move(snake);
                     (*m_clients)[it->first]->snake = it->second;
                 }
 
