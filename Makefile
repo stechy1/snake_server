@@ -1,7 +1,7 @@
 #compiler
 CC=g++
 #compiler options
-CXXFLAGS=-Wall -pedantic -g -std=c++11
+CXXFLAGS=-Wall -pedantic -g -std=c++14
 #source files
 SOURCES=$(wildcard src/*.cpp src/network/*.cpp)
 #object files
