@@ -23,6 +23,7 @@ namespace SnakeServer {
     void Server::init(std::unique_ptr<ServerSettings> &t_serverSettings) {
         std::cout << "Server initialization..." << std::endl;
         m_settings = std::move(t_serverSettings);
+        std::cout << "Server port: " << m_settings->port << std::endl;
         //m_world = std::make_unique<World>(m_clients, m_settings->width, m_settings->height);
         //m_dataParser = std::make_unique<DataParser>(m_clients);
         m_dataParser = new DataParser(m_clients);

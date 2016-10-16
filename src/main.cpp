@@ -4,15 +4,21 @@
 #include "Server.h"
 #include "commons.h"
 
-std::unique_ptr<SnakeServer::ServerSettings> parseArguments(int argc, char argv[]) {
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        std::cout << "Použití: ./server -port <port> -players <maxPlayers> -width <width> -height <height>" << std::endl;
+        exit(1);
+    }
+
     std::unique_ptr<SnakeServer::ServerSettings> settings = std::make_unique<SnakeServer::ServerSettings>();
     int i = 0;
 
     while (i < argc) {
-        std::string param(&argv[++i]);
+        std::string param(argv[++i]);
+        std::cout << "Testuji argument: " << param << std::endl;
 
-        if (param == "-port") {
-            std::string port = &argv[++i];
+        if (param.compare("-port") == 0) {
+            std::string port = argv[++i];
 
             if (!Commons::isInteger(port)) {
                 perror("Port musí být číslo");
@@ -20,11 +26,12 @@ std::unique_ptr<SnakeServer::ServerSettings> parseArguments(int argc, char argv[
             }
 
             settings->port = std::stoi(port);
+            std::cout << "Nastavuji port na: " << port << std::endl;
             continue;
         }
 
         if (param == "-players") {
-            std::string playersCount = &argv[++i];
+            std::string playersCount = argv[++i];
 
             if (!Commons::isInteger(playersCount)) {
                 perror("Počet hráčů musí být číslo");
@@ -32,11 +39,12 @@ std::unique_ptr<SnakeServer::ServerSettings> parseArguments(int argc, char argv[
             }
 
             settings->maxPlayers = std::stoi(playersCount);
+            std::cout << "Nastavuji maximalni pocet hracu na: " << playersCount << std::endl;
             continue;
         }
 
         if (param == "-w" || param == "-width") {
-            std::string width = &argv[++i];
+            std::string width = argv[++i];
 
             if (!Commons::isInteger(width)) {
                 perror("Šířka mapy musí být číslo");
@@ -48,7 +56,7 @@ std::unique_ptr<SnakeServer::ServerSettings> parseArguments(int argc, char argv[
         }
 
         if (param == "-h" || param == "-height") {
-            std::string height = &argv[++i];
+            std::string height = argv[++i];
 
             if (!Commons::isInteger(height)) {
                 perror("Výška mapy musí být číslo");
@@ -60,33 +68,16 @@ std::unique_ptr<SnakeServer::ServerSettings> parseArguments(int argc, char argv[
         }
     }
 
-    return settings;
-}
-
-int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        std::cout << "Použití: ./server -port <port> -players <maxPlayers> -width <width> -height <height>" << std::endl;
-        exit(1);
-    }
-
-    std::unique_ptr<SnakeServer::ServerSettings> settings;
-
-    try {
-        settings = parseArguments(argc, *argv);
-    } catch (std::runtime_error ex) {
-        exit(1);
-    }
-
     std::cout << "Program arguments parsed..." << std::endl;
 
-    try {
-        SnakeServer::Server server;
-        server.init(settings);
-        server.start();
-    } catch (std::exception ex) {
-        std::cout << ex.what() << std::endl;
-    }
+//    try {
+//        SnakeServer::Server server;
+//        server.init(settings);
+//        server.start();
+//    } catch (std::exception ex) {
+//        std::cout << ex.what() << std::endl;
+//    }
 
     std::cout << "Unexpected exit" << std::endl;
-    //return 0;
+    return 0;
 }

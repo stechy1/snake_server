@@ -19,7 +19,7 @@ namespace SnakeServer {
             FD_ZERO(&m_read_fds);
             FD_ZERO(&m_write_fds);
 
-            std::cout << "TCPConnection initialized" << std::endl;
+            std::cout << "TCPConnection initialized: " << m_port << std::endl;
         }
 
         TCPConnection::~TCPConnection() {

@@ -46,7 +46,7 @@ namespace SnakeServer {
         std::vector<int> m_snakesToRemove;  // Kolekce id všech hadů, kterí chtějí opustit mapu
         snakeMap m_snakesToAdd;              // Mapa všech hadů, kterí se připojují do mapy
 
-        std::list<Event::GameEvent> gameEvent;
+        //std::list<Event::GameEvent> gameEvent;
 
         // Methods
 
