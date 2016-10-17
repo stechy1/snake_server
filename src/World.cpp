@@ -51,14 +51,13 @@ namespace SnakeServer {
             // update logic
             if (!m_clients->empty()) { // Pokud jsou nějací hadi ve světě
                 for(clientsMap_t::iterator it = m_clients->begin(); it != m_clients->end(); it++) {
-                    //it->second->update();
                     it->second->snake->update();
                 }
             }
 
-            if (!m_snakesToAdd.empty()) { // Pokud chci nějaké hady odebrat
-                for(snakeMap::iterator it = m_snakesToAdd.begin(); it != m_snakesToAdd.end(); it++) {
-                    (*m_clients)[it->first]->snake = it->second;
+            if (!m_snakesToAdd.empty()) { // Pokud chci nějaké hady přidat
+                for(auto temp : m_snakesToAdd) {
+                    (*m_clients)[temp.first]->snake = temp.second;
                 }
 
                 m_snakesToAdd.clear();

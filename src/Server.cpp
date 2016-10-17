@@ -43,13 +43,13 @@ namespace SnakeServer {
 
         std::cout << "Starting service threads..." << std::endl;
         std::thread parserThread = m_dataParser->start();
-        std::thread worldThread = m_world->start();
+        //std::thread worldThread = m_world->start();
         std::thread connectionThread = m_connection->start();
         std::cout << "Service threads started." << std::endl;
 
         std::cout << "Server started" << std::endl;
 
-        worldThread.join();
+        //worldThread.join();
         parserThread.join();
         connectionThread.join();
 
