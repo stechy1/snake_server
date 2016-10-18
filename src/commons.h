@@ -1,17 +1,16 @@
 #ifndef SNAKE_COMMONS
 #define SNAKE_COMMONS
 
-namespace Commons {
+#include <string>
+#include <vector>
 
-    inline bool isInteger(const std::string &s) {
-        if (s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false;
+namespace SnakeServer {
+    namespace Utils {
 
-        char *p;
-        strtol(s.c_str(), &p, 10);
+        bool isInteger(const std::string &s);
 
-        return (*p == 0);
-    }
+        std::vector<std::string> split(const std::string str, const std::string delim);
+    } // end namespace Utils
 
-}
-
+} // end namespace SnakeServer
 #endif
