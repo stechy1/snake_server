@@ -26,7 +26,7 @@ namespace SnakeServer {
             if (received == -1) {
                 if (errno != EWOULDBLOCK) {
                     closeStream();
-                    throw new std::runtime_error("connection_lost");
+                    throw std::runtime_error("connection_lost");
                 }
 
                 return "";
