@@ -50,13 +50,13 @@ namespace SnakeServer {
 
             //std::map<int, std::unique_ptr<TCPStream>> m_clients; // Mapa klientů, kde klíč = fds; value = TCPStream
 
-            IOHandler *m_ioHandler;
+            std::shared_ptr<IOHandler> m_ioHandler;
 
             bool interupt = false;
 
         public:
             TCPConnection(clientsMap_t *t_clients, const unsigned int t_port,
-                        IOHandler *t_ioHandler); // Konstruktor s portem jako parametr
+                        std::shared_ptr<IOHandler> t_ioHandler); // Konstruktor s portem jako parametr
 
             ~TCPConnection();
 

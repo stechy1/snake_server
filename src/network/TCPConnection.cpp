@@ -12,7 +12,7 @@ namespace SnakeServer {
 
     namespace Network {
 
-        TCPConnection::TCPConnection(clientsMap_t *t_clients, const unsigned int t_port, IOHandler *t_ioHandler)
+        TCPConnection::TCPConnection(clientsMap_t *t_clients, const unsigned int t_port, std::shared_ptr<IOHandler> t_ioHandler)
                 : m_clients(t_clients), m_lsd(0), m_port(t_port), m_listening(false), m_ioHandler(t_ioHandler) {
             FD_ZERO(&m_master_read_fds);
             FD_ZERO(&m_master_write_fds);

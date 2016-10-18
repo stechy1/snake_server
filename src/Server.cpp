@@ -3,11 +3,9 @@
 
 namespace SnakeServer {
 
-    Server::Server() /*: m_dataParser(std::make_unique<DataParser>(m_clients))*/ {
+    Server::Server() {
         std::srand(time(NULL));
-
         m_clients = new clientsMap_t;
-
         std::cout << "Server initialized" << std::endl;
     }
 
@@ -17,8 +15,6 @@ namespace SnakeServer {
         m_world->shutDown();
         m_connection->shutDown();
 
-
-        delete m_dataParser;
         delete m_clients;
     }
 
@@ -27,7 +23,7 @@ namespace SnakeServer {
         m_settings = std::move(t_serverSettings);
         std::cout << "Server port: " << m_settings->port << std::endl;
         m_world = std::make_unique<World>(m_clients, m_settings->width, m_settings->height);
-        m_dataParser = new DataParser(m_clients);
+        m_dataParser = std::make_shared<DataParser>(m_clients);
         std::cout << "Server initialization done..." << std::endl;
     }
 
