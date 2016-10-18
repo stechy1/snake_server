@@ -23,7 +23,7 @@ namespace SnakeServer {
         void generate(); // Vygeneruje novou mapu
         void addSnake(int i, std::unique_ptr<GameObject::Snake::Snake> &snake); // Přidá hada do mapy
         void removeSnake(int i); // Odebere hada z mapy
-        std::thread start();
+        void start();
         void run();
         void shutDown();
 
@@ -50,6 +50,8 @@ namespace SnakeServer {
         //snakeMap m_snakes;                  // Mapa všech právě připojených hadů
         std::vector<int> m_snakesToRemove;  // Kolekce id všech hadů, kterí chtějí opustit mapu
         snakeMap m_snakesToAdd;              // Mapa všech hadů, kterí se připojují do mapy
+
+        std::thread thread;
 
         //std::list<Event::GameEvent> gameEvent;
 

@@ -26,6 +26,12 @@ namespace SnakeServer {
             if (m_lsd > 0) {
                 close(m_lsd);
             }
+
+            if (thread.joinable()) {
+                thread.join();
+            }
+
+            std::cout << "TCPConnection shut down" << std::endl;
         }
 
         bool TCPConnection::openPort() {
@@ -75,17 +81,29 @@ namespace SnakeServer {
             m_fdMax = m_lsd; // Nastavení maximální ho offsetu socketů
             m_fdMin = m_lsd; // Nastavení minimálního offsetu socketů
 
+            if (pipe(m_pipefd) == -1) {
+                perror("pipe");
+                exit(EXIT_FAILURE);
+            }
+
+            FD_SET(m_pipefd[0], &m_master_read_fds);
+            m_fdMax = m_pipefd[0];
+            std::cout << "My socket: " << m_lsd << std::endl;
+            std::cout << "Pipe socket: " << m_pipefd[0] << std::endl;
+
             m_listening = true;
             return true;
         }
 
-        std::thread TCPConnection::start() {
+        void TCPConnection::start() {
             std::cout << "TCPService running..." << std::endl;
-            return std::thread(&TCPConnection::run, this);
+            thread = std::thread(&TCPConnection::run, this);
         }
 
         void TCPConnection::shutDown() {
             interupt = true;
+
+            write(m_pipefd[1], "x", 1);
         }
 
         void TCPConnection::run() {
@@ -100,9 +118,13 @@ namespace SnakeServer {
                     exit(1);
                 }
 
+                std::cout << "Select OK" << std::endl;
+
                 // Proiteruj všechny sockety
                 for (int i = m_fdMin; i <= m_fdMax; i++) {
                     if (FD_ISSET(i, &m_read_fds)) { // Pokud je socket[i] čtecího typu
+                        std::cout << "Socket s id: " << i << std::endl;
+                        if (i == m_pipefd[0]) { break; }
                         if (i == m_lsd) { // Pokud je ten čtecí socket můj hlavní socket
                             // Jsem připraven přijmout do své náruče nového klienta
                             //std::cout << "Jsem připraven přijmout do své náruče nového klienta." << std::endl;
@@ -111,6 +133,7 @@ namespace SnakeServer {
                                 std::cout << "Vytvorilo se nove spojeni s klientem: " << i << std::endl;
                                 //m_dataParser->onClientConnected(i);
                             } catch (std::exception e) {
+
                                 std::cout << "Vyskytla se chyba s připojením uživatele" << std::endl;
                             }
                         } else {

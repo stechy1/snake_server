@@ -9,15 +9,21 @@ namespace SnakeServer {
         std::cout << "World initialized" << std::endl;
     }
 
-    World::~World() {}
+    World::~World() {
+        if (thread.joinable()) {
+            thread.join();
+        }
+
+        std::cout << "World shut down" << std::endl;
+    }
 
     void World::generate() {
         std::cout << "Generuji svět" << std::endl;
     }
 
-    std::thread World::start() {
+    void World::start() {
         std::cout << "World service running..." << std::endl;
-        return std::thread(&World::run, this);
+        thread =  std::thread(&World::run, this);
     }
 
     void World::run() {
@@ -34,7 +40,10 @@ namespace SnakeServer {
         while (m_running) {
 
             std::unique_lock<std::mutex> lk(m_mutex);
-            m_conditionVariable.wait(lk, [&] { lastTime = Time::now(); return !m_clients->empty() && m_ready; });
+            m_conditionVariable.wait(lk, [&] {
+                lastTime = Time::now();
+                return (!m_clients->empty() && m_ready) || (!m_running && m_ready);
+            });
 
             now = Time::now();
             fsec delta = lastTime - now;
@@ -81,11 +90,17 @@ namespace SnakeServer {
                     m_ready = true;
                 }
             }
+
+            lk.unlock();
         }
+
+        std::cout << "World ended" << std::endl;
     }
 
     void World::shutDown() {
+        //std::lock_guard<std::mutex> lk(m_mutex);
         m_running = false;
+        m_ready = true;
         m_conditionVariable.notify_one(); // Vzbudíme vlákno, pokud nějaké čeká
     }
 }

@@ -12,8 +12,8 @@ namespace SnakeServer {
     typedef std::shared_ptr<std::list<std::string>> cache_list;
 
     struct Client {
-        std::shared_ptr<Network::TCPStream> stream = nullptr;
-        std::shared_ptr<GameObject::Snake::Snake> snake = nullptr;
+        std::shared_ptr<Network::TCPStream> stream;
+        std::shared_ptr<GameObject::Snake::Snake> snake;
         cache_list cache = std::make_shared<std::list<std::string>>();
         bool ready = false;
     };

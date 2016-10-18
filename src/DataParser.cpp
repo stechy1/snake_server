@@ -11,7 +11,13 @@ namespace SnakeServer {
         std::cout << "DataParser initialized" << std::endl;
     }
 
-    DataParser::~DataParser() {}
+    DataParser::~DataParser() {
+        if (thread.joinable()) {
+            thread.join();
+        }
+
+        std::cout << "DataParser shut down" << std::endl;
+    }
 
     void DataParser::onReceived(int clientID, std::string data) {
         m_clients->find(clientID)->second->cache->push_back(data);
@@ -21,9 +27,9 @@ namespace SnakeServer {
         m_conditionVariable.notify_one();
     }
 
-    std::thread DataParser::start() {
-        printf("Data parsing service running...\n");
-        return std::thread(&DataParser::run, this);
+    void DataParser::start() {
+        std::cout << "Data parsing service running..." << std::endl;
+        thread =  std::thread(&DataParser::run, this);
     }
 
     void DataParser::run() {
@@ -67,10 +73,17 @@ namespace SnakeServer {
             if (notReady == m_clients->size()) {
                 m_ready = false;
             }
+
+            lk.unlock();
         }
+
+        std::cout << "DataParser ended" << std::endl;
     }
 
     void DataParser::shutDown() {
+//        std::lock_guard<std::mutex> lk(m_mutex);
         m_interupt = true;
+        m_ready = true;
+        m_conditionVariable.notify_one();
     }
 }

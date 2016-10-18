@@ -53,6 +53,8 @@ namespace SnakeServer {
             std::shared_ptr<IOHandler> m_ioHandler;
 
             bool interupt = false;
+            std::thread thread;
+            int m_pipefd[2] = {0, 0};
 
         public:
             TCPConnection(clientsMap_t *t_clients, const unsigned int t_port,
@@ -61,7 +63,7 @@ namespace SnakeServer {
             ~TCPConnection();
 
             bool openPort();     // Pokusí se otevřít naslouchací port
-            std::thread start();        // Spustí nové vlákno
+            void start();        // Spustí nové vlákno
             void shutDown();     // Ukončí vlákno
 
         protected:

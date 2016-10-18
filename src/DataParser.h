@@ -14,7 +14,7 @@ namespace SnakeServer {
     public:
         DataParser(clientsMap_t *t_clients);
         void onReceived(int clientID, std::string data);
-        std::thread start();
+        void start();
         void run();
         void shutDown();
 
@@ -27,6 +27,7 @@ namespace SnakeServer {
         bool m_ready = false;
         bool m_interupt = false;
         clientsMap_t *m_clients;
+        std::thread thread;
 
     }; // end class
 

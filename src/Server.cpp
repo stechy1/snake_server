@@ -40,18 +40,21 @@ namespace SnakeServer {
         std::cout << "Port opened" << std::endl;
 
         std::cout << "Starting service threads..." << std::endl;
-        std::thread parserThread = m_dataParser->start();
-        std::thread worldThread = m_world->start();
-        std::thread connectionThread = m_connection->start();
+        m_dataParser->start();
+        m_world->start();
+        m_connection->start();
         std::cout << "Service threads started." << std::endl;
 
         std::cout << "Server started" << std::endl;
 
-        worldThread.join();
-        parserThread.join();
-        connectionThread.join();
+//        worldThread.join();
+//        parserThread.join();
+//        connectionThread.join();
 
-        perror("Server finished");
+        int n;
+        std::cin >> n;
+
+        std::cout << "Server finished" << std::endl;
     }
 
 } // end namespace
