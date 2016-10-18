@@ -120,7 +120,7 @@ namespace SnakeServer {
                                 //auto data = m_clients[i]->receive();
                                 auto data = (*m_clients)[i]->stream->receive();
                                 if (data != "") {
-                                    std::cout << "Received: " << data  << std::endl;
+                                    //std::cout << "Received: " << data  << std::endl;
                                     m_ioHandler->onReceived(i, data);
                                 }
 

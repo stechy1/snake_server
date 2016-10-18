@@ -2,7 +2,6 @@
 #include <iostream>
 
 #include "Server.h"
-#include "commons.h"
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
@@ -20,7 +19,7 @@ int main(int argc, char *argv[]) {
         if (param.compare("-port") == 0) {
             std::string port = argv[++i];
 
-            if (!Commons::isInteger(port)) {
+            if (!SnakeServer::Utils::isInteger(port)) {
                 perror("Port musí být číslo");
                 exit(1);
             }
@@ -33,7 +32,7 @@ int main(int argc, char *argv[]) {
         if (param == "-players") {
             std::string playersCount = argv[++i];
 
-            if (!Commons::isInteger(playersCount)) {
+            if (!SnakeServer::Utils::isInteger(playersCount)) {
                 perror("Počet hráčů musí být číslo");
                 exit(1);
             }
@@ -46,7 +45,7 @@ int main(int argc, char *argv[]) {
         if (param == "-w" || param == "-width") {
             std::string width = argv[++i];
 
-            if (!Commons::isInteger(width)) {
+            if (!SnakeServer::Utils::isInteger(width)) {
                 perror("Šířka mapy musí být číslo");
                 exit(1);
             }
@@ -58,7 +57,7 @@ int main(int argc, char *argv[]) {
         if (param == "-h" || param == "-height") {
             std::string height = argv[++i];
 
-            if (!Commons::isInteger(height)) {
+            if (!SnakeServer::Utils::isInteger(height)) {
                 perror("Výška mapy musí být číslo");
                 exit(1);
             }
@@ -71,7 +70,7 @@ int main(int argc, char *argv[]) {
     std::cout << "Program arguments parsed..." << std::endl;
 
     SnakeServer::Server server;
-    server.init(settings);
+    server.init(std::move(settings));
     server.start();
 
     std::cout << "Unexpected exit" << std::endl;

@@ -5,6 +5,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "network/TCPConnection.h"
+#include "Commons.h"
 
 namespace SnakeServer {
 
@@ -21,15 +22,12 @@ namespace SnakeServer {
 
     private:
 
-        //typedef std::map<int, std::unique_ptr<std::list<std::string>>> cacheMap;
-
         std::mutex m_mutex;
         std::condition_variable m_conditionVariable;
-        bool m_ready;
-        bool m_interupt;
+        bool m_ready = false;
+        bool m_interupt = false;
         clientsMap_t *m_clients;
 
-        //cacheMap m_cache;
     }; // end class
 
 } // end namespace SnakeServer

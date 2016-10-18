@@ -4,6 +4,7 @@
 #include <chrono>
 #include <map>
 #include <list>
+#include <condition_variable>
 #include "gameobject/BaseObject.h"
 #include "gameobject/snake/Snake.h"
 #include "event/GameEvent.h"
@@ -24,6 +25,7 @@ namespace SnakeServer {
         void removeSnake(int i); // Odebere hada z mapy
         std::thread start();
         void run();
+        void shutDown();
 
     protected:
         // Variables
@@ -39,8 +41,11 @@ namespace SnakeServer {
 
         const int m_width = 600;
         const int m_height = 600;
-        bool running = false;
+        bool m_running = false;
+        bool m_ready = false;
 
+        std::mutex m_mutex;
+        std::condition_variable m_conditionVariable;
 
         //snakeMap m_snakes;                  // Mapa všech právě připojených hadů
         std::vector<int> m_snakesToRemove;  // Kolekce id všech hadů, kterí chtějí opustit mapu

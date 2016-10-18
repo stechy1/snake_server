@@ -14,5 +14,9 @@ namespace SnakeServer {
         std::string LoginEvent::getBytes() {
             return "";
         }
+
+        std::string LoginEvent::getDescription() {
+            return "LoginEvent";
+        }
     }
 }

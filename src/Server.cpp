@@ -13,14 +13,16 @@ namespace SnakeServer {
 
     Server::~Server() {
         std::cout << "Shutting down server..." << std::endl;
-        m_connection->shutDown();
         m_dataParser->shutDown();
+        m_world->shutDown();
+        m_connection->shutDown();
+
 
         delete m_dataParser;
         delete m_clients;
     }
 
-    void Server::init(std::unique_ptr<ServerSettings> &t_serverSettings) {
+    void Server::init(std::unique_ptr<ServerSettings> t_serverSettings) {
         std::cout << "Server initialization..." << std::endl;
         m_settings = std::move(t_serverSettings);
         std::cout << "Server port: " << m_settings->port << std::endl;
@@ -43,13 +45,13 @@ namespace SnakeServer {
 
         std::cout << "Starting service threads..." << std::endl;
         std::thread parserThread = m_dataParser->start();
-        //std::thread worldThread = m_world->start();
+        std::thread worldThread = m_world->start();
         std::thread connectionThread = m_connection->start();
         std::cout << "Service threads started." << std::endl;
 
         std::cout << "Server started" << std::endl;
 
-        //worldThread.join();
+        worldThread.join();
         parserThread.join();
         connectionThread.join();
 

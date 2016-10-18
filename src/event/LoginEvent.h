@@ -2,13 +2,14 @@
 #define SNAKE_SERVER_LOGINEVENT_H
 
 #include <string>
+#include <vector>
+#include "GameEvent.h"
 
 namespace SnakeServer {
 
     namespace Event {
 
-        //class GameEvent;
-        class LoginEvent {
+        class LoginEvent : public GameEvent {
 
         public:
             LoginEvent(int m_clientID, std::string t_data);
@@ -17,6 +18,8 @@ namespace SnakeServer {
             virtual ~LoginEvent();
 
             std::string getBytes();
+
+            virtual std::string getDescription() override;
 
         private:
             std::string m_nickname;

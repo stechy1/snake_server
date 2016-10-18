@@ -15,8 +15,9 @@ namespace SnakeServer {
 
             virtual ~GameEvent();
 
-            std::string getBytes();
+            virtual std::string getBytes()= 0;
 
+            virtual std::string getDescription()= 0;
 //            static std::unique_ptr<GameEvent> from(std::string bytes, int clientID) {
 //                auto type = bytes.at(0);
 //                return std::make_unique<LoginEvent>(clientID, bytes);

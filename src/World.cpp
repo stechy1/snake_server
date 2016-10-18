@@ -12,7 +12,7 @@ namespace SnakeServer {
     World::~World() {}
 
     void World::generate() {
-        printf("Generuji svet");
+        std::cout << "Generuji svět" << std::endl;
     }
 
     std::thread World::start() {
@@ -21,17 +21,21 @@ namespace SnakeServer {
     }
 
     void World::run() {
-        if (running) {
+        if (m_running) {
             return;
         }
 
-        running = true;
+        m_running = true;
 
         long lag = 0;
         auto now = Time::now();
         auto lastTime = now;
 
-        while (running) {
+        while (m_running) {
+
+            std::unique_lock<std::mutex> lk(m_mutex);
+            m_conditionVariable.wait(lk, [&] { lastTime = Time::now(); return !m_clients->empty() && m_ready; });
+
             now = Time::now();
             fsec delta = lastTime - now;
             ms elapsed = std::chrono::duration_cast<ms>(delta);
@@ -47,23 +51,41 @@ namespace SnakeServer {
 
             // handle input from world's event queue
 
-
+            unsigned int clientCount = 0;
             // update logic
             if (!m_clients->empty()) { // Pokud jsou nějací hadi ve světě
                 for(clientsMap_t::iterator it = m_clients->begin(); it != m_clients->end(); it++) {
-                    it->second->snake->update();
+                    if (it->second->ready) {
+                        ++clientCount;
+                    } else {
+                        it->second->snake->update();
+                    }
                 }
             }
 
+            if (clientCount == m_clients->size()) {
+                m_ready = false;
+            }
+
+            clientCount = 0;
             if (!m_snakesToAdd.empty()) { // Pokud chci nějaké hady přidat
-                for(auto temp : m_snakesToAdd) {
-                    (*m_clients)[temp.first]->snake = temp.second;
+                for(auto snake : m_snakesToAdd) {
+                    (*m_clients)[snake.first]->snake = snake.second;
+                    if ((*m_clients)[snake.first]->ready) {
+                        ++clientCount;
+                    }
                 }
 
                 m_snakesToAdd.clear();
+                if (clientCount > 0) {
+                    m_ready = true;
+                }
             }
-
-
         }
+    }
+
+    void World::shutDown() {
+        m_running = false;
+        m_conditionVariable.notify_one(); // Vzbudíme vlákno, pokud nějaké čeká
     }
 }

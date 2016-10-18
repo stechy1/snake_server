@@ -29,7 +29,7 @@ namespace SnakeServer {
     public:
         // Variables
         // Inicializační metoda, nastaví potřebné proměnné serveru
-        virtual void init(std::unique_ptr<ServerSettings> &t_serverSettings);
+        virtual void init(std::unique_ptr<ServerSettings> t_serverSettings);
 
         // Spuštění serveru
         virtual void start();
