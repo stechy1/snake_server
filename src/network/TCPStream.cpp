@@ -1,6 +1,7 @@
 #include "TCPStream.h"
 
 #include <iostream>
+#include <stdexcept>
 
 namespace SnakeServer {
 
