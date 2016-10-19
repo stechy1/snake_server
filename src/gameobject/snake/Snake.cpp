@@ -12,6 +12,24 @@ namespace SnakeServer {
 
             Snake::~Snake() {}
 
+            void Snake::addEvent(std::unique_ptr<Event::GameEvent> t_event) {
+                //m_events.push_back(std::move(t_event));
+                //m_events.push_back(t_event);
+            }
+
+            void Snake::addEvent(Event::GameEvent *t_event) {
+
+            }
+
+            void Snake::update() {
+                if (!m_events.empty()) {
+                    std::unique_ptr<Event::GameEvent> event = std::move(m_events.front());
+                    m_events.pop_front();
+
+                    event->applyChanges(this);
+                }
+            }
+
         } // end namespace Snake
 
     } // end namespace GameObject

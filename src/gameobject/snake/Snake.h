@@ -3,6 +3,8 @@
 
 
 #include "../BaseObject.h"
+#include "../../event/GameEvent.h"
+#include <list>
 
 namespace SnakeServer {
 
@@ -10,7 +12,7 @@ namespace SnakeServer {
 
         namespace Snake {
 
-    class Snake : public BaseObject {
+    class Snake : public BaseObject, public IUpdatable {
     public:
 //         Variables
         //const unsigned int size = 1000;
@@ -20,13 +22,17 @@ namespace SnakeServer {
 
         virtual ~Snake();
 
+        void addEvent(std::unique_ptr<Event::GameEvent> t_event);
+        void addEvent(Event::GameEvent *t_event);
+
+        virtual void update() override;
 
 //    protected:
         // Variables
         // Methods
-//    private:
+    private:
         // Variables
-
+        std::list<std::unique_ptr<Event::GameEvent>> m_events;
 
         // Methods
 

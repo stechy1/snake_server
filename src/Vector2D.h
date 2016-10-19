@@ -211,6 +211,13 @@ namespace SnakeServer {
             return *this;
         }
 
+        Vector2D &set(const Vector2D &other) {
+            m_x = other.m_x;
+            m_y = other.m_y;
+
+            return *this;
+        }
+
         static std::unique_ptr<Vector2D> ZERO() {
             return std::make_unique<Vector2D>(Vector2D(0, 0));
         }

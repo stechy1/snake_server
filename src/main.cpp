@@ -2,8 +2,23 @@
 #include <iostream>
 
 #include "Server.h"
+#include "event/LoginEvent.h"
+
+void testing() {
+    SnakeServer::Client client;
+    client.snake = std::make_unique<SnakeServer::GameObject::Snake::Snake>(nullptr, nullptr, nullptr, nullptr);
+    //std::unique_ptr<SnakeServer::Event::GameEvent> event = std::make_unique<SnakeServer::Event::LoginEvent>(1, "username");
+    SnakeServer::Event::LoginEvent event1(1, "event1");
+
+    //client.snake->addEvent(std::move(event));
+    std::shared_ptr<SnakeServer::GameObject::Snake::Snake> snake = client.snake;
+    snake.get()->addEvent(&event1);
+}
 
 int main(int argc, char *argv[]) {
+    testing();
+    return 0;
+
     if (argc < 2) {
         std::cout << "Použití: ./server -port <port> -players <maxPlayers> -width <width> -height <height>" << std::endl;
         exit(1);

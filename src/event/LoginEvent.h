@@ -21,6 +21,8 @@ namespace SnakeServer {
 
             virtual std::string getDescription() override;
 
+            virtual void applyChanges(IUpdatable *updatable) override;
+
         private:
             std::string m_nickname;
             int m_clientID;

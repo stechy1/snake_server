@@ -2,6 +2,7 @@
 #define SNAKE_SERVER_GAMEEVENT_H
 
 #include <memory>
+#include "../IUpdatable.h"
 
 namespace SnakeServer {
 
@@ -16,6 +17,8 @@ namespace SnakeServer {
             virtual ~GameEvent();
 
             virtual std::string getBytes()= 0;
+
+            virtual void applyChanges(IUpdatable *updatable) = 0;
 
             virtual std::string getDescription()= 0;
 //            static std::unique_ptr<GameEvent> from(std::string bytes, int clientID) {

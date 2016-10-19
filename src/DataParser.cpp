@@ -50,11 +50,12 @@ namespace SnakeServer {
                 client.second->cache->pop_front();
                 std::cout << "Naparsovana data: " << data << std::endl;
 
-                std::unique_ptr<Event::GameEvent> event;
-                if (data.find("login:") != std::string::npos) {
-                    data = data.substr(6);
 
-                    event = std::make_unique<Event::LoginEvent>(client.first, data);
+                if (data.find("login:") != std::string::npos) {
+                    std::string res = data.substr(6);
+
+                    std::unique_ptr<Event::GameEvent> event = std::make_unique<Event::LoginEvent>(client.first, res);
+                    //std::unique_ptr<Event::GameEvent> event = std::unique_ptr<Event::LoginEvent>(new Event::LoginEvent(client.first, res));
                 } else if (data.find("changedir:") != std::string::npos) {
                     data = data.substr(10);
 
@@ -62,12 +63,13 @@ namespace SnakeServer {
                     double x = std::stod(dirData[0]);
                     double y = std::stod(dirData[1]);
                     std::unique_ptr<Vector2D> vector = std::make_unique<Vector2D>(x, y);
-                    event = std::make_unique<Event::SnakeChangeDirectionEvent>(client.first, vector);
+                    std::unique_ptr<Event::GameEvent> event = std::make_unique<Event::SnakeChangeDirectionEvent>(client.first, vector);
+                    //client.second->snake->addEvent(std::move(event));
                 }
 
-                if (event != nullptr) {
-                    std::cout << "Event: " << event->getDescription() << std::endl;
-                }
+//                if (event != nullptr) {
+//                    std::cout << "Event: " << event->getDescription() << std::endl;
+//                }
             }
 
             if (notReady == m_clients->size()) {
@@ -81,7 +83,6 @@ namespace SnakeServer {
     }
 
     void DataParser::shutDown() {
-//        std::lock_guard<std::mutex> lk(m_mutex);
         m_interupt = true;
         m_ready = true;
         m_conditionVariable.notify_one();

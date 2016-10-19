@@ -22,6 +22,8 @@ namespace SnakeServer {
 
             virtual std::string getBytes() override;
 
+            virtual void applyChanges(IUpdatable *updatable) override;
+
             virtual std::string getDescription() override;
         };
 

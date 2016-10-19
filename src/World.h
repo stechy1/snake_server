@@ -53,7 +53,7 @@ namespace SnakeServer {
 
         std::thread thread;
 
-        //std::list<Event::GameEvent> gameEvent;
+        std::list<std::unique_ptr<Event::GameEvent>> gameEvent;
 
         // Methods
 
