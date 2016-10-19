@@ -2,10 +2,12 @@ snake_server
 
 ## Přeložení:
 Kód se přeloží zavoláním příkazu "make", ten vytvoří soubor "server.out", který je spustitelný
+
 ## Spuštění:
 Server se spouští standartním způsobem pro konkrétní platformu.
  - Windows: spuštění exe souboru snake_server.exe
  - Linux: spuštění binárního souboru "server.out"
+
 ## Argumenty programu:
  - port: Číslo portu, na kterém bude server poslouchat. Parametr je povinný.
  - players: Maximální počet hráčů v jedné hře. Parametr je povinný. Není implementováno
