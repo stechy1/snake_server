@@ -20,36 +20,25 @@ namespace SnakeServer {
     }; // end struct
 
     class Server {
+    public:
+        Server();
+
+        virtual ~Server();
+
+        // Inicializační metoda, nastaví potřebné proměnné serveru
+        void init(std::unique_ptr<ServerSettings> t_serverSettings);
+        // Spuštění serveru
+        void start();
+
+    private:
+        // Methods
+        clientsMap_t *m_clients;
 
         std::unique_ptr<World> m_world;
         std::unique_ptr<ServerSettings> m_settings;
         std::unique_ptr<Network::TCPConnection> m_connection;
         std::shared_ptr<DataParser> m_dataParser;
 
-    public:
-        // Variables
-        // Inicializační metoda, nastaví potřebné proměnné serveru
-        virtual void init(std::unique_ptr<ServerSettings> t_serverSettings);
-
-        // Spuštění serveru
-        virtual void start();
-        // Methods
-
-        Server();
-
-        virtual ~Server();
-
-
-    protected:
-        // Variables
-
-        // Methods
-
-
-    private:
-        // Methods
-        clientsMap_t *m_clients;
-        //DataParser *m_dataParser;
 
     }; // end class
 

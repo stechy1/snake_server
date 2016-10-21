@@ -18,5 +18,9 @@ namespace SnakeServer {
         std::string LoginEvent::getDescription() {
             return "LoginEvent";
         }
+
+        void LoginEvent::applyChanges(IUpdatable *updatable) {
+
+        }
     }
 }

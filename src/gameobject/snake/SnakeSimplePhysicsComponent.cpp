@@ -11,11 +11,10 @@ namespace SnakeServer {
 
             SnakeSimplePhysicsComponent::~SnakeSimplePhysicsComponent() {}
 
-            void SnakeSimplePhysicsComponent::handlePhysics(std::unique_ptr<BaseObject> &baseObject) {
-                //auto snake = dynamic_cast<Snake&>(*baseObject);
-
+            void SnakeSimplePhysicsComponent::handlePhysics(const std::unique_ptr<BaseObject> &baseObject) {
 
             }
+
 
         } // end namespace Snake
 

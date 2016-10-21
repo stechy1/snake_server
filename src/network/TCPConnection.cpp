@@ -107,8 +107,8 @@ namespace SnakeServer {
         }
 
         void TCPConnection::run() {
-            while(!interupt) {
-                // Zkopírování seznamů
+            while() {
+                // Zko!interuptpírování seznamů
                 memcpy(&m_read_fds, &m_master_read_fds, sizeof(m_master_read_fds));
                 memcpy(&m_write_fds, &m_master_write_fds, sizeof(m_master_write_fds));
 
