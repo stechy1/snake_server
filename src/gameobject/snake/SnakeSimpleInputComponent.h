@@ -14,7 +14,9 @@ namespace SnakeServer {
             public:
                 SnakeSimpleInputComponent();
 
-                virtual void handleInput(std::unique_ptr<BaseObject> &baseObject) ;
+                ~SnakeSimpleInputComponent();
+
+                virtual void handleInput(const std::unique_ptr<BaseObject> &baseObject);
 
             }; // end class
 

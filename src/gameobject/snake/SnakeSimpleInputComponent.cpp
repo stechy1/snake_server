@@ -9,11 +9,12 @@ namespace SnakeServer {
 
             SnakeSimpleInputComponent::SnakeSimpleInputComponent() {}
 
-            void SnakeSimpleInputComponent::handleInput(std::unique_ptr<BaseObject> &baseObject) {
-                //auto snake = dynamic_cast<Snake&>(*baseObject);
+            SnakeSimpleInputComponent::~SnakeSimpleInputComponent() {}
 
+            void SnakeSimpleInputComponent::handleInput(const std::unique_ptr<BaseObject> &baseObject) {
 
             }
+
 
         } // end namespace Snake
 

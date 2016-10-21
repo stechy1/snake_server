@@ -5,14 +5,16 @@
 
 namespace SnakeServer {
 
-    class BaseObject;
+    //class BaseObject;
     class InputComponent : public IComponent {
 
     public:
-        virtual void handleInput(std::unique_ptr<BaseObject> &baseObject) = 0;
-
         virtual ~InputComponent() {}
-    };
-}
+
+        virtual void handleInput(const std::unique_ptr<BaseObject> &baseObject) {};
+
+    }; // end class
+
+} // end namespace
 
 #endif //SNAKE_SERVER_INPUTCOMPONENT_H

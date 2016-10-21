@@ -1,7 +1,6 @@
 #ifndef SNAKE_SERVER_GAMEOBJECT_H
 #define SNAKE_SERVER_GAMEOBJECT_H
 
-
 #include "../Vector2D.h"
 #include "../PhysicsComponent.h"
 #include "../InputComponent.h"

@@ -1,7 +1,3 @@
-//
-// Created by stech on 12.10.2016.
-//
-
 #ifndef SNAKE_SERVER_ICOMPONENT_H
 #define SNAKE_SERVER_ICOMPONENT_H
 
@@ -13,9 +9,9 @@ namespace SnakeServer {
     class IComponent {
 
     public:
-        virtual void init(std::unique_ptr<World> &world) = 0;
+        virtual ~IComponent() = default;
 
-        virtual ~IComponent() {};
+        //void init(std::unique_ptr<World> &world) {}
 
     }; // end class
 
