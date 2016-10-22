@@ -6,23 +6,30 @@
 #include <mutex>
 #include <condition_variable>
 #include "gameobject/snake/Snake.h"
+#include "ObservableRegistry.h"
 
 namespace SnakeServer {
 
 class World {
 public:
-    World();
+    World(int t_width, int t_height);
     ~World();
 
     void init();
     void start();
     void stop();
 
-    void addSnake(int uid, GameObject::Snake::Snake &snake);
+    void addSnake(int uid);
     void removeSnake(int uid);
+
+
 
 private:
     void run();
+
+    int m_width = 0;
+    int m_height = 0;
+    double m_border = 0;
 
     typedef std::chrono::high_resolution_clock Time;
     typedef std::chrono::milliseconds ms;

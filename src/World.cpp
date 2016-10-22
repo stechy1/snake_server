@@ -2,7 +2,9 @@
 
 namespace SnakeServer {
 
-World::World() {}
+World::World(int t_width, int t_height) : m_width(t_width), m_height(t_height), m_border(0) {
+    m_border = std::min(m_width, m_height) / 0.7;
+}
 
 World::~World() {
     if (m_thread.joinable()) {
@@ -68,16 +70,24 @@ void World::run() {
     }
 }
 
-void World::addSnake(int uid, GameObject::Snake::Snake &snake) {
-    std::pair<int, GameObject::Snake::Snake&> pair(uid, snake);
-    m_snakesToAdd.insert(pair);
+void World::removeSnake(int uid) {
+    m_snakesToRemove.push_back(uid);
 
     m_ready = true;
     m_conditionVariable.notify_one();
 }
 
-void World::removeSnake(int uid) {
-    m_snakesToRemove.push_back(uid);
+void World::addSnake(int uid) {
+    std::unique_ptr<SnakeServer::Vector2D> pos = std::make_unique<SnakeServer::Vector2D>(SnakeServer::Vector2D::RANDOM(
+            -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border));
+    std::unique_ptr<SnakeServer::Vector2D> dir = std::make_unique<SnakeServer::Vector2D>(SnakeServer::Vector2D::RANDOM());
+
+    GameObject::Snake::Snake snake(std::move(pos), std::move(dir));
+    std::pair<int, GameObject::Snake::Snake&> pair(uid, snake);
+    m_snakesToAdd.insert(pair);
+
+    m_ready = true;
+    m_conditionVariable.notify_one();
 }
 
 }
