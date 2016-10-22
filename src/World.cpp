@@ -1,0 +1,83 @@
+#include "World.h"
+
+namespace SnakeServer {
+
+World::World() {}
+
+World::~World() {
+    if (m_thread.joinable()) {
+        m_thread.join();
+    }
+}
+
+void World::init() {
+    std::cout << "Generuji svět..." << std::endl;
+}
+
+void World::start() {
+    m_thread = std::thread(&World::run, this);
+}
+
+void World::stop() {
+    m_interupt = true;
+    m_ready = true;
+    m_conditionVariable.notify_one();
+}
+
+void World::run() {
+    double t = 0.0;
+    double dt = 0.01;
+
+    auto currentTime = Time::now();
+    double accumulator = 0.0;
+
+    while ( !m_interupt ) {
+        std::unique_lock<std::mutex> lk(m_mutex);
+        m_conditionVariable.wait(lk, [&] {
+            currentTime = Time::now();
+            return (!m_snakesOnMap.empty() && m_ready) || (m_interupt && m_ready);
+        });
+
+        auto newTime = Time::now();
+        fsec delta = newTime - currentTime;
+        double frameTime = std::chrono::duration_cast<ms>(delta).count();
+        if (frameTime > 0.25)
+            frameTime = 0.25;
+        currentTime = newTime;
+        accumulator += frameTime;
+
+        for(int index : m_snakesToRemove) {
+            m_snakesOnMap.erase(index);
+        }
+        m_snakesToRemove.clear();
+
+        while (accumulator >= dt) {
+            for(auto &snake : m_snakesOnMap) {
+                snake.second.update(t, dt);
+            }
+            t += dt;
+            accumulator -= dt;
+        }
+
+        for(auto &newSnake : m_snakesToAdd) {
+            m_snakesOnMap.insert(newSnake);
+        }
+        m_snakesToAdd.clear();
+
+        m_ready = !m_snakesOnMap.empty();
+    }
+}
+
+void World::addSnake(int uid, GameObject::Snake::Snake &snake) {
+    std::pair<int, GameObject::Snake::Snake&> pair(uid, snake);
+    m_snakesToAdd.insert(pair);
+
+    m_ready = true;
+    m_conditionVariable.notify_one();
+}
+
+void World::removeSnake(int uid) {
+    m_snakesToRemove.push_back(uid);
+}
+
+}
