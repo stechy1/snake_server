@@ -12,10 +12,26 @@ namespace Network {
 
 const unsigned int BACKLOG = 10; // Maximální počet uživatelů čekajících ve frontě
 
-
-class TCPConnection : public SingleStreamListener {
+class IOHandler {
 public:
-    TCPConnection();
+    IOHandler() {}
+    virtual ~IOHandler() {}
+
+    virtual void onDataReceived(int socketID, std::list<std::string> data) = 0;
+    virtual void onDisconnect(int socketID) = 0;
+};
+
+class IDataSender {
+public:
+    IDataSender() {}
+    virtual ~IDataSender() {}
+
+    virtual void sendData(int socketID, std::string data) = 0;
+};
+
+class TCPConnection : public SingleStreamListener, public IDataSender {
+public:
+    TCPConnection(IOHandler &t_ioHandler);
     ~TCPConnection();
 
     void init();
@@ -27,6 +43,8 @@ public:
     virtual void onLostConnection(int socketID) override;
     virtual void onDisconnect(int socketID) override;
     virtual void onRestoreConnection(int socketID) override;
+
+    virtual void sendData(int socketID, std::string data) override;
 
 protected:
     void accept();
@@ -46,6 +64,8 @@ private:
     int m_pipefd[2] = {0, 0}; // Pipe pro interní komunikaci
 
     std::map<int, std::unique_ptr<TCPStream>> m_clients;
+
+    IOHandler &m_ioHandler;
 
     std::thread m_thread;
     bool m_interupt = true;

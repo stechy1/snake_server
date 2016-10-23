@@ -9,7 +9,7 @@
 namespace SnakeServer {
 namespace Network {
 
-TCPConnection::TCPConnection() {}
+TCPConnection::TCPConnection(IOHandler &t_ioHandler) : m_ioHandler(t_ioHandler) {}
 
 TCPConnection::~TCPConnection() {}
 
@@ -164,6 +164,11 @@ void TCPConnection::onDisconnect(int socketID) {
 
 void TCPConnection::onRestoreConnection(int socketID) {
     // TODO implementovat handler onRestoreConnection
+}
+
+void TCPConnection::sendData(int socketID, std::string data) {
+    m_clients[socketID]->prepareDataToSend(data);
+    FD_SET(socketID, &m_master_write_fds);
 }
 
 }
