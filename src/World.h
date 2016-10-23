@@ -6,7 +6,6 @@
 #include <mutex>
 #include <condition_variable>
 #include "gameobject/snake/Snake.h"
-#include "ObservableRegistry.h"
 
 namespace SnakeServer {
 
@@ -21,8 +20,6 @@ public:
 
     void addSnake(int uid);
     void removeSnake(int uid);
-
-
 
 private:
     void run();
