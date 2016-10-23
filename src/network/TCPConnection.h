@@ -10,9 +10,10 @@
 namespace SnakeServer {
 namespace Network {
 
-    const unsigned int BACKLOG = 10; // Maximální počet uživatelů čekajících ve frontě
+const unsigned int BACKLOG = 10; // Maximální počet uživatelů čekajících ve frontě
 
-class TCPConnection {
+
+class TCPConnection : public SingleStreamListener {
 public:
     TCPConnection();
     ~TCPConnection();
@@ -21,6 +22,11 @@ public:
     void start();
     void run();
     void stop();
+
+    virtual void onDataReceived(int socketID, std::list<std::string> data) override;
+    virtual void onLostConnection(int socketID) override;
+    virtual void onDisconnect(int socketID) override;
+    virtual void onRestoreConnection(int socketID) override;
 
 protected:
     void accept();

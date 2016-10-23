@@ -103,6 +103,7 @@ void TCPConnection::run() {
                 } else {
                     try {
                         // Přijímám data od klienta
+                        m_clients[i]->receive();
                     } catch (std::exception ex) {
                         std::cout << "Chyba při přijímání dat od klienta" << std::endl;
                     }
@@ -132,7 +133,7 @@ void TCPConnection::accept() {
     }
 
     // Přidání nového klienta do mapy
-    m_clients[sd] = std::make_unique<TCPStream>(sd, &address);
+    m_clients[sd] = std::make_unique<TCPStream>(sd, &address, *this);
 
     // Přidání socket descriptoru do hlavní seznamu descriptorů
     FD_SET(sd, &m_master_read_fds);
@@ -145,6 +146,24 @@ void TCPConnection::stop() {
     m_interupt = true;
     // Zápis do interní pipy pro případné probuzení selectu
     write(m_pipefd[1], "x", 1);
+}
+
+void TCPConnection::onDataReceived(int socketID, std::list<std::string> data) {
+    // TODO implementovat handler onDataReceived
+}
+
+void TCPConnection::onLostConnection(int socketID) {
+    // TODO implementovat handler onLostConection
+}
+
+void TCPConnection::onDisconnect(int socketID) {
+    // TODO implementovat handler onDisconnect
+    FD_CLR(socketID, &m_master_read_fds);
+    FD_CLR(socketID, &m_master_write_fds);
+}
+
+void TCPConnection::onRestoreConnection(int socketID) {
+    // TODO implementovat handler onRestoreConnection
 }
 
 }

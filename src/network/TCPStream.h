@@ -15,11 +15,26 @@ namespace Network {
 
     const unsigned int BUFFER_SIZE = 2048;
 
+class SingleStreamListener {
+public:
+    SingleStreamListener() {}
+    virtual ~SingleStreamListener() {}
+
+    virtual void onDataReceived(int socketID, std::list<std::string> data) = 0;
+    virtual void onLostConnection(int socketID) = 0;
+    virtual void onDisconnect(int socketID) = 0;
+    virtual void onRestoreConnection(int socketID) = 0;
+};
+
+enum ConnectionStatus {
+    DISCONNECTED, CONNECTED, LOST_CONNECTION
+};
+
 class TCPStream {
 public:
     friend class TCPConnection;
 
-    TCPStream(const int t_sd, const struct sockaddr_in *t_address);
+    TCPStream(const int t_sd, const struct sockaddr_in *t_address, SingleStreamListener &listener);
     virtual ~TCPStream();
 
     void send();
@@ -33,8 +48,12 @@ private:
     std::string m_peerIP;
     uint16_t m_peerPort;
 
+    ConnectionStatus connectionStatus = DISCONNECTED;
+
     std::string m_inputBuffer;
     std::string m_outputBuffer;
+
+    SingleStreamListener &m_listener;
 };
 
 }
