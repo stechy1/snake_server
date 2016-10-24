@@ -39,6 +39,8 @@ public:
     void run();
     void stop();
 
+    void disconnectClient(int socketID);
+
     virtual void onDataReceived(int socketID, std::list<std::string> data) override;
     virtual void onLostConnection(int socketID) override;
     virtual void onDisconnect(int socketID) override;

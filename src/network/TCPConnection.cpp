@@ -148,6 +148,13 @@ void TCPConnection::stop() {
     write(m_pipefd[1], "x", 1);
 }
 
+void TCPConnection::disconnectClient(int socketID) {
+    if (m_clients.find(socketID) != m_clients.end()) {
+        m_clients[socketID]->closeStream();
+        m_clients.erase(socketID);
+    }
+}
+
 void TCPConnection::onDataReceived(int socketID, std::list<std::string> data) {
     // TODO implementovat handler onDataReceived
     m_ioHandler.onDataReceived(socketID, data);
