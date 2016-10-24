@@ -4,10 +4,6 @@
 #include "event/SnakeChangeDirectionEvent.h"
 #include "World.h"
 
-#ifndef  __CYGWIN__
-#include <boost/log/trivial.hpp>
-#endif
-
 
 // Otestuje aplikaci eventu změny směru na hada
 void testing() {
@@ -36,7 +32,5 @@ void testing() {
 }
 
 int main(int argc, char *argv[]) {
-#ifndef __CYGWIN__
-    BOOST_LOG_TRIVIAL(trace) << "Hello Boost logging library";
-#endif
+
 }
