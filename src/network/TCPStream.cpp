@@ -17,12 +17,21 @@ TCPStream::TCPStream(const int t_sd, const struct sockaddr_in *t_address, Single
 
 TCPStream::~TCPStream() {}
 
-void TCPStream::send() {
+unsigned long TCPStream::send() {
     if (connectionStatus != CONNECTED) {
         throw std::runtime_error("Client is not connected");
     }
 
-    const char *buff = m_outputBuffer.c_str();
+    unsigned long count = m_outputBuffer.size();
+    std::string stringBuff;
+    std::list<std::string> bufferCopy = m_outputBuffer;
+    m_outputBuffer.clear();
+
+    for(auto &string : bufferCopy) {
+        stringBuff += string;
+    }
+
+    const char *buff = stringBuff.c_str();
     m_outputBuffer.clear();
 
     unsigned long len = strlen(buff);
@@ -42,6 +51,8 @@ void TCPStream::send() {
     }
 
     // TODO ošetřit errno v případě, že 'n == -1'
+    // TODO vrátit počet odeslaných updatů/eventů
+    return count;
 }
 
 void TCPStream::receive() {
@@ -85,7 +96,7 @@ void TCPStream::closeStream() {
 }
 
 void TCPStream::prepareDataToSend(std::string data) {
-    m_outputBuffer+= data;
+    m_outputBuffer.push_back(data);
 }
 
 }

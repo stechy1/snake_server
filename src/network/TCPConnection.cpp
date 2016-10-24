@@ -111,8 +111,8 @@ void TCPConnection::run() {
             }
             if (FD_ISSET(i, &m_write_fds)) {
                 // Posílám data klientovi
-                m_clients[i]->send();
-                // TODO odebrat socket z FD_SETu pro zápis
+                unsigned long sended = m_clients[i]->send();
+                // TODO odebrat socket z FD_SETu pro zápis pouze, pokud už není více věcí k zápisu
             }
         }
     }
@@ -150,6 +150,7 @@ void TCPConnection::stop() {
 
 void TCPConnection::onDataReceived(int socketID, std::list<std::string> data) {
     // TODO implementovat handler onDataReceived
+    m_ioHandler.onDataReceived(socketID, data);
 }
 
 void TCPConnection::onLostConnection(int socketID) {
@@ -160,6 +161,7 @@ void TCPConnection::onDisconnect(int socketID) {
     // TODO implementovat handler onDisconnect
     FD_CLR(socketID, &m_master_read_fds);
     FD_CLR(socketID, &m_master_write_fds);
+    m_ioHandler.onDisconnect(socketID);
 }
 
 void TCPConnection::onRestoreConnection(int socketID) {
@@ -169,6 +171,7 @@ void TCPConnection::onRestoreConnection(int socketID) {
 void TCPConnection::sendData(int socketID, std::string data) {
     m_clients[socketID]->prepareDataToSend(data);
     FD_SET(socketID, &m_master_write_fds);
+    // TODO inkerementovat ve své struktuře counter představující počet dat k odeslání
 }
 
 }

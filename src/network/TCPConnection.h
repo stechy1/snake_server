@@ -64,6 +64,7 @@ private:
     int m_pipefd[2] = {0, 0}; // Pipe pro interní komunikaci
 
     std::map<int, std::unique_ptr<TCPStream>> m_clients;
+    // TODO vymyslet nějakou strukturu, kde budu uchovávat počet zpráv, které chci odeslat klientovi
 
     IOHandler &m_ioHandler;
 
