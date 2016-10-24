@@ -4,6 +4,11 @@
 #include "event/SnakeChangeDirectionEvent.h"
 #include "World.h"
 
+#ifndef  __CYGWIN__
+#include <boost/log/trivial.hpp>
+#endif
+
+
 // Otestuje aplikaci eventu změny směru na hada
 void testing() {
     std::unique_ptr<SnakeServer::Vector2D> pos = std::make_unique<SnakeServer::Vector2D>(SnakeServer::Vector2D::ZERO());
@@ -31,7 +36,7 @@ void testing() {
 }
 
 int main(int argc, char *argv[]) {
-    std::cout << "Hello world" << std::endl;
-
-    testing();
+#ifndef __CYGWIN__
+    BOOST_LOG_TRIVIAL(trace) << "Hello Boost logging library";
+#endif
 }
