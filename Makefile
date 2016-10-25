@@ -3,7 +3,7 @@ CC=g++
 #compiler options
 CXXFLAGS=-Wall -pedantic -g -std=c++14
 #source files
-SOURCES=$(wildcard src/*.cpp)
+SOURCES=$(wildcard src/*.cpp src/event/*.cpp src/gameobject/*.cpp src/network/*.cpp)
 #object files
 OBJECTS=$(SOURCES:.cpp=.o)
 #sdl-config or any other library here. 
