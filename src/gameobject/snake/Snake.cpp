@@ -15,9 +15,7 @@ Snake::Snake(std::unique_ptr<Vector2D> t_pos, std::unique_ptr<Vector2D> t_dir, s
     *m_vel*=VELOCITY_MULTIPLIER;
 }
 
-Snake::~Snake() {
-
-}
+Snake::~Snake() {}
 
 void SnakeServer::GameObject::Snake::Snake::update(double t, double dt) {
     std::cout << "Aktualizace stavu hada" << std::endl;
