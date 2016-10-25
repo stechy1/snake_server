@@ -37,11 +37,11 @@ public:
     TCPStream(const int t_sd, const struct sockaddr_in *t_address, SingleStreamListener &listener);
     virtual ~TCPStream();
 
-    unsigned long send();
+    void send(std::string data);
     void receive();
     void closeStream();
 
-    void prepareDataToSend(std::string data);
+    //void prepareDataToSend(std::string data);
 
 private:
     int m_sd;
@@ -51,7 +51,7 @@ private:
     ConnectionStatus connectionStatus = DISCONNECTED;
 
     std::string m_inputBuffer;
-    std::list<std::string> m_outputBuffer;
+    //std::list<std::string> m_outputBuffer;
 
     SingleStreamListener &m_listener;
 };

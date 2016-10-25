@@ -6,6 +6,7 @@
 #include <thread>
 #include <sys/select.h>
 #include "TCPStream.h"
+#include "SingleStreamListenerImpl.h"
 
 namespace SnakeServer {
 namespace Network {
@@ -29,7 +30,7 @@ public:
     virtual void sendData(int socketID, std::string data) = 0;
 };
 
-class TCPConnection : public SingleStreamListener, public IDataSender {
+class TCPConnection : public IDataSender {
 public:
     TCPConnection(IOHandler &t_ioHandler);
     ~TCPConnection();
@@ -40,11 +41,6 @@ public:
     void stop();
 
     void disconnectClient(int socketID);
-
-    virtual void onDataReceived(int socketID, std::list<std::string> data) override;
-    virtual void onLostConnection(int socketID) override;
-    virtual void onDisconnect(int socketID) override;
-    virtual void onRestoreConnection(int socketID) override;
 
     virtual void sendData(int socketID, std::string data) override;
 
@@ -66,9 +62,9 @@ private:
     int m_pipefd[2] = {0, 0}; // Pipe pro interní komunikaci
 
     std::map<int, std::unique_ptr<TCPStream>> m_clients;
-    // TODO vymyslet nějakou strukturu, kde budu uchovávat počet zpráv, které chci odeslat klientovi
 
     IOHandler &m_ioHandler;
+    SingleStreamListenerImpl m_streamHandler;
 
     std::thread m_thread;
     bool m_interupt = true;

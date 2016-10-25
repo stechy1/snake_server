@@ -1,5 +1,6 @@
 #include <cstring>
 #include <stdexcept>
+#include <assert.h>
 #include "TCPStream.h"
 
 namespace SnakeServer {
@@ -17,42 +18,51 @@ TCPStream::TCPStream(const int t_sd, const struct sockaddr_in *t_address, Single
 
 TCPStream::~TCPStream() {}
 
-unsigned long TCPStream::send() {
-    if (connectionStatus != CONNECTED) {
-        throw std::runtime_error("Client is not connected");
-    }
+void TCPStream::send(std::string data) {
 
-    unsigned long count = m_outputBuffer.size();
-    std::string stringBuff;
-    std::list<std::string> bufferCopy = m_outputBuffer;
-    m_outputBuffer.clear();
+    const unsigned long len = data.size();
 
-    for(auto &string : bufferCopy) {
-        stringBuff += string;
-    }
+    ssize_t n = ::send(m_sd, &data, len, 0);
 
-    const char *buff = stringBuff.c_str();
-    m_outputBuffer.clear();
+    assert(n == len);
 
-    unsigned long len = strlen(buff);
-
-    int total = 0;
-    unsigned long bytesleft = len;
-    ssize_t n;
-
-    while (total < len) {
-        n = ::send(m_sd, buff+total, bytesleft, 0);
-        if (n == -1) {
-            break;
-        }
-
-        total += n;
-        bytesleft -= n;
-    }
-
-    // TODO ošetřit errno v případě, že 'n == -1'
-    // TODO vrátit počet odeslaných updatů/eventů
-    return count;
+//    if (connectionStatus != CONNECTED) {
+//        throw std::runtime_error("Client is not connected");
+//    }
+//
+//    unsigned long count = m_outputBuffer.size();
+//    std::string stringBuff;
+//    std::list<std::string> bufferCopy = m_outputBuffer;
+//    m_outputBuffer.clear();
+//
+//    for(auto &string : bufferCopy) {
+//        stringBuff += string;
+//    }
+//
+//    const char *buff = stringBuff.c_str();
+//    m_outputBuffer.clear();
+//
+//    unsigned long len = strlen(buff);
+//
+//    int total = 0;
+//    unsigned long bytesleft = len;
+//    ssize_t n;
+//
+//    while (total < len) {
+//        n = ::send(m_sd, buff+total, bytesleft, 0);
+//        if (n == -1) {
+//            break;
+//            // TODO socket je v háji
+//        }
+//
+//        assert (n == bytesleft);
+//
+//        total += n;
+//        bytesleft -= n;
+//    }
+//
+//    // TODO ošetřit errno v případě, že 'n == -1'
+//    return count;
 }
 
 void TCPStream::receive() {
@@ -95,9 +105,9 @@ void TCPStream::closeStream() {
     ::close(m_sd);
 }
 
-void TCPStream::prepareDataToSend(std::string data) {
-    m_outputBuffer.push_back(data);
-}
+//void TCPStream::prepareDataToSend(std::string data) {
+//    m_outputBuffer.push_back(data);
+//}
 
 }
 }

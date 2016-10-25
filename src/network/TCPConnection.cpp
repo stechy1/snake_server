@@ -109,11 +109,11 @@ void TCPConnection::run() {
                     }
                 }
             }
-            if (FD_ISSET(i, &m_write_fds)) {
-                // Posílám data klientovi
-                unsigned long sended = m_clients[i]->send();
-                // TODO odebrat socket z FD_SETu pro zápis pouze, pokud už není více věcí k zápisu
-            }
+//            if (FD_ISSET(i, &m_write_fds)) {
+//                // Posílám data klientovi
+//                unsigned long sended = m_clients[i]->send();
+//                // TODO odebrat socket z FD_SETu pro zápis pouze, pokud už není více věcí k zápisu
+//            }
         }
     }
 }
@@ -133,7 +133,7 @@ void TCPConnection::accept() {
     }
 
     // Přidání nového klienta do mapy
-    m_clients[sd] = std::make_unique<TCPStream>(sd, &address, *this);
+    m_clients[sd] = std::make_unique<TCPStream>(sd, &address, m_streamHandler);
 
     // Přidání socket descriptoru do hlavní seznamu descriptorů
     FD_SET(sd, &m_master_read_fds);
@@ -155,31 +155,11 @@ void TCPConnection::disconnectClient(int socketID) {
     }
 }
 
-void TCPConnection::onDataReceived(int socketID, std::list<std::string> data) {
-    // TODO implementovat handler onDataReceived
-    m_ioHandler.onDataReceived(socketID, data);
-}
-
-void TCPConnection::onLostConnection(int socketID) {
-    // TODO implementovat handler onLostConection
-}
-
-void TCPConnection::onDisconnect(int socketID) {
-    // TODO implementovat handler onDisconnect
-    FD_CLR(socketID, &m_master_read_fds);
-    FD_CLR(socketID, &m_master_write_fds);
-    m_ioHandler.onDisconnect(socketID);
-}
-
-void TCPConnection::onRestoreConnection(int socketID) {
-    // TODO implementovat handler onRestoreConnection
-}
-
 void TCPConnection::sendData(int socketID, std::string data) {
-    m_clients[socketID]->prepareDataToSend(data);
-    FD_SET(socketID, &m_master_write_fds);
-    // TODO inkerementovat ve své struktuře counter představující počet dat k odeslání
+    m_clients[socketID]->send(data);
 }
+
+
 
 }
 }
