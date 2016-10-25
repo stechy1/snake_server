@@ -9,9 +9,9 @@ namespace GameObject {
 class BaseObject {
 public:
     BaseObject();
-    BaseObject(std::unique_ptr<Vector2D> t_pos);
-    BaseObject(std::unique_ptr<Vector2D> t_pos, std::unique_ptr<Vector2D> t_dir);
-    BaseObject(std::unique_ptr<Vector2D> t_pos, std::unique_ptr<Vector2D> t_dir, std::unique_ptr<Vector2D> t_vel);
+    BaseObject(Vector2D &t_pos);
+    BaseObject(Vector2D &t_pos, Vector2D &t_dir);
+    BaseObject(Vector2D &t_pos, Vector2D &t_dir, Vector2D &t_vel);
 
     virtual ~BaseObject() {}
 
@@ -19,9 +19,9 @@ public:
 
     virtual std::string getDescription();
 
-    std::unique_ptr<Vector2D> m_pos;
-    std::unique_ptr<Vector2D> m_dir;
-    std::unique_ptr<Vector2D> m_vel;
+    Vector2D m_pos = Vector2D::ZERO();
+    Vector2D m_dir;
+    Vector2D m_vel;
 
 };
 

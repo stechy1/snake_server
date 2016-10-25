@@ -15,9 +15,11 @@ namespace Snake {
 
 class Snake : public BaseObject, public Event::IUpdatable {
 public:
-    Snake(std::unique_ptr<Vector2D> t_pos, std::unique_ptr<Vector2D> t_dir);
+    Snake();
 
-    Snake(std::unique_ptr<Vector2D> t_pos, std::unique_ptr<Vector2D> t_dir, std::unique_ptr<Vector2D> t_vel);
+    Snake(Vector2D &t_pos);
+    Snake(Vector2D &t_pos, Vector2D &t_dir);
+    Snake(Vector2D &t_pos, Vector2D &t_dir, Vector2D &t_vel);
 
     virtual ~Snake();
 

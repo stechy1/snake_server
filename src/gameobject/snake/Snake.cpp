@@ -5,15 +5,13 @@ namespace SnakeServer {
 namespace GameObject {
 namespace Snake {
 
-Snake::Snake(std::unique_ptr<Vector2D> t_pos, std::unique_ptr<Vector2D> t_dir)
-        : BaseObject(std::move(t_pos), std::move(t_dir)) {
-    *m_vel*=VELOCITY_MULTIPLIER;
-}
+Snake::Snake() {}
 
-Snake::Snake(std::unique_ptr<Vector2D> t_pos, std::unique_ptr<Vector2D> t_dir, std::unique_ptr<Vector2D> t_vel)
-        : BaseObject(std::move(t_pos), std::move(t_dir), std::move(t_vel)) {
-    *m_vel*=VELOCITY_MULTIPLIER;
-}
+Snake::Snake(Vector2D &t_pos) : BaseObject(t_pos) {}
+
+Snake::Snake(Vector2D &t_pos, Vector2D &t_dir) : BaseObject(t_pos, t_dir) {}
+
+Snake::Snake(Vector2D &t_pos, Vector2D &t_dir, Vector2D &t_vel) : BaseObject(t_pos, t_dir, t_vel) {}
 
 Snake::~Snake() {}
 
@@ -26,10 +24,10 @@ void SnakeServer::GameObject::Snake::Snake::update(double t, double dt) {
         event->applyChanged(*this);
     }
 
-    const Vector2D newPos(Vector2D::mul(*m_dir, *m_vel)*=SIZE);
-    *m_pos+=newPos;
+    const Vector2D newPos(Vector2D::mul(m_dir, m_vel)*=SIZE);
+    m_pos+=newPos;
 
-    std::cout << "Position: " << m_pos->to_string() << std::endl;
+    std::cout << "Position: " << m_pos.to_string() << std::endl;
 }
 
 void Snake::addEvent(std::shared_ptr<Event::BaseEvent> event) {

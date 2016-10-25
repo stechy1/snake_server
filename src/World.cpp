@@ -78,16 +78,16 @@ void World::removeSnake(int uid) {
 }
 
 void World::addSnake(int uid) {
-//    std::unique_ptr<SnakeServer::Vector2D> pos = std::make_unique<SnakeServer::Vector2D>(SnakeServer::Vector2D::RANDOM(
-//            -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border));
-//    std::unique_ptr<SnakeServer::Vector2D> dir = std::make_unique<SnakeServer::Vector2D>(SnakeServer::Vector2D::RANDOM());
-//
-//    GameObject::Snake::Snake snake(std::move(pos), std::move(dir));
-//    std::pair<int, GameObject::Snake::Snake&> pair(uid, snake);
-//    m_snakesToAdd.insert(pair);
-//
-//    m_ready = true;
-//    m_conditionVariable.notify_one();
+    Vector2D pos = Vector2D::RANDOM(
+            -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border);
+    Vector2D dir = Vector2D::RANDOM();
+
+    GameObject::Snake::Snake snake(pos, dir);
+    std::pair<int, GameObject::Snake::Snake&> pair(uid, snake);
+    m_snakesToAdd.insert(pair);
+
+    m_ready = true;
+    m_conditionVariable.notify_one();
 }
 
 }

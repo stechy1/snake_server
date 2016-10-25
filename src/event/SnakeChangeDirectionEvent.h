@@ -10,7 +10,7 @@ namespace Event {
 
 class SnakeChangeDirectionEvent : public BaseEvent {
 public:
-    SnakeChangeDirectionEvent(int t_userID, std::shared_ptr<Vector2D> t_direction);
+    SnakeChangeDirectionEvent(int t_userID, Vector2D &t_direction);
 
     virtual std::string getDescription() override;
 
@@ -20,7 +20,7 @@ public:
 
 private:
     int m_userID;
-    std::shared_ptr<Vector2D> m_direction;
+    Vector2D m_direction;
 };
 
 }
