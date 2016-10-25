@@ -9,7 +9,12 @@
 namespace SnakeServer {
 namespace Network {
 
-TCPConnection::TCPConnection(int t_port, IOHandler &t_ioHandler) : m_port(t_port), m_ioHandler(t_ioHandler) {}
+TCPConnection::TCPConnection(uint16_t t_port, IOHandler &t_ioHandler) : m_port(t_port), m_ioHandler(t_ioHandler) {
+    FD_ZERO(&m_master_read_fds);
+    FD_ZERO(&m_master_write_fds);
+    FD_ZERO(&m_read_fds);
+    FD_ZERO(&m_write_fds);
+}
 
 TCPConnection::~TCPConnection() {}
 
@@ -63,8 +68,6 @@ void TCPConnection::init() {
     // Začlenění pipy do FD setu
     FD_SET(m_pipefd[0], &m_master_read_fds);
     m_fdMax = m_pipefd[0];
-
-    m_listening = true;
 }
 
 void TCPConnection::start() {
@@ -90,7 +93,7 @@ void TCPConnection::run() {
             break;
         }
 
-        for(int i = m_fdMin; i < m_fdMax; ++i) {
+        for(int i = m_fdMin; i <= m_fdMax; ++i) {
             if (FD_ISSET(i, &m_read_fds)) { // Pokud je socket[i] čtecího typu
                 if (i == m_pipefd[0]) {break;};
                 if (i == m_lsd) { // Pokud je socket[i] můj hlavní server socket
