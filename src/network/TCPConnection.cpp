@@ -71,7 +71,7 @@ void TCPConnection::init() {
 }
 
 void TCPConnection::start() {
-    if (m_interupt || m_listening) {
+    if (m_listening) {
         return;
     }
 
