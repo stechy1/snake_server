@@ -19,6 +19,8 @@ public:
 
     Snake(std::unique_ptr<Vector2D> t_pos, std::unique_ptr<Vector2D> t_dir, std::unique_ptr<Vector2D> t_vel);
 
+    virtual ~Snake();
+
     void addEvent(std::shared_ptr<Event::BaseEvent> event);
 
     virtual void update(double t, double dt) override;
