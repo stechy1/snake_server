@@ -51,15 +51,25 @@ void TCPStream::receive() {
 
     // Vyzvednout z bufferu dříve přijatá data
     received = m_inputBuffer + received;
+    unsigned long index = 0;
 
-    // TODO naparsovat přijatá data, zavolat obslužnou událost, zbytek nezpracovaných dat vložit zpět do bufferu
     // Naparsovat přijatá data
-    // Pokud se mi je podaří naparsovat, tak zavolám nějakou obslužnou událost pro zpracování naparsovaných dat
     std::list<std::string> list;
-    list.push_back(received);
+    while ((index = received.find(DELIMITER)) != std::string::npos) {
+        unsigned long size = received.size();
+        std::string data = received.substr(0, index - 1);
+        list.push_back(data);
+
+        if (size - index + 1 > 0) {
+            received = received.substr(index + 1, size);
+        } else {
+            received = "";
+        }
+    }
+    m_inputBuffer = received;
+
+    // Pokud se mi je podaří naparsovat, tak zavolám nějakou obslužnou událost pro zpracování naparsovaných dat
     m_listener.onDataReceived(m_sd, list);
-    // Zbytek nezpracovaných dat vložit do bufferu
-    m_inputBuffer = ""; // TODO Dočasné řešení. Vše, co nedokážu naparsovat tak zahodím
 }
 
 void TCPStream::closeStream() {

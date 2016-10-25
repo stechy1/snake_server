@@ -14,6 +14,7 @@ namespace SnakeServer {
 namespace Network {
 
     const unsigned int BUFFER_SIZE = 2048;
+const char *DELIMITER = ";";
 
 class SingleStreamListener {
 public:
