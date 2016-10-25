@@ -1,7 +1,5 @@
 #include <iostream>
 #include "gameobject/snake/Snake.h"
-#include "event/LoginEvent.h"
-#include "event/SnakeChangeDirectionEvent.h"
 #include "World.h"
 #include "network/TCPConnection.h"
 

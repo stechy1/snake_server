@@ -71,11 +71,12 @@ void TCPConnection::init() {
 }
 
 void TCPConnection::start() {
-    if (m_interupt || !m_listening) {
+    if (m_interupt || m_listening) {
         return;
     }
 
     m_interupt = false;
+    m_listening = true;
     m_thread = std::thread(&TCPConnection::run, this);
 }
 
