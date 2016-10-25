@@ -9,7 +9,7 @@
 namespace SnakeServer {
 namespace Network {
 
-TCPConnection::TCPConnection(uint16_t t_port, IOHandler &t_ioHandler) : m_port(t_port), m_ioHandler(t_ioHandler) {
+TCPConnection::TCPConnection(uint16_t t_port, IOHandler &t_ioHandler) : m_port(t_port), m_ioHandler(t_ioHandler), m_streamHandler(*this) {
     FD_ZERO(&m_master_read_fds);
     FD_ZERO(&m_master_write_fds);
     FD_ZERO(&m_read_fds);

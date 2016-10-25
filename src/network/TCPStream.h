@@ -41,8 +41,6 @@ public:
     void receive();
     void closeStream();
 
-    //void prepareDataToSend(std::string data);
-
 private:
     int m_sd;
     std::string m_peerIP;
@@ -51,7 +49,6 @@ private:
     ConnectionStatus connectionStatus = DISCONNECTED;
 
     std::string m_inputBuffer;
-    //std::list<std::string> m_outputBuffer;
 
     SingleStreamListener &m_listener;
 };

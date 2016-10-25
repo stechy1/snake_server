@@ -35,6 +35,8 @@ public:
     TCPConnection(uint16_t t_port, IOHandler &t_ioHandler);
     ~TCPConnection();
 
+    friend class SingleStreamListenerImpl;
+
     void init();
     void start();
     void run();

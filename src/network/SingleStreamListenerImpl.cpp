@@ -1,19 +1,21 @@
 #include <iostream>
 #include "SingleStreamListenerImpl.h"
+#include "TCPConnection.h"
 
 namespace SnakeServer {
 namespace Network {
 
-SingleStreamListenerImpl::SingleStreamListenerImpl() {}
+SingleStreamListenerImpl::SingleStreamListenerImpl(TCPConnection &t_tcpConnection) : m_tcpConnection(t_tcpConnection) {}
 
 SingleStreamListenerImpl::~SingleStreamListenerImpl() {}
 
 void SingleStreamListenerImpl::onDataReceived(int socketID, std::list<std::string> data) {
     // TODO implementovat handler onDataReceived
     //m_ioHandler.onDataReceived(socketID, data);
-    for(auto &tmp : data) {
-        std::cout << "Received: sID: " << socketID << ", data: " << tmp << std::endl;
-    }
+//    for(auto &tmp : data) {
+//        std::cout << "Received: sID: " << socketID << ", data: " << tmp << std::endl;
+//    }
+    m_tcpConnection.m_ioHandler.onDataReceived(socketID, data);
 }
 
 void SingleStreamListenerImpl::onLostConnection(int socketID) {
@@ -25,6 +27,7 @@ void SingleStreamListenerImpl::onDisconnect(int socketID) {
     //FD_CLR(socketID, &m_master_read_fds);
     //FD_CLR(socketID, &m_master_write_fds);
     //m_ioHandler.onDisconnect(socketID);
+    m_tcpConnection.m_ioHandler.onDisconnect(socketID);
 }
 
 void SingleStreamListenerImpl::onRestoreConnection(int socketID) {
