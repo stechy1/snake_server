@@ -32,7 +32,7 @@ public:
 
 class TCPConnection : public IDataSender {
 public:
-    TCPConnection(IOHandler &t_ioHandler);
+    TCPConnection(int t_port, IOHandler &t_ioHandler);
     ~TCPConnection();
 
     void init();

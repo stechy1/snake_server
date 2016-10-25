@@ -52,7 +52,7 @@ void testing() {
 int main(int argc, char *argv[]) {
 
     SnakeServer::Network::IOHandler *handler = new IOImpl();
-    SnakeServer::Network::TCPConnection connection(*handler);
+    SnakeServer::Network::TCPConnection connection(10000, *handler);
 
     connection.init();
     connection.start();
