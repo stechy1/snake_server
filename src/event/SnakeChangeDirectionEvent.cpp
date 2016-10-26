@@ -19,7 +19,6 @@ std::string SnakeChangeDirectionEvent::getData() {
 void SnakeChangeDirectionEvent::applyChanged(IUpdatable &updatable) {
     SnakeServer::GameObject::Snake::Snake &snake = static_cast<SnakeServer::GameObject::Snake::Snake&>(updatable);
 
-    std::cout << "Aplikuji změny v ChangeDirectionEventu" << std::endl;
     snake.m_dir.set(m_direction);
 }
 

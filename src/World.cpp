@@ -10,6 +10,16 @@ World::~World() {
     if (m_thread.joinable()) {
         m_thread.join();
     }
+
+    for(auto tmp : m_snakesToAdd) {
+        delete tmp.second;
+    }
+
+    for(auto tmp : m_snakesOnMap) {
+        delete tmp.second;
+    }
+
+    std::cout << "World destruct OK" << std::endl;
 }
 
 void World::init() {
@@ -34,7 +44,6 @@ void World::run() {
     double accumulator = 0.0;
 
     while ( !m_interupt ) {
-        std::cout << "Running" << std::endl;
         std::unique_lock<std::mutex> lk(m_mutex);
         m_conditionVariable.wait(lk, [&] {
             currentTime = Time::now();
@@ -50,7 +59,6 @@ void World::run() {
         accumulator += frameTime;
 
         for(int index : m_snakesToRemove) {
-            std::cout << "Odebiram hada z mapy" << std::endl;
             delete m_snakesOnMap.at(index);
             m_snakesOnMap.erase(index);
         }
@@ -65,7 +73,6 @@ void World::run() {
 //        }
 
         for(auto &newSnake : m_snakesToAdd) {
-            std::cout << "Vkladam hada do mapy" << std::endl;
             m_snakesOnMap.insert(newSnake);
         }
         m_snakesToAdd.clear();

@@ -16,7 +16,19 @@ TCPConnection::TCPConnection(uint16_t t_port, IOHandler &t_ioHandler) : m_port(t
     FD_ZERO(&m_write_fds);
 }
 
-TCPConnection::~TCPConnection() {}
+TCPConnection::~TCPConnection() {
+    if (m_thread.joinable()) {
+        m_thread.join();
+    }
+
+    FD_ZERO(&m_master_read_fds);
+
+    for(auto &client : m_clients) {
+        client.second->closeStream();
+    }
+
+    std::cout << "TCPConnection destruct OK" << std::endl;
+}
 
 void TCPConnection::init() {
     if (m_listening) {
