@@ -23,14 +23,14 @@ public:
 
     virtual ~Snake();
 
-    void addEvent(std::shared_ptr<Event::BaseEvent> event);
+    void addEvent(Event::BaseEvent &event);
 
     virtual void update(double t, double dt) override;
 
     virtual std::string getDescription() override;
 
 private:
-    std::list<std::shared_ptr<Event::BaseEvent>> m_eventQueue;
+    std::list<Event::BaseEvent> m_eventQueue;
 };
 
 }

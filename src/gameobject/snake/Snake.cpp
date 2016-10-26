@@ -19,9 +19,9 @@ void SnakeServer::GameObject::Snake::Snake::update(double t, double dt) {
     std::cout << "Aktualizace stavu hada" << std::endl;
 
     if (!m_eventQueue.empty()) {
-        const std::shared_ptr<Event::BaseEvent> event = m_eventQueue.front();
+        Event::BaseEvent &event = m_eventQueue.front();
         m_eventQueue.pop_front();
-        event->applyChanged(*this);
+        event.applyChanged(*this);
     }
 
     const Vector2D newPos(Vector2D::mul(m_dir, m_vel)*=SIZE);
@@ -30,7 +30,7 @@ void SnakeServer::GameObject::Snake::Snake::update(double t, double dt) {
     std::cout << "Position: " << m_pos.to_string() << std::endl;
 }
 
-void Snake::addEvent(std::shared_ptr<Event::BaseEvent> event) {
+void Snake::addEvent(Event::BaseEvent &event) {
     m_eventQueue.push_back(event);
 }
 

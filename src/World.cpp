@@ -95,7 +95,8 @@ void World::addEvent(Event::BaseEvent &event) {
     if (event.getEventType() == Event::EventType::WORLD) {
         event.applyChanged(*this);
     } else {
-
+        int id = event.getUserID();
+        m_snakesOnMap[id].addEvent(event);
     }
 }
 
