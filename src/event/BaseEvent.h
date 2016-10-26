@@ -2,7 +2,6 @@
 #define SNAKE_SERVER_BASEEVENT_H
 
 #include <string>
-#include <stdexcept>
 #include "IUpdatable.h"
 
 namespace SnakeServer {
@@ -14,22 +13,21 @@ enum EventType {
 
 class BaseEvent {
 public:
-    BaseEvent(int t_userID) : m_userID(t_userID) {}
+    BaseEvent() {}
 
     virtual ~BaseEvent() {}
 
-    int getUserID() { return m_userID; }
+    virtual std::string getDescription() = 0;
 
-    virtual std::string getDescription() {return "";}
+    virtual std::string getData() = 0;
 
-    virtual std::string getData() { return "";}
+    virtual void applyChanged(IUpdatable &updatable) = 0;
 
-    virtual void applyChanged(IUpdatable &updatable) {}
+    virtual EventType getEventType() = 0;
 
-    virtual EventType getEventType() {throw std::runtime_error("unimplemented");};
+    virtual int getUserID() = 0;
 
-protected:
-    int m_userID = -1;
+
 };
 
 }

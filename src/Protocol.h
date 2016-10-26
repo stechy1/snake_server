@@ -9,13 +9,12 @@ namespace SnakeServer {
 
 const std::string LOGIN = "login:";
 
-Event::BaseEvent parseEvent(int userID, std::string data) {
+std::unique_ptr<Event::BaseEvent> parseEvent(int userID, std::string data) {
 
     if (data.find("login:") != std::string::npos) {
         std::string res = data.substr(LOGIN.size());
 
-        //Event::BaseEvent event = Event::LoginEvent(userID, res);
-        Event::LoginEvent event(userID, res);
+        std::unique_ptr<Event::BaseEvent> event = std::make_unique<Event::LoginEvent>(userID, res);
         return event;
     }
 

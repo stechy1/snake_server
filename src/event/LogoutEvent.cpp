@@ -4,7 +4,7 @@
 namespace SnakeServer {
 namespace Event {
 
-LogoutEvent::LogoutEvent(int t_userID) : BaseEvent(t_userID) {}
+LogoutEvent::LogoutEvent(int t_userID) : m_userID(t_userID) {}
 
 LogoutEvent::~LogoutEvent() {}
 
@@ -24,6 +24,10 @@ void LogoutEvent::applyChanged(IUpdatable &updatable) {
 
 EventType LogoutEvent::getEventType() {
     return EventType::WORLD;
+}
+
+int LogoutEvent::getUserID() {
+    return m_userID;
 }
 
 }

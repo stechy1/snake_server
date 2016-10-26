@@ -6,7 +6,7 @@
 namespace SnakeServer {
 namespace Event {
 
-LoginEvent::LoginEvent(int t_userID, std::string t_username) : BaseEvent(t_userID), m_username(t_username) {}
+LoginEvent::LoginEvent(int t_userID, std::string t_username) : m_userID(t_userID), m_username(t_username) {}
 
 std::string LoginEvent::getDescription() {
     return "Login event";
@@ -25,7 +25,9 @@ EventType LoginEvent::getEventType() {
     return EventType::WORLD;
 }
 
-
+int LoginEvent::getUserID() {
+    return m_userID;
+}
 
 }
 }

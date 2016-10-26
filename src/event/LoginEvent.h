@@ -18,7 +18,10 @@ public:
 
     virtual EventType getEventType() override;
 
+    virtual int getUserID() override;
+
 private:
+    int m_userID;
     std::string m_username;
 };
 

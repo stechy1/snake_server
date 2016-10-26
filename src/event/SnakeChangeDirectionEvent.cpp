@@ -6,7 +6,7 @@ namespace SnakeServer {
 namespace Event {
 
 SnakeChangeDirectionEvent::SnakeChangeDirectionEvent(int t_userID, Vector2D &t_direction)
-        : BaseEvent(t_userID), m_direction(t_direction) {}
+        : m_userID(t_userID), m_direction(t_direction) {}
 
 std::string SnakeChangeDirectionEvent::getDescription() {
     return "SnakeChangeDirectionEvent";
@@ -25,6 +25,10 @@ void SnakeChangeDirectionEvent::applyChanged(IUpdatable &updatable) {
 
 EventType SnakeChangeDirectionEvent::getEventType() {
     return EventType::GAME_OBJECT;
+}
+
+int SnakeChangeDirectionEvent::getUserID() {
+    return m_userID;
 }
 
 }

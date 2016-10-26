@@ -20,7 +20,10 @@ public:
 
     virtual EventType getEventType() override;
 
+    virtual int getUserID() override;
+
 private:
+    int m_userID;
     Vector2D m_direction;
 };
 
