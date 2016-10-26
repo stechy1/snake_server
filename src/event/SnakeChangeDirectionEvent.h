@@ -18,8 +18,9 @@ public:
 
     virtual void applyChanged(IUpdatable &updatable) override;
 
+    virtual EventType getEventType() override;
+
 private:
-    int m_userID;
     Vector2D m_direction;
 };
 

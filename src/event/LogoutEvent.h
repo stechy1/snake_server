@@ -1,14 +1,16 @@
-#ifndef SNAKE_SERVER_LOGINEVENT_H
-#define SNAKE_SERVER_LOGINEVENT_H
+#ifndef SNAKE_SERVER_LOGOUTEVENT_H
+#define SNAKE_SERVER_LOGOUTEVENT_H
 
 #include "BaseEvent.h"
 
 namespace SnakeServer {
 namespace Event {
 
-class LoginEvent : public BaseEvent {
+class LogoutEvent : public BaseEvent {
 public:
-    LoginEvent(int t_userID, std::string t_username);
+    LogoutEvent(int t_userID);
+
+    virtual ~LogoutEvent();
 
     virtual std::string getDescription() override;
 
@@ -19,11 +21,9 @@ public:
     virtual EventType getEventType() override;
 
 private:
-    std::string m_username;
 };
 
 }
 }
 
-
-#endif //SNAKE_SERVER_LOGINEVENT_H
+#endif //SNAKE_SERVER_LOGOUTEVENT_H

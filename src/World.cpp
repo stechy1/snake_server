@@ -78,6 +78,7 @@ void World::removeSnake(int uid) {
 }
 
 void World::addSnake(int uid) {
+    std::cout << "Přidávám nového hada do hry" << std::endl;
     Vector2D pos = Vector2D::RANDOM(
             -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border);
     Vector2D dir = Vector2D::RANDOM();
@@ -88,6 +89,14 @@ void World::addSnake(int uid) {
 
     m_ready = true;
     m_conditionVariable.notify_one();
+}
+
+void World::addEvent(Event::BaseEvent &event) {
+    if (event.getEventType() == Event::EventType::WORLD) {
+        event.applyChanged(*this);
+    } else {
+
+    }
 }
 
 }

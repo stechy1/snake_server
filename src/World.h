@@ -9,7 +9,7 @@
 
 namespace SnakeServer {
 
-class World {
+class World : public Event::IUpdatable {
 public:
     World(int t_width, int t_height);
     ~World();
@@ -20,6 +20,8 @@ public:
 
     void addSnake(int uid);
     void removeSnake(int uid);
+
+    void addEvent(Event::BaseEvent &event);
 
 private:
     void run();
