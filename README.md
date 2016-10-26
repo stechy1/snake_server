@@ -3,7 +3,7 @@ snake_server
 ## Přeložení:
 Překlad se provádí pomocí nástroje Cmake
 1. Vygenerování Cmake cache příkazem: "cmake ./"
-2. Sestavení přojektu: "make"
+2. Sestavení projektu: "make"
 
 ## Spuštění:
 Server se spouští standartním způsobem pro konkrétní platformu.
