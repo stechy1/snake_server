@@ -110,6 +110,7 @@ void TCPConnection::run() {
                         m_clients[i]->receive();
                     } catch (std::exception ex) {
                         std::cout << "Chyba při přijímání dat od klienta" << std::endl;
+                        std::cout << ex.what() << std::endl;
                     }
                 }
             }
