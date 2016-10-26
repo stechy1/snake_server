@@ -10,14 +10,16 @@
 
 namespace SnakeServer {
 
+const std::string EVENT_DELIMITER = ":";
 const std::string LOGIN = "login:";
 const std::string LOGOUT = "logout";
-const std::string CHANGE_DIR = "chagedir:";
+const std::string CHANGE_DIR = "changedir:";
 
 std::unique_ptr<Event::BaseEvent> parseEvent(int userID, std::string data) {
+    unsigned long delimiterIndex = data.find(EVENT_DELIMITER);
 
     if (data.find(LOGIN) != std::string::npos) {
-        std::string res = data.substr(LOGIN.size());
+        std::string res = data.substr(delimiterIndex+1);
 
         std::unique_ptr<Event::BaseEvent> event = std::make_unique<Event::LoginEvent>(userID, res);
         return event;
@@ -25,9 +27,9 @@ std::unique_ptr<Event::BaseEvent> parseEvent(int userID, std::string data) {
         std::unique_ptr<Event::BaseEvent> event = std::make_unique<Event::LogoutEvent>(userID);
         return event;
     } else if (data.find(CHANGE_DIR) != std::string::npos) {
-        std::string res = data.substr(CHANGE_DIR.size());
+        std::string res = data.substr(delimiterIndex+1);
 
-        std::vector<std::string> dirData = Utils::split(res, ":");
+        std::vector<std::string> dirData = Utils::split(res, "|");
         double x = std::stod(dirData[0]);
         double y = std::stod(dirData[1]);
 
@@ -36,6 +38,7 @@ std::unique_ptr<Event::BaseEvent> parseEvent(int userID, std::string data) {
         return event;
     }
 
+    std::cout << "Nebyl nalezen odpovídající event" << std::endl;
     throw std::runtime_error("Could not parse event");
 }
 

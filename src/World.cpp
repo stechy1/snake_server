@@ -34,10 +34,11 @@ void World::run() {
     double accumulator = 0.0;
 
     while ( !m_interupt ) {
+        std::cout << "Running" << std::endl;
         std::unique_lock<std::mutex> lk(m_mutex);
         m_conditionVariable.wait(lk, [&] {
             currentTime = Time::now();
-            return (!m_snakesOnMap.empty() && m_ready) || (m_interupt && m_ready);
+            return (!m_snakesOnMap.empty() && m_ready) || (!m_snakesToAdd.empty()) || (m_interupt && m_ready);
         });
 
         auto newTime = Time::now();
@@ -49,24 +50,29 @@ void World::run() {
         accumulator += frameTime;
 
         for(int index : m_snakesToRemove) {
+            std::cout << "Odebiram hada z mapy" << std::endl;
+            delete m_snakesOnMap.at(index);
             m_snakesOnMap.erase(index);
         }
         m_snakesToRemove.clear();
 
-        while (accumulator >= dt) {
+//        while (accumulator >= dt) {
             for(auto &snake : m_snakesOnMap) {
-                snake.second.update(t, dt);
+                snake.second->update(t, dt);
             }
-            t += dt;
-            accumulator -= dt;
-        }
+//            t += dt;
+//            accumulator -= dt;
+//        }
 
         for(auto &newSnake : m_snakesToAdd) {
+            std::cout << "Vkladam hada do mapy" << std::endl;
             m_snakesOnMap.insert(newSnake);
         }
         m_snakesToAdd.clear();
 
         m_ready = !m_snakesOnMap.empty();
+
+        std::this_thread::sleep_for(2s);
     }
 }
 
@@ -83,8 +89,8 @@ void World::addSnake(int uid) {
             -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border);
     Vector2D dir = Vector2D::RANDOM();
 
-    GameObject::Snake::Snake snake(pos, dir);
-    std::pair<int, GameObject::Snake::Snake&> pair(uid, snake);
+    GameObject::Snake::Snake *snake = new GameObject::Snake::Snake(pos, dir);
+    std::pair<int, GameObject::Snake::Snake*> pair(uid, snake);
     m_snakesToAdd.insert(pair);
 
     m_ready = true;
@@ -96,8 +102,7 @@ void World::addEvent(Event::BaseEvent &event) {
         event.applyChanged(*this);
     } else {
         int id = event.getUserID();
-        GameObject::Snake::Snake &snake = m_snakesOnMap.at(id);
-        snake.addEvent(event);
+        m_snakesOnMap.at(id)->addEvent(event);
     }
 }
 

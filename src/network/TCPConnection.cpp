@@ -114,11 +114,6 @@ void TCPConnection::run() {
                     }
                 }
             }
-//            if (FD_ISSET(i, &m_write_fds)) {
-//                // Posílám data klientovi
-//                unsigned long sended = m_clients[i]->send();
-//                // TODO odebrat socket z FD_SETu pro zápis pouze, pokud už není více věcí k zápisu
-//            }
         }
     }
 }
@@ -157,6 +152,7 @@ void TCPConnection::disconnectClient(int socketID) {
     if (m_clients.find(socketID) != m_clients.end()) {
         m_clients[socketID]->closeStream();
         m_clients.erase(socketID);
+        FD_CLR(socketID, &m_master_read_fds);
     }
 }
 

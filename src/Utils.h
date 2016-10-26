@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 
 namespace SnakeServer {
 namespace Utils {
@@ -18,6 +19,7 @@ std::vector<std::string> split(const std::string str, const std::string delim) {
     } while (pos < str.length() && prev < str.length());
     return tokens;
 }
+
 }
 }
 

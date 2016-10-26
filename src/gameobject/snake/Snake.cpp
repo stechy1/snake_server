@@ -22,6 +22,7 @@ void SnakeServer::GameObject::Snake::Snake::update(double t, double dt) {
         Event::BaseEvent *event = m_eventQueue.front();
         m_eventQueue.pop_front();
         event->applyChanged(*this);
+        delete event;
     }
 
     const Vector2D newPos(Vector2D::mul(m_dir, m_vel)*=SIZE);

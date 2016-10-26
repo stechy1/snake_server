@@ -5,6 +5,8 @@
 #include "Protocol.h"
 
 SnakeServer::World *world;
+SnakeServer::Network::IOHandler *handler;
+SnakeServer::Network::TCPConnection *connection;
 
 class IOImpl : public SnakeServer::Network::IOHandler {
 public:
@@ -22,23 +24,30 @@ public:
 
     virtual void onDisconnect(int socketID) override {
         std::cout << "Oops, disconnected" << std::endl;
-
+        world->removeSnake(socketID);
+        connection->disconnectClient(socketID);
     }
 };
 
 int main(int argc, char *argv[]) {
 
     world = new SnakeServer::World(400, 300);
-    SnakeServer::Network::IOHandler *handler = new IOImpl();
-    SnakeServer::Network::TCPConnection connection(10000, *handler);
+    handler = new IOImpl();
+    connection = new SnakeServer::Network::TCPConnection(10000, *handler);
 
-    connection.init();
-    connection.start();
+    connection->init();
+    connection->start();
+
+    world->init();
+    world->start();
 
     int i;
     std::cin >> i;
 
-    connection.stop();
+    world->stop();
+    connection->stop();
 
     delete handler;
+    delete world;
+    delete connection;
 }

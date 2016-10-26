@@ -9,6 +9,8 @@
 
 namespace SnakeServer {
 
+using namespace std::chrono_literals;
+
 class World : public Event::IUpdatable {
 public:
     World(int t_width, int t_height);
@@ -34,8 +36,8 @@ private:
     typedef std::chrono::milliseconds ms;
     typedef std::chrono::duration<float> fsec;
 
-    std::map<int, GameObject::Snake::Snake&> m_snakesOnMap;
-    std::map<int, GameObject::Snake::Snake&> m_snakesToAdd;
+    std::map<int, GameObject::Snake::Snake*> m_snakesOnMap;
+    std::map<int, GameObject::Snake::Snake*> m_snakesToAdd;
     std::list<int> m_snakesToRemove;
 
     std::mutex m_mutex;

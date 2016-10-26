@@ -1,10 +1,17 @@
 #include <cstring>
 #include <stdexcept>
 #include <assert.h>
+#include <algorithm>
 #include "TCPStream.h"
 
 namespace SnakeServer {
 namespace Network {
+
+inline std::string& ltrim(std::string& s, const char* t = " \t\n\r\f\v")
+{
+    s.erase(0, s.find_first_not_of(t));
+    return s;
+}
 
 TCPStream::TCPStream(const int t_sd, const struct sockaddr_in *t_address, SingleStreamListener &t_listener)
         : m_sd(t_sd), m_listener(t_listener) {
@@ -50,14 +57,14 @@ void TCPStream::receive() {
     }
 
     // Vyzvednout z bufferu dříve přijatá data
-    received = m_inputBuffer + received;
+    received = m_inputBuffer + ltrim(received);
     unsigned long index = 0;
 
     // Naparsovat přijatá data
     std::list<std::string> list;
     while ((index = received.find(DELIMITER)) != std::string::npos) {
         unsigned long size = received.size();
-        std::string data = received.substr(0, index - 1);
+        std::string data = received.substr(0, index);
         list.push_back(data);
 
         if (size - index + 1 > 0) {
@@ -75,6 +82,7 @@ void TCPStream::receive() {
 void TCPStream::closeStream() {
     ::close(m_sd);
 }
+
 
 }
 }
