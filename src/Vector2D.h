@@ -28,7 +28,6 @@ public:
     Vector2D(const Vector2D &other) {
         m_x = other.m_x;
         m_y = other.m_y;
-        std::cout << "Kopy konstruktor: " << to_string() << std::endl;
     }
 
     ~Vector2D() {};
@@ -112,6 +111,14 @@ public:
         temp -= *this;
 
         return temp.mag();
+    }
+
+    double X() {
+        return m_x;
+    }
+
+    double Y() {
+        return m_y;
     }
 
     Vector2D &normalize() {
@@ -311,8 +318,6 @@ public:
 private:
     double m_x;
     double m_y;
-
-    //friend std::ostream& operator<<(std::ostream&, const Vector2D&);
 
     static double random(double min, double max) {
         static double doubleMax = std::numeric_limits<double>::max();

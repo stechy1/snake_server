@@ -2,7 +2,8 @@
 
 namespace SnakeServer {
 
-World::World(int t_width, int t_height) : m_width(t_width), m_height(t_height), m_border(0) {
+World::World(int t_width, int t_height, Network::IDataSender &t_dataSender)
+        : m_width(t_width), m_height(t_height), m_border(0), m_dataSender(t_dataSender) {
     m_border = std::min(m_width, m_height) / 0.7;
 }
 
@@ -96,7 +97,7 @@ void World::addSnake(int uid) {
             -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border);
     Vector2D dir = Vector2D::RANDOM();
 
-    GameObject::Snake::Snake *snake = new GameObject::Snake::Snake(pos, dir);
+    GameObject::Snake::Snake *snake = new GameObject::Snake::Snake(uid, pos, dir);
     std::pair<int, GameObject::Snake::Snake*> pair(uid, snake);
     m_snakesToAdd.insert(pair);
 
@@ -112,6 +113,16 @@ void World::addEvent(Event::BaseEvent *event) {
         int id = event->getUserID();
         m_snakesOnMap.at(id)->addEvent(event);
         // Event se smaže až poté, co se aplikuje...
+    }
+}
+
+void World::broadcastMessage(int uid, std::string data) {
+    for(auto &pair : m_snakesOnMap) {
+        if (pair.first == uid) {
+            continue;
+        }
+
+        m_dataSender.sendData(pair.first, data);
     }
 }
 

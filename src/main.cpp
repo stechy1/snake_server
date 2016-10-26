@@ -30,9 +30,9 @@ public:
 
 int main(int argc, char *argv[]) {
 
-    world = new SnakeServer::World(400, 300);
     handler = new IOImpl();
     connection = new SnakeServer::Network::TCPConnection(10000, *handler);
+    world = new SnakeServer::World(400, 300, *connection);
 
     connection->init();
     connection->start();

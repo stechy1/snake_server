@@ -6,6 +6,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "gameobject/snake/Snake.h"
+#include "network/TCPConnection.h"
 
 namespace SnakeServer {
 
@@ -13,7 +14,7 @@ using namespace std::chrono_literals;
 
 class World : public Event::IUpdatable {
 public:
-    World(int t_width, int t_height);
+    World(int t_width, int t_height, Network::IDataSender &dataSender);
     ~World();
 
     void init();
@@ -24,6 +25,7 @@ public:
     void removeSnake(int uid);
 
     void addEvent(Event::BaseEvent *event);
+    void broadcastMessage(int uid, std::string data);
 
 private:
     void run();
@@ -31,6 +33,7 @@ private:
     int m_width = 0;
     int m_height = 0;
     double m_border = 0;
+    Network::IDataSender &m_dataSender;
 
     typedef std::chrono::high_resolution_clock Time;
     typedef std::chrono::milliseconds ms;
@@ -46,6 +49,8 @@ private:
     bool m_interupt = false;
     bool m_ready = false;
 };
+
+
 
 }
 

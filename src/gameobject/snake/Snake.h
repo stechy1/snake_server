@@ -10,16 +10,12 @@ namespace SnakeServer {
 namespace GameObject {
 namespace Snake {
 
-    static const unsigned int SIZE = 15;
-    static const float VELOCITY_MULTIPLIER = 0.7f;
+static const unsigned int SIZE = 15;
+static const float VELOCITY_MULTIPLIER = 0.7f;
 
 class Snake : public BaseObject, public Event::IUpdatable {
 public:
-    Snake();
-
-    Snake(Vector2D &t_pos);
-    Snake(Vector2D &t_pos, Vector2D &t_dir);
-    Snake(Vector2D &t_pos, Vector2D &t_dir, Vector2D &t_vel);
+    Snake(int t_id, Vector2D &t_pos, Vector2D &t_dir);
 
     virtual ~Snake();
 
@@ -30,6 +26,7 @@ public:
     virtual std::string getDescription() override;
 
 private:
+    int m_id;
     std::list<Event::BaseEvent*> m_eventQueue;
 };
 

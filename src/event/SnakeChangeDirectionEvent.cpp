@@ -13,7 +13,7 @@ std::string SnakeChangeDirectionEvent::getDescription() {
 }
 
 std::string SnakeChangeDirectionEvent::getData() {
-    return "";
+    return "changedir:" + std::to_string(m_direction.X()) + "|" + std::to_string(m_direction.Y()) + ";";
 }
 
 void SnakeChangeDirectionEvent::applyChanged(IUpdatable &updatable) {
