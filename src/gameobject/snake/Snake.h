@@ -30,7 +30,7 @@ public:
     virtual std::string getDescription() override;
 
 private:
-    std::list<Event::BaseEvent> m_eventQueue;
+    std::list<Event::BaseEvent*> m_eventQueue;
 };
 
 }

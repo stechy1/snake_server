@@ -96,7 +96,8 @@ void World::addEvent(Event::BaseEvent &event) {
         event.applyChanged(*this);
     } else {
         int id = event.getUserID();
-        m_snakesOnMap[id].addEvent(event);
+        GameObject::Snake::Snake &snake = m_snakesOnMap.at(id);
+        snake.addEvent(event);
     }
 }
 

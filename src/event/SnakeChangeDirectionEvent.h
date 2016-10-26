@@ -12,6 +12,11 @@ class SnakeChangeDirectionEvent : public BaseEvent {
 public:
     SnakeChangeDirectionEvent(int t_userID, Vector2D &t_direction);
 
+    SnakeChangeDirectionEvent(const SnakeChangeDirectionEvent &other) {
+        m_userID = other.m_userID;
+        m_direction = other.m_direction;
+    }
+
     virtual std::string getDescription() override;
 
     virtual std::string getData() override;
