@@ -17,8 +17,9 @@ public:
     virtual void onDataReceived(int socketID, std::list<std::string> data) override {
         for(auto &tmp : data) {
             std::cout << "Data received from: " << socketID << ", content: " << tmp << std::endl;
-            std::unique_ptr<SnakeServer::Event::BaseEvent> event = SnakeServer::parseEvent(socketID, tmp);
-            world->addEvent(*event);
+            //std::unique_ptr<SnakeServer::Event::BaseEvent> event = SnakeServer::parseEvent(socketID, tmp);
+            SnakeServer::Event::BaseEvent *event = SnakeServer::parseEvent(socketID, tmp);
+            world->addEvent(event);
         }
     }
 

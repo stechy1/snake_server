@@ -9,7 +9,10 @@ Snake::Snake() {}
 
 Snake::Snake(Vector2D &t_pos) : BaseObject(t_pos) {}
 
-Snake::Snake(Vector2D &t_pos, Vector2D &t_dir) : BaseObject(t_pos, t_dir) {}
+Snake::Snake(Vector2D &t_pos, Vector2D &t_dir) : BaseObject(t_pos, t_dir) {
+    m_vel = Vector2D::ONES();
+    m_vel *= VELOCITY_MULTIPLIER;
+}
 
 Snake::Snake(Vector2D &t_pos, Vector2D &t_dir, Vector2D &t_vel) : BaseObject(t_pos, t_dir, t_vel) {}
 
@@ -31,8 +34,8 @@ void SnakeServer::GameObject::Snake::Snake::update(double t, double dt) {
     std::cout << "Position: " << m_pos.to_string() << std::endl;
 }
 
-void Snake::addEvent(Event::BaseEvent &event) {
-    m_eventQueue.push_back(&event);
+void Snake::addEvent(Event::BaseEvent *event) {
+    m_eventQueue.push_back(event);
 }
 
 std::string Snake::getDescription() {

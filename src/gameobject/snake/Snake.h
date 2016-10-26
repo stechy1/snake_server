@@ -23,7 +23,7 @@ public:
 
     virtual ~Snake();
 
-    void addEvent(Event::BaseEvent &event);
+    void addEvent(Event::BaseEvent *event);
 
     virtual void update(double t, double dt) override;
 

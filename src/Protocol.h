@@ -15,17 +15,17 @@ const std::string LOGIN = "login:";
 const std::string LOGOUT = "logout";
 const std::string CHANGE_DIR = "changedir:";
 
-std::unique_ptr<Event::BaseEvent> parseEvent(int userID, std::string data) {
+Event::BaseEvent *parseEvent(int userID, std::string data) {
     unsigned long delimiterIndex = data.find(EVENT_DELIMITER);
 
     if (data.find(LOGIN) != std::string::npos) {
         std::string res = data.substr(delimiterIndex+1);
 
-        std::unique_ptr<Event::BaseEvent> event = std::make_unique<Event::LoginEvent>(userID, res);
-        return event;
+        //std::unique_ptr<Event::BaseEvent> event = std::make_unique<Event::LoginEvent>(userID, res);
+        return new Event::LoginEvent(userID, res);
     } else if (data.find(LOGOUT) != std::string::npos) {
-        std::unique_ptr<Event::BaseEvent> event = std::make_unique<Event::LogoutEvent>(userID);
-        return event;
+        //std::unique_ptr<Event::BaseEvent> event = std::make_unique<Event::LogoutEvent>(userID);
+        return new Event::LogoutEvent(userID);
     } else if (data.find(CHANGE_DIR) != std::string::npos) {
         std::string res = data.substr(delimiterIndex+1);
 
@@ -34,8 +34,8 @@ std::unique_ptr<Event::BaseEvent> parseEvent(int userID, std::string data) {
         double y = std::stod(dirData[1]);
 
         Vector2D dir(x, y);
-        std::unique_ptr<Event::BaseEvent> event = std::make_unique<Event::SnakeChangeDirectionEvent>(userID, dir);
-        return event;
+        //std::unique_ptr<Event::BaseEvent> event = std::make_unique<Event::SnakeChangeDirectionEvent>(userID, dir);
+        return new Event::SnakeChangeDirectionEvent(userID, dir);
     }
 
     std::cout << "Nebyl nalezen odpovídající event" << std::endl;

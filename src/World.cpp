@@ -97,12 +97,14 @@ void World::addSnake(int uid) {
     m_conditionVariable.notify_one();
 }
 
-void World::addEvent(Event::BaseEvent &event) {
-    if (event.getEventType() == Event::EventType::WORLD) {
-        event.applyChanged(*this);
+void World::addEvent(Event::BaseEvent *event) {
+    if (event->getEventType() == Event::EventType::WORLD) {
+        event->applyChanged(*this);
+        delete event;
     } else {
-        int id = event.getUserID();
+        int id = event->getUserID();
         m_snakesOnMap.at(id)->addEvent(event);
+        // Event se smaže až poté, co se aplikuje...
     }
 }
 

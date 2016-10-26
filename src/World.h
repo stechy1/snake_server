@@ -23,7 +23,7 @@ public:
     void addSnake(int uid);
     void removeSnake(int uid);
 
-    void addEvent(Event::BaseEvent &event);
+    void addEvent(Event::BaseEvent *event);
 
 private:
     void run();
