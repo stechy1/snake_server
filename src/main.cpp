@@ -1,7 +1,7 @@
 #include <iostream>
-#include "gameobject/snake/Snake.h"
+#include "Snake.h"
 #include "World.h"
-#include "network/TCPConnection.h"
+#include "TCPConnection.h"
 #include "Protocol.h"
 
 SnakeServer::World *world;

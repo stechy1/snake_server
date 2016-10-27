@@ -5,12 +5,14 @@
 #include <map>
 #include <mutex>
 #include <condition_variable>
-#include "gameobject/snake/Snake.h"
-#include "network/TCPConnection.h"
+#include "Snake.h"
+#include "TCPConnection.h"
 
 namespace SnakeServer {
 
 using namespace std::chrono_literals;
+
+static const unsigned int SNAKE_SIZE = 15;
 
 class World : public Event::IUpdatable {
 public:
@@ -29,6 +31,7 @@ public:
 
 private:
     void run();
+    void updateSnake(int uid, GameObject::Snake &snake);
 
     int m_width = 0;
     int m_height = 0;
@@ -39,8 +42,8 @@ private:
     typedef std::chrono::milliseconds ms;
     typedef std::chrono::duration<float> fsec;
 
-    std::map<int, GameObject::Snake::Snake*> m_snakesOnMap;
-    std::map<int, GameObject::Snake::Snake*> m_snakesToAdd;
+    std::map<int, GameObject::Snake*> m_snakesOnMap;
+    std::map<int, GameObject::Snake*> m_snakesToAdd;
     std::list<int> m_snakesToRemove;
 
     std::mutex m_mutex;

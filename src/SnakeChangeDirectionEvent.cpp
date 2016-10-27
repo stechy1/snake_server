@@ -1,6 +1,6 @@
 #include <iostream>
 #include "SnakeChangeDirectionEvent.h"
-#include "../gameobject/snake/Snake.h"
+#include "Snake.h"
 
 namespace SnakeServer {
 namespace Event {
@@ -17,7 +17,7 @@ std::string SnakeChangeDirectionEvent::getData() {
 }
 
 void SnakeChangeDirectionEvent::applyChanged(IUpdatable &updatable) {
-    SnakeServer::GameObject::Snake::Snake &snake = static_cast<SnakeServer::GameObject::Snake::Snake&>(updatable);
+    SnakeServer::GameObject::Snake &snake = static_cast<SnakeServer::GameObject::Snake&>(updatable);
 
     snake.m_dir.set(m_direction);
 }

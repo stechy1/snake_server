@@ -67,7 +67,8 @@ void World::run() {
 
 //        while (accumulator >= dt) {
             for(auto &snake : m_snakesOnMap) {
-                snake.second->update(t, dt);
+                //snake.second->update(t, dt);
+                updateSnake(snake.first, *snake.second);
             }
 //            t += dt;
 //            accumulator -= dt;
@@ -97,8 +98,8 @@ void World::addSnake(int uid) {
             -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border);
     Vector2D dir = Vector2D::RANDOM();
 
-    GameObject::Snake::Snake *snake = new GameObject::Snake::Snake(uid, pos, dir);
-    std::pair<int, GameObject::Snake::Snake*> pair(uid, snake);
+    GameObject::Snake *snake = new GameObject::Snake(pos, dir);
+    std::pair<int, GameObject::Snake*> pair(uid, snake);
     m_snakesToAdd.insert(pair);
 
     m_ready = true;
@@ -124,6 +125,17 @@ void World::broadcastMessage(int uid, std::string data) {
 
         m_dataSender.sendData(pair.first, data);
     }
+}
+
+void World::updateSnake(int uid, GameObject::Snake &snake) {
+    Event::BaseEvent *event = snake.applyEvent();
+    if (event != nullptr) {
+        broadcastMessage(uid, event->getData());
+        delete event;
+    }
+
+    const Vector2D newPos(Vector2D::mul(snake.m_dir, snake.m_vel) *= SNAKE_SIZE);
+    snake.m_pos+=newPos;
 }
 
 }

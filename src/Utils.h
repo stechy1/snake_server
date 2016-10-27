@@ -7,6 +7,7 @@
 
 namespace SnakeServer {
 namespace Utils {
+
 std::vector<std::string> split(const std::string str, const std::string delim) {
     std::vector<std::string> tokens;
     size_t prev = 0, pos = 0;

@@ -3,7 +3,7 @@
 
 #include <memory>
 #include "BaseEvent.h"
-#include "../Vector2D.h"
+#include "Vector2D.h"
 
 namespace SnakeServer {
 namespace Event {

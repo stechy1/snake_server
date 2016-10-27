@@ -1,5 +1,5 @@
 #include "LogoutEvent.h"
-#include "../World.h"
+#include "World.h"
 
 namespace SnakeServer {
 namespace Event {

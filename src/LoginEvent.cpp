@@ -1,7 +1,7 @@
 #include <iostream>
 #include "LoginEvent.h"
-#include "../gameobject/snake/Snake.h"
-#include "../World.h"
+#include "Snake.h"
+#include "World.h"
 
 namespace SnakeServer {
 namespace Event {

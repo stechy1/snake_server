@@ -3,10 +3,10 @@
 
 #include <stdexcept>
 #include "Utils.h"
-#include "event/BaseEvent.h"
-#include "event/LoginEvent.h"
-#include "event/LogoutEvent.h"
-#include "event/SnakeChangeDirectionEvent.h"
+#include "BaseEvent.h"
+#include "LoginEvent.h"
+#include "LogoutEvent.h"
+#include "SnakeChangeDirectionEvent.h"
 
 namespace SnakeServer {
 
