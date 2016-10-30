@@ -29,10 +29,10 @@ public:
 };
 
 int main(int argc, char *argv[]) {
-
+    srand (time(NULL));
     handler = new IOImpl();
     connection = new SnakeServer::Network::TCPConnection(10000, *handler);
-    world = new SnakeServer::World(400, 300, *connection);
+    world = new SnakeServer::World(20, 20, *connection);
 
     connection->init();
     connection->start();

@@ -141,7 +141,7 @@ void TCPConnection::accept() {
     memset(&address, 0, sizeof(address));
     int sd = ::accept(m_lsd, (struct sockaddr *) &address, &len);
     if (sd < 0) {
-        throw std::runtime_error("accepf() error");
+        throw std::runtime_error("accept() error");
     }
 
     // Přidání nového klienta do mapy
@@ -161,6 +161,7 @@ void TCPConnection::stop() {
 }
 
 void TCPConnection::disconnectClient(int socketID) {
+    std::cout << "Ukončuji spojení s klidnetem: " << socketID << std::endl;
     if (m_clients.find(socketID) != m_clients.end()) {
         m_clients[socketID]->closeStream();
         m_clients.erase(socketID);
@@ -171,8 +172,6 @@ void TCPConnection::disconnectClient(int socketID) {
 void TCPConnection::sendData(int socketID, std::string data) {
     m_clients[socketID]->send(data);
 }
-
-
 
 }
 }

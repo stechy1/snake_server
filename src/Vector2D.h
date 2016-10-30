@@ -237,10 +237,11 @@ public:
     }
 
     static Vector2D RANDOM() {
-        static std::default_random_engine e{};
-        static std::uniform_int_distribution<int> randX{0, 3};
-
-        int res = randX(e);
+//        static std::default_random_engine e{};
+//        static std::uniform_int_distribution<int> randX{0, 3};
+//
+//        int res = randX(e);
+        int res = random(3, 1);
 
         switch(res) {
             case 0:
@@ -320,10 +321,8 @@ private:
     double m_y;
 
     static double random(double min, double max) {
-        static double doubleMax = std::numeric_limits<double>::max();
-        double val = (double)rand() / doubleMax;
-
-        return min + val * (max - min);
+        double f = (double)rand() / RAND_MAX;
+        return min + f * (max - min);
     }
 
 }; // end class

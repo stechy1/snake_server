@@ -1,8 +1,10 @@
 #include "World.h"
+#include "LogoutEvent.h"
+#include "RemoveSnakeEvent.h"
 
 namespace SnakeServer {
 
-World::World(int t_width, int t_height, Network::IDataSender &t_dataSender)
+World::World(int t_width, int t_height, Network::TCPConnection &t_dataSender)
         : m_width(t_width), m_height(t_height), m_border(0), m_dataSender(t_dataSender) {
     m_border = std::min(m_width, m_height) / 0.7;
 }
@@ -20,11 +22,27 @@ World::~World() {
         delete tmp.second;
     }
 
+    for(auto tmp : m_snakesToAdd) {
+        delete tmp.second;
+    }
+
+    for(auto tmp : m_foodOnMap) {
+        delete tmp.second;
+    }
+
     std::cout << "World destruct OK" << std::endl;
 }
 
 void World::init() {
     std::cout << "Generuji svět..." << std::endl;
+    for (int i = 0; i < 10; ++i) {
+        addFood(i);
+    }
+
+    for(auto &newFood : m_foodToAdd) {
+        m_foodOnMap.insert(newFood);
+    }
+    m_foodToAdd.clear();
 }
 
 void World::start() {
@@ -59,11 +77,7 @@ void World::run() {
         currentTime = newTime;
         accumulator += frameTime;
 
-        for(int index : m_snakesToRemove) {
-            delete m_snakesOnMap.at(index);
-            m_snakesOnMap.erase(index);
-        }
-        m_snakesToRemove.clear();
+        removeGameObjects();
 
 //        while (accumulator >= dt) {
             for(auto &snake : m_snakesOnMap) {
@@ -74,13 +88,11 @@ void World::run() {
 //            accumulator -= dt;
 //        }
 
-        for(auto &newSnake : m_snakesToAdd) {
-            m_snakesOnMap.insert(newSnake);
-        }
-        m_snakesToAdd.clear();
+        addGameObjects();
 
         m_ready = !m_snakesOnMap.empty();
 
+        std::cout << "Loop" << std::endl;
         std::this_thread::sleep_for(2s);
     }
 }
@@ -88,11 +100,14 @@ void World::run() {
 void World::removeSnake(int uid) {
     m_snakesToRemove.push_back(uid);
 
-    m_ready = true;
-    m_conditionVariable.notify_one();
+//    m_ready = true;
+//    m_conditionVariable.notify_one();
 }
 
-void World::addSnake(int uid) {
+GameObject::Snake *World::addSnake(int uid) {
+    if (m_snakesToAdd.find(uid) != m_snakesToAdd.end() || m_snakesOnMap.find(uid) != m_snakesOnMap.end()) {
+        throw new std::runtime_error("Hrac s timto hadem jiz existuje");
+    }
     std::cout << "Přidávám nového hada do hry" << std::endl;
     Vector2D pos = Vector2D::RANDOM(
             -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border);
@@ -102,8 +117,22 @@ void World::addSnake(int uid) {
     std::pair<int, GameObject::Snake*> pair(uid, snake);
     m_snakesToAdd.insert(pair);
 
-    m_ready = true;
-    m_conditionVariable.notify_one();
+    return snake;
+}
+
+GameObject::Food *World::addFood(int id) {
+    GameObject::Food *food = new GameObject::Food(id, Vector2D::RANDOM(
+            -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border
+    ));
+
+    std::pair<int, GameObject::Food*> pair(food->m_uid, food);
+    m_foodToAdd.insert(pair);
+
+    return food;
+}
+
+void World::removeFood(int uid) {
+    m_foodToRemove.push_back(uid);
 }
 
 void World::addEvent(Event::BaseEvent *event) {
@@ -117,14 +146,25 @@ void World::addEvent(Event::BaseEvent *event) {
     }
 }
 
+void World::sendMessage(int uid, std::string data) {
+    m_dataSender.sendData(uid, data);
+}
+
 void World::broadcastMessage(int uid, std::string data) {
     for(auto &pair : m_snakesOnMap) {
         if (pair.first == uid) {
             continue;
         }
 
-        m_dataSender.sendData(pair.first, data);
+        std::string msg = "{" + std::to_string(uid) + "}" + data;
+        std::cout << "Broadcast: " << msg << std::endl;
+        m_dataSender.sendData(pair.first, msg);
     }
+}
+
+void World::wakeUp() {
+    m_ready = true;
+    m_conditionVariable.notify_one();
 }
 
 void World::updateSnake(int uid, GameObject::Snake &snake) {
@@ -136,6 +176,35 @@ void World::updateSnake(int uid, GameObject::Snake &snake) {
 
     const Vector2D newPos(Vector2D::mul(snake.m_dir, snake.m_vel) *= SNAKE_SIZE);
     snake.m_pos+=newPos;
+}
+
+void World::addGameObjects() {
+    for(auto &newSnake : m_snakesToAdd) {
+        m_snakesOnMap.insert(newSnake);
+    }
+    m_snakesToAdd.clear();
+
+    for(auto &newFood : m_foodToAdd) {
+        m_foodOnMap.insert(newFood);
+    }
+    m_foodToAdd.clear();
+}
+
+void World::removeGameObjects() {
+    for(int index : m_snakesToRemove) {
+        std::cout << "Odebiram hada z mapy s indexem: " << index << std::endl;
+        Event::RemoveSnakeEvent event(index);
+        broadcastMessage(index, event.getData());
+        m_dataSender.disconnectClient(index);
+        delete m_snakesOnMap.at(index);
+        m_snakesOnMap.erase(index);
+    }
+    m_snakesToRemove.clear();
+
+    for(int index : m_foodToRemove) {
+        m_foodOnMap.erase(index);
+    }
+    m_foodToRemove.clear();
 }
 
 }

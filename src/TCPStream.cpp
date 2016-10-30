@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <assert.h>
 #include <algorithm>
+#include <iostream>
 #include "TCPStream.h"
 
 namespace SnakeServer {
@@ -27,8 +28,10 @@ TCPStream::~TCPStream() {}
 
 void TCPStream::send(std::string data) {
     const unsigned long len = data.size();
+    const char *buff = data.c_str();
 
-    ssize_t n = ::send(m_sd, &data, len, 0);
+    std::cout << "Posilam: " << data << std::endl;
+    ssize_t n = ::send(m_sd, buff, len, 0);
 
     assert(n == len);
 }
