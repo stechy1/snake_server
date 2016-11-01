@@ -15,20 +15,9 @@ class Snake : public Event::IUpdatable {
 public:
     Snake(Vector2D &t_pos, Vector2D &t_dir);
 
-    virtual ~Snake();
+    void addEvent(std::unique_ptr<Event::BaseEvent>&& event);
 
-    void addEvent(Event::BaseEvent *event);
-
-    Event::BaseEvent *applyEvent() {
-        if (m_eventQueue.empty()) {
-            return nullptr;
-        }
-
-        Event::BaseEvent *event = m_eventQueue.front();
-        m_eventQueue.pop_front();
-        event->applyChanged(*this);
-        return event;
-    }
+    std::unique_ptr<Event::BaseEvent> applyEvent();
 
     std::string getDescription();
 
@@ -38,7 +27,7 @@ public:
     int size = 25;
 
 private:
-    std::list<Event::BaseEvent*> m_eventQueue; // TODO unique pointer
+    std::list<std::unique_ptr<Event::BaseEvent>> m_eventQueue; // TODO unique pointer
 };
 
 }

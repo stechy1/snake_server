@@ -31,10 +31,6 @@ TCPConnection::~TCPConnection() {
 }
 
 void TCPConnection::init() {
-    if (m_listening) {
-        return;
-    }
-
     // Vytvoření nového socketu
     m_lsd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (m_lsd < 0) {
@@ -86,6 +82,7 @@ void TCPConnection::start() {
     if (m_listening) {
         return;
     }
+    init();
 
     m_interupt = false;
     m_listening = true;

@@ -10,14 +10,20 @@ Snake::Snake(Vector2D &t_pos, Vector2D &t_dir)
     m_vel *= VELOCITY_MULTIPLIER;
 }
 
-Snake::~Snake() {
-    for(auto event : m_eventQueue) {
-        delete event;
-    }
+
+void Snake::addEvent(std::unique_ptr<Event::BaseEvent>&& event) {
+    m_eventQueue.push_back(std::move(event));
 }
 
-void Snake::addEvent(Event::BaseEvent *event) {
-    m_eventQueue.push_back(event);
+std::unique_ptr<Event::BaseEvent> Snake::applyEvent() {
+    if (m_eventQueue.empty()) {
+        return nullptr;
+    }
+
+    auto event = std::move(m_eventQueue.front());
+    m_eventQueue.pop_front();
+    event->applyChanged(*this);
+    return std::move(event);
 }
 
 std::string Snake::getDescription() {

@@ -1,19 +1,19 @@
 #ifndef SNAKE_SERVER_TCPSTREAM_H
 #define SNAKE_SERVER_TCPSTREAM_H
 
-#include <list>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <vector>
 #include <string>
 
 namespace SnakeServer {
 namespace Network {
 
-    const unsigned int BUFFER_SIZE = 2048;
+const unsigned int BUFFER_SIZE = 2048;
 const std::string DELIMITER = ";";
 
 class SingleStreamListener {
@@ -21,7 +21,7 @@ public:
     SingleStreamListener() {}
     virtual ~SingleStreamListener() {}
 
-    virtual void onDataReceived(int socketID, std::list<std::string> data) = 0;
+    virtual void onDataReceived(int socketID, std::vector<std::string> data) = 0;
     virtual void onLostConnection(int socketID) = 0;
     virtual void onDisconnect(int socketID) = 0;
     virtual void onRestoreConnection(int socketID) = 0;

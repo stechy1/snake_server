@@ -35,6 +35,7 @@ World::~World() {
 
 void World::init() {
     std::cout << "Generuji svět..." << std::endl;
+    srand (time(NULL));
     for (int i = 0; i < 10; ++i) {
         addFood(i);
     }
@@ -46,6 +47,7 @@ void World::init() {
 }
 
 void World::start() {
+    init();
     m_thread = std::thread(&World::run, this);
 }
 
@@ -62,7 +64,8 @@ void World::run() {
     auto currentTime = Time::now();
     double accumulator = 0.0;
 
-    while ( !m_interupt ) { // TODO zlikvidovat confition vriable
+    while ( !m_interupt ) {
+
         std::unique_lock<std::mutex> lk(m_mutex);
         m_conditionVariable.wait(lk, [&] {
             currentTime = Time::now();
@@ -71,7 +74,8 @@ void World::run() {
         });
 
         auto newTime = Time::now();
-        fsec delta = newTime - currentTime;
+        auto delta = newTime - currentTime;
+        using ms = std::chrono::milliseconds;
         double frameTime = std::chrono::duration_cast<ms>(delta).count();
         if (frameTime > 0.25) {
             frameTime = 0.25;
@@ -101,9 +105,6 @@ void World::run() {
 
 void World::removeSnake(int uid) {
     m_snakesToRemove.push_back(uid);
-
-//    m_ready = true;
-//    m_conditionVariable.notify_one();
 }
 
 GameObject::Snake *World::addSnake(int uid) {
@@ -137,13 +138,13 @@ void World::removeFood(int uid) {
     m_foodToRemove.push_back(uid);
 }
 
-void World::addEvent(Event::BaseEvent *event) {
+void World::addEvent(std::unique_ptr<Event::BaseEvent> event) {
+    std::unique_lock<std::mutex> lk(m_mutex);
     if (event->getEventType() == Event::EventType::WORLD) { // TODO lockguard
         event->applyChanged(*this);
-        delete event;
     } else {
         int id = event->getUserID();
-        m_snakesOnMap.at(id)->addEvent(event);
+        m_snakesOnMap.at(id)->addEvent(std::move(event));
         // Event se smaže až poté, co se aplikuje...
     }
 }
@@ -170,13 +171,12 @@ void World::wakeUp() {
 }
 
 void World::updateSnake(int uid, GameObject::Snake &snake) {
-    Event::BaseEvent *event = snake.applyEvent();
+    auto event = snake.applyEvent();
     if (event != nullptr) {
         broadcastMessage(uid, event->getData());
-        delete event;
     }
 
-    const Vector2D newPos(Vector2D::mul(snake.m_dir, snake.m_vel) *= SNAKE_SIZE);
+    const Vector2D newPos = (snake.m_dir * snake.m_vel) *= SNAKE_SIZE;
     snake.m_pos+=newPos;
 }
 

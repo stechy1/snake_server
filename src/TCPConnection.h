@@ -18,7 +18,7 @@ public:
     IOHandler() {}
     virtual ~IOHandler() {}
 
-    virtual void onDataReceived(int socketID, std::list<std::string> data) = 0;
+    virtual void onDataReceived(int socketID, std::vector<std::string> data) = 0;
     virtual void onDisconnect(int socketID) = 0;
 };
 
@@ -37,16 +37,15 @@ public:
 
     friend class SingleStreamListenerImpl;
 
-    void init();
     void start();
-    void run();
     void stop();
-
     void disconnectClient(int socketID);
 
     virtual void sendData(int socketID, std::string data) override;
 
 protected:
+    void init();
+    void run();
     void accept();
 
 private:

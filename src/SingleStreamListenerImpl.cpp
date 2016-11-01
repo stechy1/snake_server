@@ -9,7 +9,7 @@ SingleStreamListenerImpl::SingleStreamListenerImpl(TCPConnection &t_tcpConnectio
 
 SingleStreamListenerImpl::~SingleStreamListenerImpl() {}
 
-void SingleStreamListenerImpl::onDataReceived(int socketID, std::list<std::string> data) {
+void SingleStreamListenerImpl::onDataReceived(int socketID, std::vector<std::string> data) {
     m_tcpConnection.m_ioHandler.onDataReceived(socketID, data);
 }
 

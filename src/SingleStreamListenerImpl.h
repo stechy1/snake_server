@@ -12,7 +12,7 @@ public:
     SingleStreamListenerImpl(TCPConnection &t_tcpConnection);
     virtual ~SingleStreamListenerImpl();
 
-    virtual void onDataReceived(int socketID, std::list<std::string> data) override;
+    virtual void onDataReceived(int socketID, std::vector<std::string> data) override;
 
     virtual void onLostConnection(int socketID) override;
 

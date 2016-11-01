@@ -4,9 +4,9 @@
 #include "TCPConnection.h"
 #include "Protocol.h"
 
-SnakeServer::World *world;
-SnakeServer::Network::IOHandler *handler;
-SnakeServer::Network::TCPConnection *connection;
+SnakeServer::World *g_world = nullptr;
+SnakeServer::Network::IOHandler *g_handler = nullptr;
+SnakeServer::Network::TCPConnection *g_connection = nullptr;
 
 class IOImpl : public SnakeServer::Network::IOHandler {
 public:
@@ -14,39 +14,32 @@ public:
 
     virtual ~IOImpl() {}
 
-    virtual void onDataReceived(int socketID, std::list<std::string> data) override {
+    virtual void onDataReceived(int socketID, std::vector<std::string> data) override {
         for(auto &tmp : data) {
-            SnakeServer::Event::BaseEvent *event = SnakeServer::parseEvent(socketID, tmp);
-            world->addEvent(event);
+            g_world->addEvent(SnakeServer::parseEvent(socketID, tmp));
         }
     }
 
     virtual void onDisconnect(int socketID) override {
         std::cout << "Oops, disconnected" << std::endl;
-        world->removeSnake(socketID);
-        connection->disconnectClient(socketID);
+        g_world->removeSnake(socketID);
     }
 };
 
 int main(int argc, char *argv[]) {
-    srand (time(NULL));
-    handler = new IOImpl();
-    connection = new SnakeServer::Network::TCPConnection(10000, *handler);
-    world = new SnakeServer::World(20, 20, *connection);
+    IOImpl handler;
+    g_handler = &handler;
+    SnakeServer::Network::TCPConnection connection(10000, handler);
+    g_connection = &connection;
+    SnakeServer::World world(20, 20, connection);
+    g_world = &world;
 
-    connection->init();
-    connection->start();
-
-    world->init();
-    world->start();
+    connection.start();
+    world.start();
 
     int i;
     std::cin >> i;
 
-    world->stop();
-    connection->stop();
-
-    delete world;
-    delete handler;
-    delete connection;
+    world.stop();
+    connection.stop();
 }

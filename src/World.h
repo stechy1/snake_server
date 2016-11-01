@@ -21,7 +21,6 @@ public:
     World(int t_width, int t_height, Network::TCPConnection &t_dataSender);
     ~World();
 
-    void init();
     void start();
     void stop();
     void wakeUp();
@@ -32,7 +31,7 @@ public:
     GameObject::Food *addFood(int id);
     void removeFood(int uid);
 
-    void addEvent(Event::BaseEvent *event);
+    void addEvent(std::unique_ptr<Event::BaseEvent> event);
     void sendMessage(int uid, std::string data);
     void broadcastMessage(int uid, std::string data);
 
@@ -43,6 +42,7 @@ public:
     std::map<int, GameObject::Food*> m_foodOnMap;
 
 private:
+    void init();
     void run();
     void updateSnake(int uid, GameObject::Snake &snake);
 
@@ -52,8 +52,6 @@ private:
     Network::TCPConnection &m_dataSender;
 
     typedef std::chrono::high_resolution_clock Time;
-    typedef std::chrono::milliseconds ms;
-    typedef std::chrono::duration<float> fsec;
 
     std::map<int, GameObject::Snake*> m_snakesToAdd; // TODO snake -> sharedPointer
     std::map<int, GameObject::Food*> m_foodToAdd;
