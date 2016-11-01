@@ -5,6 +5,7 @@
 #include <map>
 #include <mutex>
 #include <condition_variable>
+#include <chrono>
 #include "Snake.h"
 #include "TCPConnection.h"
 #include "Food.h"
@@ -54,7 +55,7 @@ private:
     typedef std::chrono::milliseconds ms;
     typedef std::chrono::duration<float> fsec;
 
-    std::map<int, GameObject::Snake*> m_snakesToAdd;
+    std::map<int, GameObject::Snake*> m_snakesToAdd; // TODO snake -> sharedPointer
     std::map<int, GameObject::Food*> m_foodToAdd;
     std::list<int> m_snakesToRemove;
     std::list<int> m_foodToRemove;

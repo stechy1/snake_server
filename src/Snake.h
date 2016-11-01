@@ -38,7 +38,7 @@ public:
     int size = 25;
 
 private:
-    std::list<Event::BaseEvent*> m_eventQueue;
+    std::list<Event::BaseEvent*> m_eventQueue; // TODO unique pointer
 };
 
 }

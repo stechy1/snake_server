@@ -62,18 +62,20 @@ void World::run() {
     auto currentTime = Time::now();
     double accumulator = 0.0;
 
-    while ( !m_interupt ) {
+    while ( !m_interupt ) { // TODO zlikvidovat confition vriable
         std::unique_lock<std::mutex> lk(m_mutex);
         m_conditionVariable.wait(lk, [&] {
             currentTime = Time::now();
-            return (!m_snakesOnMap.empty() && m_ready) || (!m_snakesToAdd.empty()) || (m_interupt && m_ready);
+            return (!m_snakesOnMap.empty() && m_ready) ||
+                    (!m_snakesToAdd.empty()) || (m_interupt && m_ready);
         });
 
         auto newTime = Time::now();
         fsec delta = newTime - currentTime;
         double frameTime = std::chrono::duration_cast<ms>(delta).count();
-        if (frameTime > 0.25)
+        if (frameTime > 0.25) {
             frameTime = 0.25;
+        }
         currentTime = newTime;
         accumulator += frameTime;
 
@@ -136,7 +138,7 @@ void World::removeFood(int uid) {
 }
 
 void World::addEvent(Event::BaseEvent *event) {
-    if (event->getEventType() == Event::EventType::WORLD) {
+    if (event->getEventType() == Event::EventType::WORLD) { // TODO lockguard
         event->applyChanged(*this);
         delete event;
     } else {

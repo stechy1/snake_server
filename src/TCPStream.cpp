@@ -64,7 +64,7 @@ void TCPStream::receive() {
     unsigned long index = 0;
 
     // Naparsovat přijatá data
-    std::list<std::string> list;
+    std::list<std::string> list; // TODO vektor misto list
     while ((index = received.find(DELIMITER)) != std::string::npos) {
         unsigned long size = received.size();
         std::string data = received.substr(0, index);
@@ -83,6 +83,7 @@ void TCPStream::receive() {
 }
 
 void TCPStream::closeStream() {
+    ::shutdown(m_sd, SHUT_RDWR);
     ::close(m_sd);
 }
 
