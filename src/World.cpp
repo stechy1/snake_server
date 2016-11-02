@@ -164,7 +164,9 @@ void World::wakeUp() {
 
 void World::applySnakeEvent(std::unique_ptr<EventData> eventData) {
     auto event = std::move(eventData->event);
-    SnakeChangeDirectionInputEvent *directionInputEvent = static_cast<SnakeChangeDirectionInputEvent*>(*event);
+    if (dynamic_cast<SnakeChangeDirectionInputEvent*>(*event) != NULL) {
+        // Zde budu provádět akce, které se týkají změny směru hada
+    }
 
 }
 
