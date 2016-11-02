@@ -9,7 +9,8 @@
 namespace SnakeServer {
 namespace Network {
 
-TCPConnection::TCPConnection(uint16_t t_port, IOHandler &t_ioHandler) : m_port(t_port), m_ioHandler(t_ioHandler), m_streamHandler(*this) {
+TCPConnection::TCPConnection(uint16_t t_port, IOHandler &t_ioHandler) : m_port(t_port), m_ioHandler(t_ioHandler),
+                                                                        m_streamHandler(*this) {
     FD_ZERO(&m_master_read_fds);
     FD_ZERO(&m_master_write_fds);
     FD_ZERO(&m_read_fds);
@@ -23,7 +24,7 @@ TCPConnection::~TCPConnection() {
 
     FD_ZERO(&m_master_read_fds);
 
-    for(auto &client : m_clients) {
+    for (auto &client : m_clients) {
         client.second->closeStream();
     }
 
@@ -90,7 +91,7 @@ void TCPConnection::start() {
 }
 
 void TCPConnection::run() {
-    while(!m_interupt) {
+    while (!m_interupt) {
         // Zkopírování seznamů se sockety
         memcpy(&m_read_fds, &m_master_read_fds, sizeof(m_master_read_fds));
         memcpy(&m_write_fds, &m_master_write_fds, sizeof(m_master_write_fds));
@@ -103,9 +104,9 @@ void TCPConnection::run() {
             break;
         }
 
-        for(int i = m_fdMin; i <= m_fdMax; ++i) {
+        for (int i = m_fdMin; i <= m_fdMax; ++i) {
             if (FD_ISSET(i, &m_read_fds)) { // Pokud je socket[i] čtecího typu
-                if (i == m_pipefd[0]) {break;};
+                if (i == m_pipefd[0]) { break; };
                 if (i == m_lsd) { // Pokud je socket[i] můj hlavní server socket
                     // Jsem připraven přijmout nového klienta
                     try {

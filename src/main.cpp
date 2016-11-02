@@ -1,10 +1,9 @@
 #include <iostream>
-#include "Snake.h"
 #include "World.h"
-#include "TCPConnection.h"
 #include "Protocol.h"
 
 SnakeServer::World *g_world = nullptr;
+SnakeServer::Network::TCPConnection *g_conn;
 
 class IOImpl : public SnakeServer::Network::IOHandler {
 public:
@@ -13,7 +12,7 @@ public:
     virtual ~IOImpl() {}
 
     virtual void onDataReceived(int socketID, std::vector<std::string> data) override {
-        for(auto &tmp : data) {
+        for (auto &tmp : data) {
             g_world->addEvent(SnakeServer::parseEvent(socketID, tmp));
         }
     }
@@ -21,12 +20,14 @@ public:
     virtual void onDisconnect(int socketID) override {
         std::cout << "Oops, disconnected" << std::endl;
         g_world->removeSnake(socketID);
+        g_conn->disconnectClient(socketID);
     }
 };
 
 int main(int argc, char *argv[]) {
     IOImpl handler;
     SnakeServer::Network::TCPConnection connection(10000, handler);
+    g_conn = &connection;
     SnakeServer::World world(20, 20, connection);
     g_world = &world;
 

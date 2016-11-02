@@ -19,11 +19,15 @@ const std::string DELIMITER = ";";
 class SingleStreamListener {
 public:
     SingleStreamListener() {}
+
     virtual ~SingleStreamListener() {}
 
     virtual void onDataReceived(int socketID, std::vector<std::string> data) = 0;
+
     virtual void onLostConnection(int socketID) = 0;
+
     virtual void onDisconnect(int socketID) = 0;
+
     virtual void onRestoreConnection(int socketID) = 0;
 };
 
@@ -36,10 +40,13 @@ public:
     friend class TCPConnection;
 
     TCPStream(const int t_sd, const struct sockaddr_in *t_address, SingleStreamListener &listener);
+
     virtual ~TCPStream();
 
     void send(std::string data);
+
     void receive();
+
     void closeStream();
 
 private:

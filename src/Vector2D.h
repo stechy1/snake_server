@@ -145,11 +145,11 @@ public:
         return temp.mag();
     }
 
-    double X() {
+    const double X() const {
         return m_x;
     }
 
-    double Y() {
+    const double Y() const {
         return m_y;
     }
 
@@ -180,7 +180,8 @@ public:
         this->normalize();
         m_x *= n;
         m_y *= n;
-        return *this; }
+        return *this;
+    }
 
     Vector2D &rotate(const double degrees) { return rotateRad(degrees * M_PI / 180); }
 
@@ -271,7 +272,7 @@ public:
     static Vector2D RANDOM() {
         int res = random(3, 1);
 
-        switch(res) {
+        switch (res) {
             case 0:
                 return UP();
             case 1:
@@ -349,7 +350,7 @@ private:
     double m_y;
 
     static double random(double min, double max) {
-        double f = (double)rand() / RAND_MAX;
+        double f = (double) rand() / RAND_MAX;
         return min + f * (max - min);
     }
 

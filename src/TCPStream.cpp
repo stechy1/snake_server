@@ -8,8 +8,7 @@
 namespace SnakeServer {
 namespace Network {
 
-inline std::string& ltrim(std::string& s, const char* t = " \t\n\r\f\v")
-{
+inline std::string &ltrim(std::string &s, const char *t = " \t\n\r\f\v") {
     s.erase(0, s.find_first_not_of(t));
     return s;
 }
@@ -44,6 +43,7 @@ void TCPStream::receive() {
         // Spojení bylo slušně ukončeno
         connectionStatus = DISCONNECTED;
         m_listener.onDisconnect(m_sd);
+        closeStream();
         return;
     }
     if (len == -1) {

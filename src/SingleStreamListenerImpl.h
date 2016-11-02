@@ -6,10 +6,12 @@
 namespace SnakeServer {
 namespace Network {
 class TCPConnection;
+
 class SingleStreamListenerImpl : public SingleStreamListener {
 
 public:
     SingleStreamListenerImpl(TCPConnection &t_tcpConnection);
+
     virtual ~SingleStreamListenerImpl();
 
     virtual void onDataReceived(int socketID, std::vector<std::string> data) override;

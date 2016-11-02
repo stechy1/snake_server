@@ -12,7 +12,7 @@ World::~World() {
         m_thread.join();
     }
 
-    for(auto tmp : m_foodOnMap) {
+    for (auto tmp : m_foodOnMap) {
         delete tmp.second;
     }
 
@@ -21,12 +21,12 @@ World::~World() {
 
 void World::init() {
     std::cout << "Generuji svět..." << std::endl;
-    srand (time(NULL));
+    srand(time(NULL));
     for (int i = 0; i < 10; ++i) {
         addFood(i);
     }
 
-    for(auto &newFood : m_foodToAdd) {
+    for (auto &newFood : m_foodToAdd) {
         m_foodOnMap.insert(newFood);
     }
     m_foodToAdd.clear();
@@ -50,14 +50,8 @@ void World::run() {
     auto currentTime = Time::now();
     double accumulator = 0.0;
 
-    while ( !m_interupt ) {
-
+    while (!m_interupt) {
         std::unique_lock<std::mutex> lk(m_mutex);
-        m_conditionVariable.wait(lk, [&] {
-            currentTime = Time::now();
-            return (!m_snakesOnMap.empty() && m_ready) ||
-                    (!m_snakesToAdd.empty()) || (m_interupt && m_ready);
-        });
 
         auto newTime = Time::now();
         auto delta = newTime - currentTime;
@@ -71,16 +65,16 @@ void World::run() {
 
         removeGameObjects();
 
-        for(auto &e : m_eventQueue) {
+        for (auto &e : m_eventQueue) {
             applySnakeEvent(std::move(e));
         }
         m_eventQueue.clear();
 
 //        while (accumulator >= dt) {
-            for(auto &snake : m_snakesOnMap) {
-                //snake.second->update(t, dt);
-                updateSnake(snake.first, snake.second);
-            }
+        for (auto &snake : m_snakesOnMap) {
+            //snake.second->update(t, dt);
+            updateSnake(snake.second);
+        }
 //            t += dt;
 //            accumulator -= dt;
 //        }
@@ -119,7 +113,7 @@ GameObject::Food *World::addFood(int id) {
             -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border
     ));
 
-    std::pair<int, GameObject::Food*> pair(food->m_uid, food);
+    std::pair<int, GameObject::Food *> pair(food->m_uid, food);
     m_foodToAdd.insert(pair);
 
     return food;
@@ -131,13 +125,30 @@ void World::removeFood(int uid) {
 
 void World::addEvent(std::unique_ptr<InputEvent> event) {
     std::unique_lock<std::mutex> lk(m_mutex);
-    if (event->getEventType() == EventType::WORLD) {
-
-        //event->applyChanged(*this);
-    } else {
+    if ((event->getEventType() & EventType::WORLD) == EventType::WORLD) {
+        //auto e = &(*event);
+        if ((event->getEventType() & EventType::LOGIN) == EventType::LOGIN) {
+            int uid = event->getUserID();
+            auto newSnake = addSnake(uid);
+            InitOutputEvent initOutputEvent(uid, newSnake, m_width, m_height, m_snakesOnMap, m_foodOnMap);
+            AddSnakeOutputEvent addSnakeOutputEvent(uid, newSnake->getPosition(), newSnake->getDirection());
+            sendMessage(uid, initOutputEvent.getData());
+            broadcastMessage(uid, addSnakeOutputEvent.getData());
+        }
+        if ((event->getEventType() & EventType::LOGOUT) == EventType::LOGOUT) {
+            removeSnake(event->getUserID());
+        }
+    } else if ((event->getEventType() & EventType::GAME_OBJECT) == EventType::GAME_OBJECT) {
         int id = event->getUserID();
+        if (m_snakesOnMap.find(id) == m_snakesOnMap.end()) {
+            return;
+        }
+
         std::unique_ptr<EventData> myEvent = std::make_unique<EventData>(m_snakesOnMap.at(id), std::move(event));
+        std::cout << "Pridavam event hadovi" << std::endl;
         m_eventQueue.push_back(std::move(myEvent));
+    } else {
+        std::cout << "Nebyl rozpoznan typ eventu..." << std::endl;
     }
 }
 
@@ -146,7 +157,7 @@ void World::sendMessage(int uid, std::string data) {
 }
 
 void World::broadcastMessage(int uid, std::string data) {
-    for(auto &pair : m_snakesOnMap) {
+    for (auto &pair : m_snakesOnMap) {
         if (pair.first == uid) {
             continue;
         }
@@ -157,47 +168,51 @@ void World::broadcastMessage(int uid, std::string data) {
     }
 }
 
-void World::wakeUp() {
-    m_ready = true;
-    m_conditionVariable.notify_one();
-}
-
 void World::applySnakeEvent(std::unique_ptr<EventData> eventData) {
+    auto snake = eventData->snake;
     auto event = std::move(eventData->event);
-    if (dynamic_cast<SnakeChangeDirectionInputEvent*>(*event) != NULL) {
-        // Zde budu provádět akce, které se týkají změny směru hada
+    auto e = &(*event);
+    if ((event->getEventType() & EventType::CHANGE_DIR) == EventType::CHANGE_DIR) {
+        int uid = event->getUserID();
+        auto snakeChangeDirection = static_cast<SnakeChangeDirectionInputEvent*>(e);
+        snake->setDirection(snakeChangeDirection->getDirection());
+        SnakeChangeDirectionOutputEvent outputEvent(uid, snakeChangeDirection->getDirection());
+        broadcastMessage(uid, outputEvent.getData());
+    } else {
+        std::cout << "Nebyl rozpoznan typ eventu" << std::endl;
     }
-
 }
 
-void World::updateSnake(int uid, std::shared_ptr<GameObject::Snake> snake) {
-    const Vector2D newPos = (snake->m_dir * snake->m_vel) *= SNAKE_SIZE;
-    snake->m_pos+=newPos;
+void World::updateSnake(std::shared_ptr<GameObject::Snake> snake) {
+    Vector2D direction = snake->getDirection();
+    Vector2D velocity = snake->getVelocity();
+    Vector2D position = snake->getPosition();
+    const Vector2D newPos = position + (direction * velocity) *= SNAKE_SIZE;
+    snake->setPosition(newPos);
 }
 
 void World::addGameObjects() {
-    for(auto &newSnake : m_snakesToAdd) {
+    for (auto &newSnake : m_snakesToAdd) {
         m_snakesOnMap.insert(newSnake);
     }
     m_snakesToAdd.clear();
 
-    for(auto &newFood : m_foodToAdd) {
+    for (auto &newFood : m_foodToAdd) {
         m_foodOnMap.insert(newFood);
     }
     m_foodToAdd.clear();
 }
 
 void World::removeGameObjects() {
-    for(int index : m_snakesToRemove) {
+    for (int index : m_snakesToRemove) {
         std::cout << "Odebiram hada z mapy s indexem: " << index << std::endl;
         RemoveSnakeOutputEvent event(index);
         broadcastMessage(index, event.getData());
-        m_dataSender.disconnectClient(index);
         m_snakesOnMap.erase(index);
     }
     m_snakesToRemove.clear();
 
-    for(int index : m_foodToRemove) {
+    for (int index : m_foodToRemove) {
         m_foodOnMap.erase(index);
     }
     m_foodToRemove.clear();

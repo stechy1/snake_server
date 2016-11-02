@@ -15,10 +15,27 @@ public:
 
     std::string getDescription();
 
+    const Vector2D &getPosition() const;
+
+    void setPosition(const Vector2D &t_pos);
+
+    const Vector2D &getDirection() const;
+
+    void setDirection(const Vector2D &t_dir);
+
+    const Vector2D &getVelocity() const;
+
+    void setVelocity(const Vector2D &t_vel);
+
+    int getSize() const;
+
+    void setSize(int t_size);
+
+private:
     Vector2D m_pos = Vector2D::ZERO();
     Vector2D m_dir = Vector2D::RIGHT();
     Vector2D m_vel = Vector2D::ONES();
-    int size = 25;
+    int m_size = 25;
 
 };
 

@@ -16,15 +16,18 @@ const unsigned int BACKLOG = 10; // Maximální počet uživatelů čekajících
 class IOHandler {
 public:
     IOHandler() {}
+
     virtual ~IOHandler() {}
 
     virtual void onDataReceived(int socketID, std::vector<std::string> data) = 0;
+
     virtual void onDisconnect(int socketID) = 0;
 };
 
 class IDataSender {
 public:
     IDataSender() {}
+
     virtual ~IDataSender() {}
 
     virtual void sendData(int socketID, std::string data) = 0;
@@ -33,19 +36,24 @@ public:
 class TCPConnection : public IDataSender {
 public:
     TCPConnection(uint16_t t_port, IOHandler &t_ioHandler);
+
     ~TCPConnection();
 
     friend class SingleStreamListenerImpl;
 
     void start();
+
     void stop();
+
     void disconnectClient(int socketID);
 
     virtual void sendData(int socketID, std::string data) override;
 
 protected:
     void init();
+
     void run();
+
     void accept();
 
 private:

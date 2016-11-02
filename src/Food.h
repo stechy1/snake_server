@@ -5,7 +5,7 @@
 
 namespace SnakeServer {
 namespace GameObject {
-class Food  {
+class Food {
 public:
 
     Food(int t_uid, const Vector2D &m_pos);
