@@ -5,8 +5,6 @@
 #include "Protocol.h"
 
 SnakeServer::World *g_world = nullptr;
-SnakeServer::Network::IOHandler *g_handler = nullptr;
-SnakeServer::Network::TCPConnection *g_connection = nullptr;
 
 class IOImpl : public SnakeServer::Network::IOHandler {
 public:
@@ -28,9 +26,7 @@ public:
 
 int main(int argc, char *argv[]) {
     IOImpl handler;
-    g_handler = &handler;
     SnakeServer::Network::TCPConnection connection(10000, handler);
-    g_connection = &connection;
     SnakeServer::World world(20, 20, connection);
     g_world = &world;
 
