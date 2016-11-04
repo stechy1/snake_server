@@ -52,6 +52,12 @@ void World::run() {
 
     while (!m_interupt) {
         std::unique_lock<std::mutex> lk(m_mutex);
+//        if (!m_ready) {
+//            m_conditionVariable.wait(lk, [&] {
+//                currentTime = Time::now();
+//                return (m_ready);
+//            });
+//        }
 
         auto newTime = Time::now();
         auto delta = newTime - currentTime;
@@ -70,21 +76,20 @@ void World::run() {
         }
         m_eventQueue.clear();
 
-//        while (accumulator >= dt) {
-        for (auto &snake : m_snakesOnMap) {
-            //snake.second->update(t, dt);
-            updateSnake(snake.second);
+        while (accumulator >= dt) {
+            for (auto &snake : m_snakesOnMap) {
+                updateSnake(snake.second);
+            }
+            t += dt;
+            accumulator -= dt;
         }
-//            t += dt;
-//            accumulator -= dt;
-//        }
 
         addGameObjects();
 
-        m_ready = !m_snakesOnMap.empty();
+        m_ready = !m_snakesOnMap.empty() | !m_snakesToAdd.empty() | m_interupt;
 
-        std::cout << "Loop" << std::endl;
-        std::this_thread::sleep_for(2s);
+//        std::cout << "Loop" << std::endl;
+        //std::this_thread::sleep_for(2s);
     }
 }
 
@@ -99,7 +104,7 @@ std::shared_ptr<GameObject::Snake> World::addSnake(int uid) {
     std::cout << "Přidávám nového hada do hry" << std::endl;
     Vector2D pos = Vector2D::RANDOM(
             -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border);
-    Vector2D dir = Vector2D::RANDOM();
+    Vector2D dir = Vector2D::ZERO();
 
     auto snake = std::make_shared<GameObject::Snake>(pos, dir);
     std::pair<int, std::shared_ptr<GameObject::Snake>> pair(uid, snake);
@@ -189,6 +194,19 @@ void World::updateSnake(std::shared_ptr<GameObject::Snake> snake) {
     Vector2D position = snake->getPosition();
     const Vector2D newPos = position + (direction * velocity) *= SNAKE_SIZE;
     snake->setPosition(newPos);
+
+    if (snake->getPosition().X() > m_width) {
+        snake->setPosition(Vector2D(-m_width, snake->getPosition().Y()));
+    }
+    if (snake->getPosition().X() < -m_width) {
+        snake->setPosition(Vector2D(m_width, snake->getPosition().Y()));
+    }
+    if (snake->getPosition().Y() > m_height) {
+        snake->setPosition(Vector2D(snake->getPosition().X(), -m_height));
+    }
+    if (snake->getPosition().Y() < -m_height) {
+        snake->setPosition(Vector2D(snake->getPosition().X(), m_height));
+    }
 }
 
 void World::addGameObjects() {

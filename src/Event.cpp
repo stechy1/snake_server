@@ -163,7 +163,7 @@ std::string SnakeChangeDirectionOutputEvent::getDescription() {
 
 // AddSnake event
 AddSnakeOutputEvent::AddSnakeOutputEvent(int uid, const Vector2D &t_pos, const Vector2D &t_dir) {
-    m_data = "addsnake:{" + joinValues("|", 5, (double)uid, t_pos.X(), t_pos.Y(), t_dir.X(), t_dir.Y()) + "}";
+    m_data = "addsnake:{[" + joinValues("|", 5, (double)uid, t_pos.X(), t_pos.Y(), t_dir.X(), t_dir.Y()) + "]};";
 }
 
 std::string AddSnakeOutputEvent::getData() {
