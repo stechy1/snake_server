@@ -1,6 +1,7 @@
 #include <iostream>
 #include "World.h"
 #include "Protocol.h"
+#include "boost/log/trivial.hpp"
 
 SnakeServer::World *g_world = nullptr;
 SnakeServer::Network::TCPConnection *g_conn;
