@@ -22,8 +22,8 @@ std::string joinValues(std::string t_delimiter, int t_count, ...) {
 // Input events
 
 // Login event
-LoginInputEvent::LoginInputEvent(int t_userID, const std::string &t_username) : m_userID(t_userID),
-                                                                                m_username(t_username) {}
+LoginInputEvent::LoginInputEvent(int t_userID, const std::string &t_username)
+        : m_userID(t_userID), m_username(t_username) {}
 
 EventType LoginInputEvent::getEventType() {
     return WORLD | LOGIN;
@@ -38,7 +38,8 @@ std::string LoginInputEvent::getDescription() {
 }
 
 // Logout event
-LogoutInputEvent::LogoutInputEvent(int t_userID) : m_userID(t_userID) {}
+LogoutInputEvent::LogoutInputEvent(int t_userID)
+        : m_userID(t_userID) {}
 
 EventType LogoutInputEvent::getEventType() {
     return WORLD | LOGOUT;
@@ -53,8 +54,8 @@ std::string LogoutInputEvent::getDescription() {
 }
 
 // ChangeDirection event
-SnakeChangeDirectionInputEvent::SnakeChangeDirectionInputEvent(int t_userID, const Vector2D &t_direction) : m_userID(
-        t_userID), m_direction(t_direction) {}
+SnakeChangeDirectionInputEvent::SnakeChangeDirectionInputEvent(int t_userID, const Vector2D &t_direction)
+        : m_userID(t_userID), m_direction(t_direction) {}
 
 EventType SnakeChangeDirectionInputEvent::getEventType() {
     return GAME_OBJECT | CHANGE_DIR;
@@ -80,7 +81,7 @@ InitOutputEvent::InitOutputEvent(int t_uid, std::shared_ptr<GameObject::Snake> t
                                  std::map<int, GameObject::Food *> &t_food) {
     m_data = "init:{[" +
              joinValues("|", 6, (double) t_uid, t_snake->getPosition().X(), t_snake->getPosition().Y(),
-                               t_snake->getDirection().X(), t_snake->getDirection().Y(), (double) t_snake->getSize()) +
+                        t_snake->getDirection().X(), t_snake->getDirection().Y(), (double) t_snake->getSize()) +
              "]}"
              + "m_size:{[" + joinValues("|", 2, (double) t_width, (double) t_height) + "]}"
              + "players:{" + playerValues(t_snakes) + "}"
@@ -88,6 +89,8 @@ InitOutputEvent::InitOutputEvent(int t_uid, std::shared_ptr<GameObject::Snake> t
 }
 
 std::string InitOutputEvent::getData() {
+    std::cout << "Posilam init event" << std::endl;
+    std::cout << m_data << std::endl;
     return m_data;
 }
 
@@ -106,9 +109,9 @@ std::string InitOutputEvent::playerValues(std::map<int, std::shared_ptr<GameObje
         auto snake = *info.second;
         std::string infoString = "["
                                  + joinValues("|", 6, (double) info.first, snake.getPosition().X(),
-                                                     snake.getPosition().Y(),
-                                                     snake.getDirection().X(), snake.getDirection().Y(),
-                                                     (double) snake.getSize())
+                                              snake.getPosition().Y(),
+                                              snake.getDirection().X(), snake.getDirection().Y(),
+                                              (double) snake.getSize())
                                  + "]";
         res += infoString + ",";
     }
@@ -139,7 +142,8 @@ std::string InitOutputEvent::foodValues(std::map<int, GameObject::Food *> &t_foo
 }
 
 // RemoveSnake event
-RemoveSnakeOutputEvent::RemoveSnakeOutputEvent(int t_uid) : m_uid(t_uid) {}
+RemoveSnakeOutputEvent::RemoveSnakeOutputEvent(int t_uid)
+        : m_uid(t_uid) {}
 
 std::string RemoveSnakeOutputEvent::getData() {
     return "remsnake:{" + std::to_string(m_uid) + "}";
@@ -150,8 +154,8 @@ std::string RemoveSnakeOutputEvent::getDescription() {
 }
 
 // SnakeChangeDrection event
-SnakeChangeDirectionOutputEvent::SnakeChangeDirectionOutputEvent(int t_uid, const Vector2D &t_dir) : m_uid(t_uid),
-                                                                                                     m_dir(t_dir) {}
+SnakeChangeDirectionOutputEvent::SnakeChangeDirectionOutputEvent(int t_uid, const Vector2D &t_dir)
+        : m_uid(t_uid), m_dir(t_dir) {}
 
 std::string SnakeChangeDirectionOutputEvent::getData() {
     return "changedir:" + std::to_string(m_dir.X()) + "|" + std::to_string(m_dir.Y()) + ";";
@@ -162,8 +166,10 @@ std::string SnakeChangeDirectionOutputEvent::getDescription() {
 }
 
 // AddSnake event
-AddSnakeOutputEvent::AddSnakeOutputEvent(int uid, const Vector2D &t_pos, const Vector2D &t_dir) {
-    m_data = "addsnake:{[" + joinValues("|", 5, (double)uid, t_pos.X(), t_pos.Y(), t_dir.X(), t_dir.Y()) + "]};";
+AddSnakeOutputEvent::AddSnakeOutputEvent(int uid, const std::shared_ptr<GameObject::Snake> snake) {
+    m_data = "addsnake:{[" + joinValues("|", 6, (double) uid, snake->getPosition().X(), snake->getPosition().Y(),
+                                        snake->getDirection().X(), snake->getDirection().Y(),
+                                        (double) snake->getSize()) + "]};";
 }
 
 std::string AddSnakeOutputEvent::getData() {
@@ -173,4 +179,5 @@ std::string AddSnakeOutputEvent::getData() {
 std::string AddSnakeOutputEvent::getDescription() {
     return "AddSnakeEvent";
 }
+
 }

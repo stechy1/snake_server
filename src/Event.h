@@ -109,7 +109,7 @@ private:
 
 class AddSnakeOutputEvent : public OutputEvent {
 public:
-    AddSnakeOutputEvent(int uid, const Vector2D &t_pos, const Vector2D &t_dir);
+    AddSnakeOutputEvent(int uid, std::shared_ptr<GameObject::Snake> snake);
 
     virtual std::string getData() override;
 

@@ -19,10 +19,12 @@ namespace SnakeServer {
 class Vector2D {
 public:
     // Konstruktor se souřadnicemi X a Y
-    Vector2D() : m_x(0), m_y(0) {}
+    Vector2D()
+            : m_x(0), m_y(0) {}
 
     // Standartní kostruktor
-    Vector2D(const double t_x, const double t_y) : m_x(t_x), m_y(t_y) {}
+    Vector2D(const double t_x, const double t_y)
+            : m_x(t_x), m_y(t_y) {}
 
     // Kopy konstruktor
     Vector2D(const Vector2D &other) {

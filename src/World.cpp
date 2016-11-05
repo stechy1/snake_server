@@ -89,7 +89,7 @@ void World::run() {
         m_ready = !m_snakesOnMap.empty() | !m_snakesToAdd.empty() | m_interupt;
 
 //        std::cout << "Loop" << std::endl;
-        //std::this_thread::sleep_for(2s);
+        std::this_thread::sleep_for(1ms);
     }
 }
 
@@ -104,7 +104,7 @@ std::shared_ptr<GameObject::Snake> World::addSnake(int uid) {
     std::cout << "Přidávám nového hada do hry" << std::endl;
     Vector2D pos = Vector2D::RANDOM(
             -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border);
-    Vector2D dir = Vector2D::ZERO();
+    Vector2D dir = Vector2D::RIGHT();
 
     auto snake = std::make_shared<GameObject::Snake>(pos, dir);
     std::pair<int, std::shared_ptr<GameObject::Snake>> pair(uid, snake);
@@ -131,12 +131,11 @@ void World::removeFood(int uid) {
 void World::addEvent(std::unique_ptr<InputEvent> event) {
     std::unique_lock<std::mutex> lk(m_mutex);
     if ((event->getEventType() & EventType::WORLD) == EventType::WORLD) {
-        //auto e = &(*event);
         if ((event->getEventType() & EventType::LOGIN) == EventType::LOGIN) {
             int uid = event->getUserID();
             auto newSnake = addSnake(uid);
             InitOutputEvent initOutputEvent(uid, newSnake, m_width, m_height, m_snakesOnMap, m_foodOnMap);
-            AddSnakeOutputEvent addSnakeOutputEvent(uid, newSnake->getPosition(), newSnake->getDirection());
+            AddSnakeOutputEvent addSnakeOutputEvent(uid, newSnake);
             sendMessage(uid, initOutputEvent.getData());
             broadcastMessage(uid, addSnakeOutputEvent.getData());
         }
@@ -168,7 +167,6 @@ void World::broadcastMessage(int uid, std::string data) {
         }
 
         std::string msg = "{" + std::to_string(uid) + "}" + data;
-        std::cout << "Broadcast: " << msg << std::endl;
         m_dataSender.sendData(pair.first, msg);
     }
 }
@@ -179,7 +177,7 @@ void World::applySnakeEvent(std::unique_ptr<EventData> eventData) {
     auto e = &(*event);
     if ((event->getEventType() & EventType::CHANGE_DIR) == EventType::CHANGE_DIR) {
         int uid = event->getUserID();
-        auto snakeChangeDirection = static_cast<SnakeChangeDirectionInputEvent*>(e);
+        auto snakeChangeDirection = static_cast<SnakeChangeDirectionInputEvent *>(e);
         snake->setDirection(snakeChangeDirection->getDirection());
         SnakeChangeDirectionOutputEvent outputEvent(uid, snakeChangeDirection->getDirection());
         broadcastMessage(uid, outputEvent.getData());
@@ -196,16 +194,16 @@ void World::updateSnake(std::shared_ptr<GameObject::Snake> snake) {
     snake->setPosition(newPos);
 
     if (snake->getPosition().X() > m_width) {
-        snake->setPosition(Vector2D(-m_width, snake->getPosition().Y()));
+        snake->setPosition(Vector2D(-m_width, position.Y()));
     }
     if (snake->getPosition().X() < -m_width) {
-        snake->setPosition(Vector2D(m_width, snake->getPosition().Y()));
+        snake->setPosition(Vector2D(m_width, position.Y()));
     }
     if (snake->getPosition().Y() > m_height) {
-        snake->setPosition(Vector2D(snake->getPosition().X(), -m_height));
+        snake->setPosition(Vector2D(position.X(), -m_height));
     }
     if (snake->getPosition().Y() < -m_height) {
-        snake->setPosition(Vector2D(snake->getPosition().X(), m_height));
+        snake->setPosition(Vector2D(position.X(), m_height));
     }
 }
 

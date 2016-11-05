@@ -21,11 +21,13 @@ struct EventData {
     std::shared_ptr<GameObject::Snake> snake;
     std::unique_ptr<InputEvent> event;
 
-    EventData(std::shared_ptr<GameObject::Snake> t_snake, std::unique_ptr<InputEvent> t_event) : snake(t_snake),
-                                                                                                 event(std::move(
-                                                                                                         t_event)) {}
+    EventData(std::shared_ptr<GameObject::Snake> t_snake, std::unique_ptr<InputEvent> t_event)
+            : snake(t_snake),
+              event(std::move(
+                      t_event)) {}
 
-    EventData(EventData &&other) : snake(other.snake), event(std::move(other.event)) {}
+    EventData(EventData &&other)
+            : snake(other.snake), event(std::move(other.event)) {}
 
     EventData &operator=(EventData &&other) {
         snake = other.snake;

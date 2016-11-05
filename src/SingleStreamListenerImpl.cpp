@@ -5,7 +5,8 @@
 namespace SnakeServer {
 namespace Network {
 
-SingleStreamListenerImpl::SingleStreamListenerImpl(TCPConnection &t_tcpConnection) : m_tcpConnection(t_tcpConnection) {}
+SingleStreamListenerImpl::SingleStreamListenerImpl(TCPConnection &t_tcpConnection)
+        : m_tcpConnection(t_tcpConnection) {}
 
 SingleStreamListenerImpl::~SingleStreamListenerImpl() {}
 

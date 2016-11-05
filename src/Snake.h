@@ -7,7 +7,7 @@
 namespace SnakeServer {
 namespace GameObject {
 
-static const float VELOCITY_MULTIPLIER = 0.7f;
+static const float VELOCITY_MULTIPLIER = 0.05f;
 
 class Snake {
 public:

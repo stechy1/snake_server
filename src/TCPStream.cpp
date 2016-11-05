@@ -29,7 +29,6 @@ void TCPStream::send(std::string data) {
     const unsigned long len = data.size();
     const char *buff = data.c_str();
 
-    std::cout << "Posilam: " << data << std::endl;
     ssize_t n = ::send(m_sd, buff, len, 0);
 
     assert(n == len);
