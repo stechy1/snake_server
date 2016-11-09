@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
     IOImpl handler;
     SnakeServer::Network::TCPConnection connection(10000, handler);
     g_conn = &connection;
-    SnakeServer::World world(100, 100, connection);
+    SnakeServer::World world(300, 300, connection);
     g_world = &world;
 
     connection.start();

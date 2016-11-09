@@ -16,6 +16,8 @@ namespace SnakeServer {
 using namespace std::chrono_literals;
 
 static const unsigned int SNAKE_SIZE = 15;
+static const double UPS = 0.25;
+static const int UPDATE_PERIOD = 10000;
 
 struct EventData {
     std::shared_ptr<GameObject::Snake> snake;

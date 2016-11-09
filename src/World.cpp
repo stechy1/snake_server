@@ -57,8 +57,8 @@ void World::run() {
         auto delta = newTime - currentTime;
         using ms = std::chrono::milliseconds;
         double frameTime = std::chrono::duration_cast<ms>(delta).count();
-        if (frameTime > 0.25) {
-            frameTime = 0.25;
+        if (frameTime > UPS) {
+            frameTime = UPS;
         }
         currentTime = newTime;
         accumulator += frameTime;
@@ -70,18 +70,21 @@ void World::run() {
         }
         m_eventQueue.clear();
 
+        int x = 0;
         while (accumulator >= dt) {
             for (auto &item : m_snakesOnMap) {
                 auto snake = item.second;
                 updateSnake(snake);
-                if (snake->getCounterValue() % 1000 == 0) {
+                if (snake->getCounterValue() % UPDATE_PERIOD == 0) {
                     SyncOutputEvent syncEvent(m_snakesOnMap);
                     sendMessage(item.first, syncEvent.getData());
                 }
             }
             t += dt;
             accumulator -= dt;
+            x++;
         }
+        std::cout << "Cycle count: " << x << std::endl;
 
         addGameObjects();
 
@@ -196,9 +199,11 @@ void World::updateSnake(std::shared_ptr<GameObject::Snake> snake) {
     snake->setPosition(newPos);
 
     if (snake->getPosition().X() > m_width) {
+        std::cout << "Upravuji X pozici, protoze je vetsi nez sirka" << std::endl;
         snake->setPosition(Vector2D(-m_width, position.Y()));
     }
     if (snake->getPosition().X() < -m_width) {
+        std::cout << "Upravuji X pozici, protoze je mensi nez sirka" << std::endl;
         snake->setPosition(Vector2D(m_width, position.Y()));
     }
     if (snake->getPosition().Y() > m_height) {
