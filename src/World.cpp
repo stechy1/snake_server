@@ -124,7 +124,7 @@ void World::removeFood(int uid) {
 void World::addEvent(std::unique_ptr<InputEvent> event) {
     std::unique_lock<std::mutex> lk(m_mutex);
     switch (event->getEventType()) {
-        case EventType::LOGIN:
+        case EventType::LOGIN: {
             int uid = event->getUserID();
             auto newSnake = addSnake(uid);
             InitOutputEvent initOutputEvent(uid, newSnake, m_width, m_height, m_snakesOnMap, m_foodOnMap);
@@ -132,10 +132,12 @@ void World::addEvent(std::unique_ptr<InputEvent> event) {
             sendMessage(uid, initOutputEvent.getData());
             broadcastMessage(uid, addSnakeOutputEvent.getData());
             break;
-        case EventType::LOGOUT:
+        }
+        case EventType::LOGOUT: {
             removeSnake(event->getUserID());
             break;
-        default:
+        }
+        default: {
             int id = event->getUserID();
             if (m_snakesOnMap.find(id) == m_snakesOnMap.end()) {
                 return;
@@ -144,6 +146,7 @@ void World::addEvent(std::unique_ptr<InputEvent> event) {
             std::unique_ptr<EventData> myEvent = std::make_unique<EventData>(m_snakesOnMap.at(id), std::move(event));
             std::cout << "Pridavam event hadovi" << std::endl;
             m_eventQueue.push_back(std::move(myEvent));
+        }
     }
 }
 
@@ -167,13 +170,14 @@ void World::applySnakeEvent(std::unique_ptr<EventData> eventData) {
     auto event = std::move(eventData->event);
     auto e = &(*event);
     switch (event->getEventType()) {
-        case EventType::CHANGE_DIR:
+        case EventType::CHANGE_DIR: {
             int uid = event->getUserID();
             auto snakeChangeDirection = static_cast<SnakeChangeDirectionInputEvent *>(e);
             snake->setDirection(snakeChangeDirection->getDirection());
             SnakeChangeDirectionOutputEvent outputEvent(uid, snakeChangeDirection->getDirection());
             broadcastMessage(uid, outputEvent.getData());
             break;
+        }
         default:
             std::cout << "Nebyl rozpoznan typ eventu" << std::endl;
     }
