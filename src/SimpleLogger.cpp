@@ -1,4 +1,4 @@
-#include "simpleLogger.h"
+#include "SimpleLogger.h"
 
 #include <boost/log/core/core.hpp>
 #include <boost/log/expressions/formatters/date_time.hpp>
