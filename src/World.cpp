@@ -71,8 +71,13 @@ void World::run() {
         m_eventQueue.clear();
 
         while (accumulator >= dt) {
-            for (auto &snake : m_snakesOnMap) {
-                updateSnake(snake.second);
+            for (auto &item : m_snakesOnMap) {
+                auto snake = item.second;
+                updateSnake(snake);
+                if (snake->getCounterValue() % 1000 == 0) {
+                    SyncOutputEvent syncEvent(m_snakesOnMap);
+                    sendMessage(item.first, syncEvent.getData());
+                }
             }
             t += dt;
             accumulator -= dt;
@@ -187,7 +192,7 @@ void World::updateSnake(std::shared_ptr<GameObject::Snake> snake) {
     Vector2D direction = snake->getDirection();
     Vector2D velocity = snake->getVelocity();
     Vector2D position = snake->getPosition();
-    const Vector2D newPos = position + (direction * velocity) *= SNAKE_SIZE;
+    const Vector2D newPos = position + ((direction * velocity) *= SNAKE_SIZE);
     snake->setPosition(newPos);
 
     if (snake->getPosition().X() > m_width) {
@@ -202,6 +207,8 @@ void World::updateSnake(std::shared_ptr<GameObject::Snake> snake) {
     if (snake->getPosition().Y() < -m_height) {
         snake->setPosition(Vector2D(position.X(), m_height));
     }
+
+    snake->incrementCounter();
 }
 
 void World::addGameObjects() {

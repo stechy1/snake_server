@@ -46,6 +46,14 @@ void Snake::setSize(int t_size) {
     Snake::m_size = t_size;
 }
 
+const void Snake::incrementCounter() {
+    m_updateCounter++;
+}
+
+const unsigned int Snake::getCounterValue() {
+    return m_updateCounter;
+}
+
 }
 }
 

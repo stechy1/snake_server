@@ -19,6 +19,30 @@ std::string joinValues(std::string t_delimiter, int t_count, ...) {
     return res;
 }
 
+std::string playerValues(std::map<int, std::shared_ptr<GameObject::Snake>> t_snakes) {
+    std::string res = "";
+
+    if (t_snakes.size() == 0) {
+        return res;
+    }
+
+    for (auto &info : t_snakes) {
+        auto snake = *info.second;
+        std::string infoString = "["
+                                 + joinValues("|", 6, (double) info.first, snake.getPosition().X(),
+                                              snake.getPosition().Y(),
+                                              snake.getDirection().X(), snake.getDirection().Y(),
+                                              (double) snake.getSize())
+                                 + "]";
+        res += infoString + ",";
+    }
+
+    res = res.erase(res.size() - 1);
+
+
+    return res;
+}
+
 // Input events
 
 // Login event
@@ -98,30 +122,6 @@ std::string InitOutputEvent::getDescription() {
     return "InitEvent";
 }
 
-std::string InitOutputEvent::playerValues(std::map<int, std::shared_ptr<GameObject::Snake>> t_snakes) {
-    std::string res = "";
-
-    if (t_snakes.size() == 0) {
-        return res;
-    }
-
-    for (auto &info : t_snakes) {
-        auto snake = *info.second;
-        std::string infoString = "["
-                                 + joinValues("|", 6, (double) info.first, snake.getPosition().X(),
-                                              snake.getPosition().Y(),
-                                              snake.getDirection().X(), snake.getDirection().Y(),
-                                              (double) snake.getSize())
-                                 + "]";
-        res += infoString + ",";
-    }
-
-    res = res.erase(res.size() - 1);
-
-
-    return res;
-}
-
 std::string InitOutputEvent::foodValues(std::map<int, GameObject::Food *> &t_food) {
     std::string res = "";
 
@@ -178,6 +178,18 @@ std::string AddSnakeOutputEvent::getData() {
 
 std::string AddSnakeOutputEvent::getDescription() {
     return "AddSnakeEvent";
+}
+
+SyncOutputEvent::SyncOutputEvent(std::map<int, std::shared_ptr<GameObject::Snake>> t_snakes) {
+    m_data = "sync:{" + playerValues(t_snakes) + "};";
+}
+
+std::string SyncOutputEvent::getData() {
+    return m_data;
+}
+
+std::string SyncOutputEvent::getDescription() {
+    return "SyncEvent";
 }
 
 }

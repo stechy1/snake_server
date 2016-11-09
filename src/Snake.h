@@ -31,11 +31,16 @@ public:
 
     void setSize(int t_size);
 
+    const void incrementCounter();
+
+    const unsigned int getCounterValue();
+
 private:
     Vector2D m_pos = Vector2D::ZERO();
     Vector2D m_dir = Vector2D::RIGHT();
     Vector2D m_vel = Vector2D::ONES();
     int m_size = 25;
+    unsigned int m_updateCounter = 0;
 
 };
 

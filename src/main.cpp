@@ -1,7 +1,6 @@
 #include <iostream>
 #include "World.h"
 #include "Protocol.h"
-#include "SimpleLogger.h"
 
 SnakeServer::World *g_world = nullptr;
 SnakeServer::Network::TCPConnection *g_conn;
@@ -26,19 +25,18 @@ public:
 };
 
 int main(int argc, char *argv[]) {
-    LOG_TRACE << "Trace log";
-//    IOImpl handler;
-//    SnakeServer::Network::TCPConnection connection(10000, handler);
-//    g_conn = &connection;
-//    SnakeServer::World world(300, 300, connection);
-//    g_world = &world;
-//
-//    connection.start();
-//    world.start();
-//
-//    int i;
-//    std::cin >> i;
-//
-//    world.stop();
-//    connection.stop();
+    IOImpl handler;
+    SnakeServer::Network::TCPConnection connection(10000, handler);
+    g_conn = &connection;
+    SnakeServer::World world(100, 100, connection);
+    g_world = &world;
+
+    connection.start();
+    world.start();
+
+    int i;
+    std::cin >> i;
+
+    world.stop();
+    connection.stop();
 }

@@ -90,7 +90,7 @@ public:
     virtual std::string getDescription() override;
 
 private:
-    std::string playerValues(std::map<int, std::shared_ptr<GameObject::Snake>> t_snakes);
+
 
     std::string foodValues(std::map<int, GameObject::Food *> &t_food);
 
@@ -132,6 +132,18 @@ public:
 private:
     int m_uid;
     Vector2D m_dir;
+};
+
+class SyncOutputEvent : public OutputEvent {
+public:
+    SyncOutputEvent(std::map<int, std::shared_ptr<GameObject::Snake>> t_snakes);
+
+    virtual std::string getData() override;
+
+    virtual std::string getDescription() override;
+
+private:
+    std::string m_data = "";
 };
 
 }
