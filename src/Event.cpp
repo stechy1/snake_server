@@ -26,7 +26,7 @@ LoginInputEvent::LoginInputEvent(int t_userID, const std::string &t_username)
         : m_userID(t_userID), m_username(t_username) {}
 
 EventType LoginInputEvent::getEventType() {
-    return WORLD | LOGIN;
+    return LOGIN;
 }
 
 int LoginInputEvent::getUserID() {
@@ -42,7 +42,7 @@ LogoutInputEvent::LogoutInputEvent(int t_userID)
         : m_userID(t_userID) {}
 
 EventType LogoutInputEvent::getEventType() {
-    return WORLD | LOGOUT;
+    return LOGOUT;
 }
 
 int LogoutInputEvent::getUserID() {
@@ -58,7 +58,7 @@ SnakeChangeDirectionInputEvent::SnakeChangeDirectionInputEvent(int t_userID, con
         : m_userID(t_userID), m_direction(t_direction) {}
 
 EventType SnakeChangeDirectionInputEvent::getEventType() {
-    return GAME_OBJECT | CHANGE_DIR;
+    return CHANGE_DIR;
 }
 
 int SnakeChangeDirectionInputEvent::getUserID() {

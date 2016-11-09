@@ -52,12 +52,6 @@ void World::run() {
 
     while (!m_interupt) {
         std::unique_lock<std::mutex> lk(m_mutex);
-//        if (!m_ready) {
-//            m_conditionVariable.wait(lk, [&] {
-//                currentTime = Time::now();
-//                return (m_ready);
-//            });
-//        }
 
         auto newTime = Time::now();
         auto delta = newTime - currentTime;
@@ -88,7 +82,6 @@ void World::run() {
 
         m_ready = !m_snakesOnMap.empty() | !m_snakesToAdd.empty() | m_interupt;
 
-//        std::cout << "Loop" << std::endl;
         std::this_thread::sleep_for(1ms);
     }
 }
@@ -130,29 +123,27 @@ void World::removeFood(int uid) {
 
 void World::addEvent(std::unique_ptr<InputEvent> event) {
     std::unique_lock<std::mutex> lk(m_mutex);
-    if ((event->getEventType() & EventType::WORLD) == EventType::WORLD) {
-        if ((event->getEventType() & EventType::LOGIN) == EventType::LOGIN) {
+    switch (event->getEventType()) {
+        case EventType::LOGIN:
             int uid = event->getUserID();
             auto newSnake = addSnake(uid);
             InitOutputEvent initOutputEvent(uid, newSnake, m_width, m_height, m_snakesOnMap, m_foodOnMap);
             AddSnakeOutputEvent addSnakeOutputEvent(uid, newSnake);
             sendMessage(uid, initOutputEvent.getData());
             broadcastMessage(uid, addSnakeOutputEvent.getData());
-        }
-        if ((event->getEventType() & EventType::LOGOUT) == EventType::LOGOUT) {
+            break;
+        case EventType::LOGOUT:
             removeSnake(event->getUserID());
-        }
-    } else if ((event->getEventType() & EventType::GAME_OBJECT) == EventType::GAME_OBJECT) {
-        int id = event->getUserID();
-        if (m_snakesOnMap.find(id) == m_snakesOnMap.end()) {
-            return;
-        }
+            break;
+        default:
+            int id = event->getUserID();
+            if (m_snakesOnMap.find(id) == m_snakesOnMap.end()) {
+                return;
+            }
 
-        std::unique_ptr<EventData> myEvent = std::make_unique<EventData>(m_snakesOnMap.at(id), std::move(event));
-        std::cout << "Pridavam event hadovi" << std::endl;
-        m_eventQueue.push_back(std::move(myEvent));
-    } else {
-        std::cout << "Nebyl rozpoznan typ eventu..." << std::endl;
+            std::unique_ptr<EventData> myEvent = std::make_unique<EventData>(m_snakesOnMap.at(id), std::move(event));
+            std::cout << "Pridavam event hadovi" << std::endl;
+            m_eventQueue.push_back(std::move(myEvent));
     }
 }
 
@@ -175,14 +166,16 @@ void World::applySnakeEvent(std::unique_ptr<EventData> eventData) {
     auto snake = eventData->snake;
     auto event = std::move(eventData->event);
     auto e = &(*event);
-    if ((event->getEventType() & EventType::CHANGE_DIR) == EventType::CHANGE_DIR) {
-        int uid = event->getUserID();
-        auto snakeChangeDirection = static_cast<SnakeChangeDirectionInputEvent *>(e);
-        snake->setDirection(snakeChangeDirection->getDirection());
-        SnakeChangeDirectionOutputEvent outputEvent(uid, snakeChangeDirection->getDirection());
-        broadcastMessage(uid, outputEvent.getData());
-    } else {
-        std::cout << "Nebyl rozpoznan typ eventu" << std::endl;
+    switch (event->getEventType()) {
+        case EventType::CHANGE_DIR:
+            int uid = event->getUserID();
+            auto snakeChangeDirection = static_cast<SnakeChangeDirectionInputEvent *>(e);
+            snake->setDirection(snakeChangeDirection->getDirection());
+            SnakeChangeDirectionOutputEvent outputEvent(uid, snakeChangeDirection->getDirection());
+            broadcastMessage(uid, outputEvent.getData());
+            break;
+        default:
+            std::cout << "Nebyl rozpoznan typ eventu" << std::endl;
     }
 }
 
@@ -221,10 +214,12 @@ void World::addGameObjects() {
 
 void World::removeGameObjects() {
     for (int index : m_snakesToRemove) {
-        std::cout << "Odebiram hada z mapy s indexem: " << index << std::endl;
         RemoveSnakeOutputEvent event(index);
         broadcastMessage(index, event.getData());
-        m_snakesOnMap.erase(index);
+        auto erased = m_snakesOnMap.erase(index);
+        if (erased > 0) {
+            std::cout << "Odebiram hada z mapy s indexem: " << index << std::endl;
+        }
     }
     m_snakesToRemove.clear();
 

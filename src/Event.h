@@ -10,20 +10,10 @@
 namespace SnakeServer {
 
 enum EventType {
-    WORLD = 1 << 0,
-    GAME_OBJECT = 1 << 1,
-    LOGIN = 1 << 2,
-    LOGOUT = 1 << 3,
-    CHANGE_DIR = 1 << 4
+    LOGIN,
+    LOGOUT,
+    CHANGE_DIR
 };
-
-inline EventType operator|(EventType a, EventType b) {
-    return static_cast<EventType>(static_cast<int>(a) | static_cast<int>(b));
-}
-
-inline EventType operator&(EventType a, EventType b) {
-    return static_cast<EventType>(static_cast<int>(a) & static_cast<int>(b));
-}
 
 // Získám přes parser
 class InputEvent {
