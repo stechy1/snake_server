@@ -90,7 +90,7 @@ void World::run() {
 
         m_ready = !m_snakesOnMap.empty() | !m_snakesToAdd.empty() | m_interupt;
 
-        std::this_thread::sleep_for(1ms);
+        std::this_thread::sleep_for(50ms);
     }
 }
 
