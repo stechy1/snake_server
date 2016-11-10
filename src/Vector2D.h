@@ -32,6 +32,12 @@ public:
         m_y = other.m_y;
     }
 
+    Vector2D &operator=(const Vector2D &other) {
+        m_x = other.m_x;
+        m_y = other.m_y;
+        return *this;
+    }
+
     ~Vector2D() {};
 
     // Přetížení operátorů - standartní operace
@@ -136,7 +142,7 @@ public:
 
     double magSq() { return (m_x * m_x + m_y * m_y); }
 
-    double dot(const double _x, const double _y) { return m_x * _x + m_y * _y; }
+    double dot(const double t_x, const double t_y) { return m_x * t_x + m_y * t_y; }
 
     double cross(const Vector2D &other) { return m_x * other.m_y - m_y * other.m_x; }
 
@@ -199,9 +205,9 @@ public:
 
     Vector2D &lerp(const Vector2D &other, double amt) { return this->lerp(other.m_x, other.m_y, amt); }
 
-    Vector2D &lerp(const double _x, const double _y, const double amt) {
-        m_x += (_x - m_x) * amt;
-        m_y += (_y - m_y) * amt;
+    Vector2D &lerp(const double t_x, const double t_y, const double amt) {
+        m_x += (t_x - m_x) * amt;
+        m_y += (t_y - m_y) * amt;
 
         return *this;
     }
@@ -298,54 +304,6 @@ public:
         Vector2D vector(x, y);
         return vector;
     }
-
-//    static Vector2D add(const Vector2D &l, const Vector2D &r) {
-//        return add(l, r.m_x, r.m_y);
-//    }
-//
-//    static Vector2D add(const Vector2D &vector, const double value) {
-//        return add(vector, value, value);
-//    }
-//
-//    static Vector2D add(const Vector2D &vector, const double x, const double y) {
-//        return Vector2D(vector.m_x + x, vector.m_y + y);
-//    }
-//
-//    static Vector2D sub(const Vector2D &l, const Vector2D &r) {
-//        return sub(l, r.m_x, r.m_y);
-//    }
-//
-//    static Vector2D sub(const Vector2D &vector, const double value) {
-//        return sub(vector, value, value);
-//    }
-//
-//    static Vector2D sub(const Vector2D &vector, const double x, const double y) {
-//        return Vector2D(vector.m_x - x, vector.m_y - y);
-//    }
-//
-//    static Vector2D mul(const Vector2D &l, const Vector2D &r) {
-//        return mul(l, r.m_x, r.m_y);
-//    }
-//
-//    static Vector2D mul(const Vector2D &vector, const double value) {
-//        return mul(vector, value, value);
-//    }
-//
-//    static Vector2D mul(const Vector2D &vector, const double x, const double y) {
-//        return Vector2D(vector.m_x * x, vector.m_y * y);
-//    }
-//
-//    static Vector2D div(const Vector2D &l, const Vector2D &r) {
-//        return div(l, r.m_x, r.m_y);
-//    }
-//
-//    static Vector2D div(const Vector2D &vector, const double value) {
-//        return div(vector, value, value);
-//    }
-//
-//    static Vector2D div(const Vector2D &vector, const double x, const double y) {
-//        return Vector2D(vector.m_x / x, vector.m_y / y);
-//    }
 
 private:
     double m_x;
