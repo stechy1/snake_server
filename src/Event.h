@@ -9,6 +9,15 @@
 
 namespace SnakeServer {
 
+static const std::string EVENT_LINE_SEPARATOR = "\n";
+static const std::string VALUE_SEPARATOR = "|";
+static const std::string EVENT_TYPE_OPEN_BRACKET = "{";
+static const std::string EVENT_TYPE_CLOSE_BRACKET = "}";
+static const std::string VALUE_OPEN_BRACKET = "[";
+static const std::string VALUE_CLOSE_BRACKET = "]";
+static const std::string EVENT_VALUE_OPEN_BRACKET = "{[";
+static const std::string EVENT_VALUE_CLOSE_BRACKET = "]}";
+
 enum EventType {
     LOGIN,
     LOGOUT,
@@ -90,7 +99,6 @@ public:
     virtual std::string getDescription() override;
 
 private:
-
 
     std::string foodValues(std::map<int, GameObject::Food *> &t_food);
 
