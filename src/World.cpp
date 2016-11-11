@@ -84,7 +84,6 @@ void World::run() {
             accumulator -= dt;
             x++;
         }
-        std::cout << "Cycle count: " << x << std::endl;
 
         addGameObjects();
 
@@ -152,7 +151,7 @@ void World::addEvent(std::unique_ptr<InputEvent> event) {
             }
 
             std::unique_ptr<EventData> myEvent = std::make_unique<EventData>(m_snakesOnMap.at(id), std::move(event));
-            std::cout << "Pridavam event hadovi" << std::endl;
+            //std::cout << "Pridavam event hadovi" << std::endl;
             m_eventQueue.push_back(std::move(myEvent));
         }
     }
@@ -199,11 +198,9 @@ void World::updateSnake(std::shared_ptr<GameObject::Snake> snake) {
     snake->setPosition(newPos);
 
     if (snake->getPosition().X() > m_width) {
-        std::cout << "Upravuji X pozici, protoze je vetsi nez sirka" << std::endl;
         snake->setPosition(Vector2D(-m_width, position.Y()));
     }
     if (snake->getPosition().X() < -m_width) {
-        std::cout << "Upravuji X pozici, protoze je mensi nez sirka" << std::endl;
         snake->setPosition(Vector2D(m_width, position.Y()));
     }
     if (snake->getPosition().Y() > m_height) {
