@@ -1,5 +1,5 @@
-#ifndef simpleLogger_h__
-#define simpleLogger_h__
+#ifndef SNAKE_SERVER_SIMPLE_LOGGER_H
+#define SNAKE_SERVER_SIMPLE_LOGGER_H
 
 #include <boost/log/trivial.hpp>
 #include <boost/log/sources/global_logger_storage.hpp>
@@ -8,7 +8,7 @@
 #define LOGFILE "server.log"
 
 // just log messages with severity >= SEVERITY_THRESHOLD are written
-#define SEVERITY_THRESHOLD logging::trivial::warning
+#define SEVERITY_THRESHOLD logging::trivial::debug
 
 // register a global logger
 BOOST_LOG_GLOBAL_LOGGER(logger, boost::log::sources::severity_logger_mt<boost::log::trivial::severity_level>)
@@ -24,4 +24,4 @@ BOOST_LOG_GLOBAL_LOGGER(logger, boost::log::sources::severity_logger_mt<boost::l
 #define LOG_ERROR   LOG(error)
 #define LOG_FATAL   LOG(fatal)
 
-#endif
+#endif // SNAKE_SERVER_SIMPLE_LOGGER_H
