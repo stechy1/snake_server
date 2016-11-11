@@ -243,7 +243,7 @@ public:
         return *this;
     }
 
-    std::string to_string() {
+    std::string to_string() const {
         return "Vector2D{X=" + std::to_string(m_x) + ", Y=" + std::to_string(m_y) + "}";
     }
 
