@@ -15,9 +15,10 @@ namespace SnakeServer {
 
 using namespace std::chrono_literals;
 
+static const double BORDER_MULTIPLIER = 0.7;
 static const unsigned int SNAKE_SIZE = 15;
 static const double UPS = 0.25;
-static const int UPDATE_PERIOD = 10000;
+static const int UPDATE_PERIOD = 300; // TODO najít optimální hodnotu
 
 struct EventData {
     std::shared_ptr<GameObject::Snake> snake;
@@ -101,7 +102,6 @@ private:
     std::condition_variable m_conditionVariable;
     std::thread m_thread;
     bool m_interupt = false;
-    bool m_ready = false;
 };
 
 }

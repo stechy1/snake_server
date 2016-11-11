@@ -3,8 +3,8 @@
 namespace SnakeServer {
 
 World::World(int t_width, int t_height, Network::TCPConnection &t_dataSender)
-        : m_width(t_width), m_height(t_height), m_border(0), m_dataSender(t_dataSender) {
-    m_border = std::min(m_width, m_height) / 0.7;
+        : m_width(t_width), m_height(t_height), m_dataSender(t_dataSender) {
+    m_border = std::min(m_width, m_height) / BORDER_MULTIPLIER;
 }
 
 World::~World() {
@@ -39,7 +39,6 @@ void World::start() {
 
 void World::stop() {
     m_interupt = true;
-    m_ready = true;
     m_conditionVariable.notify_one();
 }
 
@@ -65,8 +64,8 @@ void World::run() {
 
         removeGameObjects();
 
-        for (auto &e : m_eventQueue) {
-            applySnakeEvent(std::move(e));
+        for (auto &event : m_eventQueue) {
+            applySnakeEvent(std::move(event));
         }
         m_eventQueue.clear();
 
@@ -87,9 +86,7 @@ void World::run() {
 
         addGameObjects();
 
-        m_ready = !m_snakesOnMap.empty() | !m_snakesToAdd.empty() | m_interupt;
-
-        std::this_thread::sleep_for(50ms);
+        std::this_thread::sleep_for(ms(100-(int)(frameTime*100)));
     }
 }
 
@@ -151,7 +148,6 @@ void World::addEvent(std::unique_ptr<InputEvent> event) {
             }
 
             std::unique_ptr<EventData> myEvent = std::make_unique<EventData>(m_snakesOnMap.at(id), std::move(event));
-            //std::cout << "Pridavam event hadovi" << std::endl;
             m_eventQueue.push_back(std::move(myEvent));
         }
     }
