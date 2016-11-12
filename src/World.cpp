@@ -129,7 +129,7 @@ void World::addEvent(std::unique_ptr<InputEvent> event) {
         case EventType::LOGIN: {
             uuid clientID = event->getUserID();
             auto newSnake = addSnake(clientID);
-            InitOutputEvent initOutputEvent(newSnake, m_width, m_height, m_snakesOnMap, m_foodOnMap);
+            InitOutputEvent initOutputEvent(clientID, newSnake, m_width, m_height, m_snakesOnMap, m_foodOnMap);
             AddSnakeOutputEvent addSnakeOutputEvent(clientID, newSnake);
             sendMessage(clientID, initOutputEvent.getData());
             broadcastMessage(clientID, addSnakeOutputEvent.getData());

@@ -95,7 +95,7 @@ public:
 
 class InitOutputEvent : public OutputEvent {
 public:
-    InitOutputEvent(std::shared_ptr<GameObject::Snake> t_snake, int t_width, int t_height,
+    InitOutputEvent(uuid &t_clientID, std::shared_ptr<GameObject::Snake> &t_snake, int t_width, int t_height,
                     std::map<uuid, std::shared_ptr<GameObject::Snake>> &t_snakes,
                     std::map<int, std::shared_ptr<GameObject::Food>> &t_food);
 

@@ -105,10 +105,10 @@ const Vector2D &SnakeChangeDirectionInputEvent::getDirection() const {
 // Output events
 
 // Init event
-InitOutputEvent::InitOutputEvent(std::shared_ptr<GameObject::Snake> t_snake, int t_width, int t_height,
+InitOutputEvent::InitOutputEvent(uuid &t_clientID, std::shared_ptr<GameObject::Snake> &t_snake, int t_width, int t_height,
                                  std::map<uuid, std::shared_ptr<GameObject::Snake>> &t_snakes,
                                  std::map<int, std::shared_ptr<GameObject::Food>> &t_food) {
-    m_data = "init:" + EVENT_VALUE_OPEN_BRACKET +
+    m_data = "init:" + EVENT_VALUE_OPEN_BRACKET + formatUid(t_clientID) +
              joinValues(VALUE_SEPARATOR, 5, t_snake->getPosition().X(), t_snake->getPosition().Y(),
                         t_snake->getDirection().X(), t_snake->getDirection().Y(), (double) t_snake->getSize()) +
              EVENT_VALUE_CLOSE_BRACKET
@@ -119,8 +119,6 @@ InitOutputEvent::InitOutputEvent(std::shared_ptr<GameObject::Snake> t_snake, int
 }
 
 std::string InitOutputEvent::getData() {
-    std::cout << "Posilam init event" << std::endl;
-    std::cout << m_data << std::endl;
     return m_data;
 }
 
@@ -167,7 +165,7 @@ SnakeChangeDirectionOutputEvent::SnakeChangeDirectionOutputEvent(uuid t_clientID
         : m_clientID(t_clientID), m_dir(t_dir) {}
 
 std::string SnakeChangeDirectionOutputEvent::getData() {
-    return "changedir:" + formatUid(m_clientID) + joinValues(VALUE_SEPARATOR, 2, m_dir.X(), m_dir.Y()) + EVENT_LINE_SEPARATOR;
+    return "changedir:" + EVENT_TYPE_OPEN_BRACKET + formatUid(m_clientID) + joinValues(VALUE_SEPARATOR, 2, m_dir.X(), m_dir.Y()) + EVENT_TYPE_CLOSE_BRACKET + EVENT_LINE_SEPARATOR;
 }
 
 std::string SnakeChangeDirectionOutputEvent::getDescription() {
@@ -176,7 +174,7 @@ std::string SnakeChangeDirectionOutputEvent::getDescription() {
 
 // AddSnake event
 AddSnakeOutputEvent::AddSnakeOutputEvent(uuid t_clientID, const std::shared_ptr<GameObject::Snake> snake) {
-    m_data = "addsnake:" + formatUid(t_clientID) + EVENT_VALUE_OPEN_BRACKET +
+    m_data = "addsnake:" + EVENT_VALUE_OPEN_BRACKET + formatUid(t_clientID) +
              joinValues(VALUE_SEPARATOR, 5, snake->getPosition().X(), snake->getPosition().Y(),
                         snake->getDirection().X(), snake->getDirection().Y(),
                         (double) snake->getSize()) + EVENT_TYPE_CLOSE_BRACKET + EVENT_LINE_SEPARATOR;
