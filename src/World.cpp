@@ -1,8 +1,10 @@
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include "World.h"
 
 namespace SnakeServer {
 
-World::World(int t_width, int t_height, Network::TCPConnection &t_dataSender)
+World::World(int t_width, int t_height, Network::Server &t_dataSender)
         : m_width(t_width), m_height(t_height), m_dataSender(t_dataSender) {
     m_border = std::min(m_width, m_height) / BORDER_MULTIPLIER;
 }
@@ -10,10 +12,6 @@ World::World(int t_width, int t_height, Network::TCPConnection &t_dataSender)
 World::~World() {
     if (m_thread.joinable()) {
         m_thread.join();
-    }
-
-    for (auto tmp : m_foodOnMap) {
-        delete tmp.second;
     }
 
     std::cout << "World destruct OK" << std::endl;
@@ -90,12 +88,12 @@ void World::run() {
     }
 }
 
-void World::removeSnake(int uid) {
-    m_snakesToRemove.push_back(uid);
+void World::removeSnake(uuid clientID) {
+    m_snakesToRemove.push_back(clientID);
 }
 
-std::shared_ptr<GameObject::Snake> World::addSnake(int uid) {
-    if (m_snakesToAdd.find(uid) != m_snakesToAdd.end() || m_snakesOnMap.find(uid) != m_snakesOnMap.end()) {
+std::shared_ptr<GameObject::Snake> World::addSnake(uuid clientID) {
+    if (m_snakesToAdd.find(clientID) != m_snakesToAdd.end() || m_snakesOnMap.find(clientID) != m_snakesOnMap.end()) {
         throw new std::runtime_error("Hrac s timto hadem jiz existuje");
     }
     std::cout << "Přidávám nového hada do hry" << std::endl;
@@ -104,37 +102,37 @@ std::shared_ptr<GameObject::Snake> World::addSnake(int uid) {
     Vector2D dir = Vector2D::RIGHT();
 
     auto snake = std::make_shared<GameObject::Snake>(pos, dir);
-    std::pair<int, std::shared_ptr<GameObject::Snake>> pair(uid, snake);
+    std::pair<uuid, std::shared_ptr<GameObject::Snake>> pair(clientID, snake);
     m_snakesToAdd.insert(pair);
 
     return snake;
 }
 
-GameObject::Food *World::addFood(int id) {
-    GameObject::Food *food = new GameObject::Food(id, Vector2D::RANDOM(
+std::shared_ptr<GameObject::Food> World::addFood(int id) {
+    std::shared_ptr<GameObject::Food> food = std::make_shared<GameObject::Food>(id, Vector2D::RANDOM(
             -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border
     ));
 
-    std::pair<int, GameObject::Food *> pair(food->m_uid, food);
+    std::pair<int, std::shared_ptr<GameObject::Food>> pair(food->m_uid, food);
     m_foodToAdd.insert(pair);
 
     return food;
 }
 
-void World::removeFood(int uid) {
-    m_foodToRemove.push_back(uid);
+void World::removeFood(int id) {
+    m_foodToRemove.push_back(id);
 }
 
 void World::addEvent(std::unique_ptr<InputEvent> event) {
     std::unique_lock<std::mutex> lk(m_mutex);
     switch (event->getEventType()) {
         case EventType::LOGIN: {
-            int uid = event->getUserID();
-            auto newSnake = addSnake(uid);
-            InitOutputEvent initOutputEvent(uid, newSnake, m_width, m_height, m_snakesOnMap, m_foodOnMap);
-            AddSnakeOutputEvent addSnakeOutputEvent(uid, newSnake);
-            sendMessage(uid, initOutputEvent.getData());
-            broadcastMessage(uid, addSnakeOutputEvent.getData());
+            uuid clientID = event->getUserID();
+            auto newSnake = addSnake(clientID);
+            InitOutputEvent initOutputEvent(newSnake, m_width, m_height, m_snakesOnMap, m_foodOnMap);
+            AddSnakeOutputEvent addSnakeOutputEvent(clientID, newSnake);
+            sendMessage(clientID, initOutputEvent.getData());
+            broadcastMessage(clientID, addSnakeOutputEvent.getData());
             break;
         }
         case EventType::LOGOUT: {
@@ -142,7 +140,7 @@ void World::addEvent(std::unique_ptr<InputEvent> event) {
             break;
         }
         default: {
-            int id = event->getUserID();
+            auto id = event->getUserID();
             if (m_snakesOnMap.find(id) == m_snakesOnMap.end()) {
                 return;
             }
@@ -153,18 +151,18 @@ void World::addEvent(std::unique_ptr<InputEvent> event) {
     }
 }
 
-void World::sendMessage(int uid, std::string data) {
-    m_dataSender.sendData(uid, data);
+void World::sendMessage(uuid clientID, std::string data) {
+    std::string msg = "(" + boost::uuids::to_string(clientID) + ")" + data;
+    m_dataSender.sendData(clientID, msg);
 }
 
-void World::broadcastMessage(int uid, std::string data) {
+void World::broadcastMessage(uuid clientID, std::string data) {
     for (auto &pair : m_snakesOnMap) {
-        if (pair.first == uid) {
+        if (pair.first == clientID) {
             continue;
         }
 
-        std::string msg = "{" + std::to_string(uid) + "}" + data;
-        m_dataSender.sendData(pair.first, msg);
+        sendMessage(clientID, data);
     }
 }
 
@@ -174,11 +172,11 @@ void World::applySnakeEvent(std::unique_ptr<EventData> eventData) {
     auto e = &(*event);
     switch (event->getEventType()) {
         case EventType::CHANGE_DIR: {
-            int uid = event->getUserID();
+            uuid clientID = event->getUserID();
             auto snakeChangeDirection = static_cast<SnakeChangeDirectionInputEvent *>(e);
             snake->setDirection(snakeChangeDirection->getDirection());
-            SnakeChangeDirectionOutputEvent outputEvent(uid, snakeChangeDirection->getDirection());
-            broadcastMessage(uid, outputEvent.getData());
+            SnakeChangeDirectionOutputEvent outputEvent(clientID, snakeChangeDirection->getDirection());
+            broadcastMessage(clientID, outputEvent.getData());
             break;
         }
         default:
@@ -222,12 +220,13 @@ void World::addGameObjects() {
 }
 
 void World::removeGameObjects() {
-    for (int index : m_snakesToRemove) {
+    for (auto index : m_snakesToRemove) {
         RemoveSnakeOutputEvent event(index);
         broadcastMessage(index, event.getData());
         auto erased = m_snakesOnMap.erase(index);
         if (erased > 0) {
-            std::cout << "Odebiram hada z mapy s indexem: " << index << std::endl;
+            std::string uid = boost::lexical_cast<std::string>(index);
+            std::cout << "Odebiram hada z mapy s indexem: " << uid << std::endl;
         }
     }
     m_snakesToRemove.clear();

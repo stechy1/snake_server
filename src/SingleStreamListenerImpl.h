@@ -2,28 +2,33 @@
 #define SNAKE_SERVER_SINGLESTREAMLISTENERIMPL_H
 
 #include "TCPStream.h"
+#include <boost/uuid/uuid.hpp>
+#include <map>
 
 namespace SnakeServer {
 namespace Network {
-class TCPConnection;
+
+typedef boost::uuids::uuid uuid;
+class Server;
 
 class SingleStreamListenerImpl : public SingleStreamListener {
 
 public:
-    SingleStreamListenerImpl(TCPConnection &t_tcpConnection);
+    SingleStreamListenerImpl(Server &t_tcpConnection, std::map<uuid, int> &t_clients_reference);
 
     virtual ~SingleStreamListenerImpl();
 
-    virtual void onDataReceived(int socketID, std::vector<std::string> data) override;
+    virtual void onDataReceived(int sid, std::vector<std::string> data) override;
 
-    virtual void onLostConnection(int socketID) override;
+    virtual void onLostConnection(int sid) override;
 
-    virtual void onDisconnect(int socketID) override;
+    virtual void onDisconnect(int sid) override;
 
-    virtual void onRestoreConnection(int socketID) override;
+    virtual void onRestoreConnection(int sid) override;
 
 private:
-    TCPConnection &m_tcpConnection;
+    Server &m_tcpConnection;
+    std::map<uuid, int> &m_clients_reference;
 };
 
 }

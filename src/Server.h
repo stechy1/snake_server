@@ -5,11 +5,15 @@
 #include <memory>
 #include <thread>
 #include <sys/select.h>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 #include "TCPStream.h"
 #include "SingleStreamListenerImpl.h"
 
 namespace SnakeServer {
 namespace Network {
+
+typedef boost::uuids::uuid uuid;
 
 const unsigned int BACKLOG = 10; // Maximální počet uživatelů čekajících ve frontě
 
@@ -19,9 +23,9 @@ public:
 
     virtual ~IOHandler() {}
 
-    virtual void onDataReceived(int socketID, std::vector<std::string> data) = 0;
+    virtual void onDataReceived(uuid clientID, std::vector<std::string> data) = 0;
 
-    virtual void onDisconnect(int socketID) = 0;
+    virtual void onDisconnect(uuid clientID) = 0;
 };
 
 class IDataSender {
@@ -30,14 +34,14 @@ public:
 
     virtual ~IDataSender() {}
 
-    virtual void sendData(int socketID, std::string data) = 0;
+    virtual void sendData(uuid clientID, std::string data) = 0;
 };
 
-class TCPConnection : public IDataSender {
+class Server : public IDataSender {
 public:
-    TCPConnection(uint16_t t_port, IOHandler &t_ioHandler);
+    Server(uint16_t t_port, IOHandler &t_ioHandler, uuid t_seed);
 
-    ~TCPConnection();
+    ~Server();
 
     friend class SingleStreamListenerImpl;
 
@@ -45,9 +49,9 @@ public:
 
     void stop();
 
-    void disconnectClient(int socketID);
+    void disconnectClient(uuid clientID);
 
-    virtual void sendData(int socketID, std::string data) override;
+    virtual void sendData(uuid clientID, std::string data) override;
 
 protected:
     void init();
@@ -71,6 +75,8 @@ private:
     int m_pipefd[2] = {0, 0}; // Pipe pro interní komunikaci
 
     std::map<int, std::unique_ptr<TCPStream>> m_clients;
+    std::map<uuid, int> m_clients_reference;
+    boost::uuids::name_generator m_uuid_generator;
 
     IOHandler &m_ioHandler;
     SingleStreamListenerImpl m_streamHandler;

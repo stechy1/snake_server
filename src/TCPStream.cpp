@@ -86,6 +86,14 @@ void TCPStream::closeStream() {
     ::close(m_sd);
 }
 
+const std::string &TCPStream::getIP() const {
+    return m_peerIP;
+}
+
+uint16_t TCPStream::getPort() const {
+    return m_peerPort;
+}
+
 
 }
 }

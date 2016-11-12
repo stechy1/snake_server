@@ -4,21 +4,22 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <cstring>
-#include "TCPConnection.h"
+#include "Server.h"
 
 namespace SnakeServer {
 namespace Network {
 
-TCPConnection::TCPConnection(uint16_t t_port, IOHandler &t_ioHandler)
+Server::Server(uint16_t t_port, IOHandler &t_ioHandler, uuid t_seed)
         : m_port(t_port), m_ioHandler(t_ioHandler),
-          m_streamHandler(*this) {
+          m_streamHandler(*this, m_clients_reference), m_uuid_generator(t_seed) {
     FD_ZERO(&m_master_read_fds);
     FD_ZERO(&m_master_write_fds);
     FD_ZERO(&m_read_fds);
     FD_ZERO(&m_write_fds);
+
 }
 
-TCPConnection::~TCPConnection() {
+Server::~Server() {
     if (m_thread.joinable()) {
         m_thread.join();
     }
@@ -29,10 +30,10 @@ TCPConnection::~TCPConnection() {
         client.second->closeStream();
     }
 
-    std::cout << "TCPConnection destruct OK" << std::endl;
+    std::cout << "Server destruct OK" << std::endl;
 }
 
-void TCPConnection::init() {
+void Server::init() {
     // Vytvoření nového socketu
     m_lsd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (m_lsd < 0) {
@@ -80,7 +81,7 @@ void TCPConnection::init() {
     m_fdMax = m_pipefd[0];
 }
 
-void TCPConnection::start() {
+void Server::start() {
     if (m_listening) {
         return;
     }
@@ -88,10 +89,10 @@ void TCPConnection::start() {
 
     m_interupt = false;
     m_listening = true;
-    m_thread = std::thread(&TCPConnection::run, this);
+    m_thread = std::thread(&Server::run, this);
 }
 
-void TCPConnection::run() {
+void Server::run() {
     while (!m_interupt) {
         // Zkopírování seznamů se sockety
         memcpy(&m_read_fds, &m_master_read_fds, sizeof(m_master_read_fds));
@@ -114,6 +115,7 @@ void TCPConnection::run() {
                         accept();
                     } catch (std::exception ex) {
                         std::cout << "Vyskytla se chyba s připojením uživatele" << std::endl;
+                        std::cout << ex.what() << std::endl;
                     }
                 } else {
                     try {
@@ -129,7 +131,7 @@ void TCPConnection::run() {
     }
 }
 
-void TCPConnection::accept() {
+void Server::accept() {
     if (!m_listening) {
         return;
     }
@@ -144,7 +146,11 @@ void TCPConnection::accept() {
     }
 
     // Přidání nového klienta do mapy
-    m_clients[sd] = std::make_unique<TCPStream>(sd, &address, m_streamHandler);
+    auto stream = std::make_unique<TCPStream>(sd, &address, m_streamHandler);
+    auto src_uid = stream->m_peerIP + std::to_string(stream->m_peerPort);
+    auto uuid = m_uuid_generator(src_uid);
+    m_clients[sd] = std::move(stream);
+    m_clients_reference[uuid] = sd;
 
     // Přidání socket descriptoru do hlavní seznamu descriptorů
     FD_SET(sd, &m_master_read_fds);
@@ -152,24 +158,25 @@ void TCPConnection::accept() {
     if (sd < m_fdMin) m_fdMin = sd;
 }
 
-void TCPConnection::stop() {
+void Server::stop() {
     // Nastavení příznaku interupt
     m_interupt = true;
     // Zápis do interní pipy pro případné probuzení selectu
     write(m_pipefd[1], "x", 1);
 }
 
-void TCPConnection::disconnectClient(int socketID) {
-    std::cout << "Ukončuji spojení s klidnetem: " << socketID << std::endl;
-    if (m_clients.find(socketID) != m_clients.end()) {
+void Server::disconnectClient(uuid clientID) {
+    if (m_clients_reference.find(clientID) != m_clients_reference.end()) {
+        auto socketID = m_clients_reference[clientID];
         m_clients[socketID]->closeStream();
         m_clients.erase(socketID);
+        m_clients_reference.erase(clientID);
         FD_CLR(socketID, &m_master_read_fds);
     }
 }
 
-void TCPConnection::sendData(int socketID, std::string data) {
-    m_clients[socketID]->send(data);
+void Server::sendData(uuid clientID, std::string data) {
+    m_clients[m_clients_reference[clientID]]->send(data);
 }
 
 }

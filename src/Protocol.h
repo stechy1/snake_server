@@ -2,9 +2,12 @@
 #define SNAKE_SERVER_DATAPARSER_H
 
 #include <stdexcept>
+#include <boost/uuid/uuid.hpp>
 #include "Event.h"
 
 namespace SnakeServer {
+
+typedef boost::uuids::uuid uuid;
 
 const std::string P_EVENT_DELIMITER = ":";
 const std::string P_LOGIN = "login:";
@@ -24,14 +27,14 @@ std::vector<std::string> split(const std::string str, const std::string delim) {
     return tokens;
 }
 
-std::unique_ptr<InputEvent> parseEvent(int userID, std::string data) {
+std::unique_ptr<InputEvent> parseEvent(uuid clientID, std::string data) {
     unsigned long delimiterIndex = data.find(P_EVENT_DELIMITER);
 
     if (data.find(P_LOGIN) != std::string::npos) {
         std::string res = data.substr(delimiterIndex + 1);
-        return std::make_unique<LoginInputEvent>(userID, res);
+        return std::make_unique<LoginInputEvent>(clientID, res);
     } else if (data.find(P_LOGOUT) != std::string::npos) {
-        return std::make_unique<LogoutInputEvent>(userID);
+        return std::make_unique<LogoutInputEvent>(clientID);
     } else if (data.find(P_CHANGE_DIR) != std::string::npos) {
         std::string res = data.substr(delimiterIndex + 1);
         std::vector<std::string> dirData = split(res, "|");
@@ -39,7 +42,7 @@ std::unique_ptr<InputEvent> parseEvent(int userID, std::string data) {
         double y = std::stod(dirData[1]);
 
         Vector2D dir(x, y);
-        return std::make_unique<SnakeChangeDirectionInputEvent>(userID, dir);
+        return std::make_unique<SnakeChangeDirectionInputEvent>(clientID, dir);
     }
 
     std::cout << "Nebyl nalezen odpovídající event" << std::endl;

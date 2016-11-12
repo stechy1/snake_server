@@ -1,7 +1,13 @@
 #include <cstdarg>
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include "Event.h"
 
 namespace SnakeServer {
+
+inline std::string formatUid(uuid clientID) {
+    return ID_OPEN_BRACKET + boost::uuids::to_string(clientID) + ID_CLOSE_BRACKET;
+}
 
 std::string joinValues(std::string t_delimiter, int t_count, ...) {
     va_list ap;
@@ -19,7 +25,7 @@ std::string joinValues(std::string t_delimiter, int t_count, ...) {
     return res;
 }
 
-std::string playerValues(std::map<int, std::shared_ptr<GameObject::Snake>> t_snakes) {
+std::string playerValues(std::map<uuid, std::shared_ptr<GameObject::Snake>> t_snakes) {
     std::string res = "";
 
     if (t_snakes.size() == 0) {
@@ -29,16 +35,15 @@ std::string playerValues(std::map<int, std::shared_ptr<GameObject::Snake>> t_sna
     for (auto &info : t_snakes) {
         auto snake = *info.second;
         std::string infoString = VALUE_OPEN_BRACKET
-                                 + joinValues(VALUE_SEPARATOR, 6, (double) info.first, snake.getPosition().X(),
+                                 + joinValues(VALUE_SEPARATOR, 5, snake.getPosition().X(),
                                               snake.getPosition().Y(),
                                               snake.getDirection().X(), snake.getDirection().Y(),
                                               (double) snake.getSize())
                                  + VALUE_CLOSE_BRACKET;
-        res += infoString + ",";
+        res += formatUid(info.first) + infoString + ",";
     }
 
     res = res.erase(res.size() - 1);
-
 
     return res;
 }
@@ -46,15 +51,15 @@ std::string playerValues(std::map<int, std::shared_ptr<GameObject::Snake>> t_sna
 // Input events
 
 // Login event
-LoginInputEvent::LoginInputEvent(int t_userID, const std::string &t_username)
-        : m_userID(t_userID), m_username(t_username) {}
+LoginInputEvent::LoginInputEvent(uuid t_clientID, const std::string &t_username)
+        : m_clientID(t_clientID), m_username(t_username) {}
 
 EventType LoginInputEvent::getEventType() {
     return LOGIN;
 }
 
-int LoginInputEvent::getUserID() {
-    return m_userID;
+uuid &LoginInputEvent::getUserID() {
+    return m_clientID;
 }
 
 std::string LoginInputEvent::getDescription() {
@@ -62,15 +67,15 @@ std::string LoginInputEvent::getDescription() {
 }
 
 // Logout event
-LogoutInputEvent::LogoutInputEvent(int t_userID)
-        : m_userID(t_userID) {}
+LogoutInputEvent::LogoutInputEvent(uuid t_clientID)
+        : m_clientID(t_clientID) {}
 
 EventType LogoutInputEvent::getEventType() {
     return LOGOUT;
 }
 
-int LogoutInputEvent::getUserID() {
-    return m_userID;
+uuid &LogoutInputEvent::getUserID() {
+    return m_clientID;
 }
 
 std::string LogoutInputEvent::getDescription() {
@@ -78,15 +83,15 @@ std::string LogoutInputEvent::getDescription() {
 }
 
 // ChangeDirection event
-SnakeChangeDirectionInputEvent::SnakeChangeDirectionInputEvent(int t_userID, const Vector2D &t_direction)
-        : m_userID(t_userID), m_direction(t_direction) {}
+SnakeChangeDirectionInputEvent::SnakeChangeDirectionInputEvent(uuid t_clientID, const Vector2D &t_direction)
+        : m_clientID(t_clientID), m_direction(t_direction) {}
 
 EventType SnakeChangeDirectionInputEvent::getEventType() {
     return CHANGE_DIR;
 }
 
-int SnakeChangeDirectionInputEvent::getUserID() {
-    return m_userID;
+uuid &SnakeChangeDirectionInputEvent::getUserID() {
+    return m_clientID;
 }
 
 std::string SnakeChangeDirectionInputEvent::getDescription() {
@@ -100,11 +105,11 @@ const Vector2D &SnakeChangeDirectionInputEvent::getDirection() const {
 // Output events
 
 // Init event
-InitOutputEvent::InitOutputEvent(int t_uid, std::shared_ptr<GameObject::Snake> t_snake, int t_width, int t_height,
-                                 std::map<int, std::shared_ptr<GameObject::Snake>> t_snakes,
-                                 std::map<int, GameObject::Food *> &t_food) {
+InitOutputEvent::InitOutputEvent(std::shared_ptr<GameObject::Snake> t_snake, int t_width, int t_height,
+                                 std::map<uuid, std::shared_ptr<GameObject::Snake>> &t_snakes,
+                                 std::map<int, std::shared_ptr<GameObject::Food>> &t_food) {
     m_data = "init:" + EVENT_VALUE_OPEN_BRACKET +
-             joinValues(VALUE_SEPARATOR, 6, (double) t_uid, t_snake->getPosition().X(), t_snake->getPosition().Y(),
+             joinValues(VALUE_SEPARATOR, 5, t_snake->getPosition().X(), t_snake->getPosition().Y(),
                         t_snake->getDirection().X(), t_snake->getDirection().Y(), (double) t_snake->getSize()) +
              EVENT_VALUE_CLOSE_BRACKET
              + "size:" + EVENT_VALUE_OPEN_BRACKET +
@@ -123,7 +128,7 @@ std::string InitOutputEvent::getDescription() {
     return "InitEvent";
 }
 
-std::string InitOutputEvent::foodValues(std::map<int, GameObject::Food *> &t_food) {
+std::string InitOutputEvent::foodValues(std::map<int, std::shared_ptr<GameObject::Food>> &t_food) {
     std::string res = "";
 
     if (t_food.size() == 0) {
@@ -145,11 +150,11 @@ std::string InitOutputEvent::foodValues(std::map<int, GameObject::Food *> &t_foo
 }
 
 // RemoveSnake event
-RemoveSnakeOutputEvent::RemoveSnakeOutputEvent(int t_uid)
-        : m_uid(t_uid) {}
+RemoveSnakeOutputEvent::RemoveSnakeOutputEvent(uuid t_clientID)
+        : m_clientID(t_clientID) {}
 
 std::string RemoveSnakeOutputEvent::getData() {
-    return "remsnake:" + EVENT_TYPE_OPEN_BRACKET + std::to_string(m_uid) + EVENT_TYPE_CLOSE_BRACKET +
+    return "remsnake:" + EVENT_TYPE_OPEN_BRACKET + formatUid(m_clientID) + EVENT_TYPE_CLOSE_BRACKET +
            EVENT_LINE_SEPARATOR;
 }
 
@@ -158,12 +163,11 @@ std::string RemoveSnakeOutputEvent::getDescription() {
 }
 
 // SnakeChangeDrection event
-SnakeChangeDirectionOutputEvent::SnakeChangeDirectionOutputEvent(int t_uid, const Vector2D &t_dir)
-        : m_uid(t_uid), m_dir(t_dir) {}
+SnakeChangeDirectionOutputEvent::SnakeChangeDirectionOutputEvent(uuid t_clientID, const Vector2D &t_dir)
+        : m_clientID(t_clientID), m_dir(t_dir) {}
 
 std::string SnakeChangeDirectionOutputEvent::getData() {
-    return "changedir:" + std::to_string(m_dir.X()) + VALUE_SEPARATOR + std::to_string(m_dir.Y()) +
-           EVENT_LINE_SEPARATOR;
+    return "changedir:" + formatUid(m_clientID) + joinValues(VALUE_SEPARATOR, 2, m_dir.X(), m_dir.Y()) + EVENT_LINE_SEPARATOR;
 }
 
 std::string SnakeChangeDirectionOutputEvent::getDescription() {
@@ -171,9 +175,9 @@ std::string SnakeChangeDirectionOutputEvent::getDescription() {
 }
 
 // AddSnake event
-AddSnakeOutputEvent::AddSnakeOutputEvent(int uid, const std::shared_ptr<GameObject::Snake> snake) {
-    m_data = "addsnake:" + EVENT_VALUE_OPEN_BRACKET +
-             joinValues(VALUE_SEPARATOR, 6, (double) uid, snake->getPosition().X(), snake->getPosition().Y(),
+AddSnakeOutputEvent::AddSnakeOutputEvent(uuid t_clientID, const std::shared_ptr<GameObject::Snake> snake) {
+    m_data = "addsnake:" + formatUid(t_clientID) + EVENT_VALUE_OPEN_BRACKET +
+             joinValues(VALUE_SEPARATOR, 5, snake->getPosition().X(), snake->getPosition().Y(),
                         snake->getDirection().X(), snake->getDirection().Y(),
                         (double) snake->getSize()) + EVENT_TYPE_CLOSE_BRACKET + EVENT_LINE_SEPARATOR;
 }
@@ -186,7 +190,7 @@ std::string AddSnakeOutputEvent::getDescription() {
     return "AddSnakeEvent";
 }
 
-SyncOutputEvent::SyncOutputEvent(std::map<int, std::shared_ptr<GameObject::Snake>> t_snakes) {
+SyncOutputEvent::SyncOutputEvent(std::map<uuid, std::shared_ptr<GameObject::Snake>> t_snakes) {
     m_data = "sync:" + EVENT_TYPE_OPEN_BRACKET + playerValues(t_snakes) + EVENT_TYPE_CLOSE_BRACKET +
              EVENT_LINE_SEPARATOR;
 }

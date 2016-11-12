@@ -6,13 +6,15 @@
 #include <mutex>
 #include <condition_variable>
 #include <chrono>
+#include <boost/uuid/uuid.hpp>
 #include "Snake.h"
-#include "TCPConnection.h"
+#include "Server.h"
 #include "Food.h"
 #include "Event.h"
 
 namespace SnakeServer {
 
+typedef boost::uuids::uuid uuid;
 using namespace std::chrono_literals;
 
 static const double BORDER_MULTIPLIER = 0.7;
@@ -47,7 +49,7 @@ struct EventData {
 
 class World {
 public:
-    World(int t_width, int t_height, Network::TCPConnection &t_dataSender);
+    World(int t_width, int t_height, Network::Server &t_dataSender);
 
     ~World();
 
@@ -55,25 +57,25 @@ public:
 
     void stop();
 
-    std::shared_ptr<GameObject::Snake> addSnake(int uid);
+    std::shared_ptr<GameObject::Snake> addSnake(uuid clientID);
 
-    void removeSnake(int uid);
+    void removeSnake(uuid clientID);
 
-    GameObject::Food *addFood(int id);
+    std::shared_ptr<GameObject::Food> addFood(int id);
 
-    void removeFood(int uid);
+    void removeFood(int id);
 
     void addEvent(std::unique_ptr<InputEvent> event);
 
-    void sendMessage(int uid, std::string data);
+    void sendMessage(uuid clientID, std::string data);
 
-    void broadcastMessage(int uid, std::string data);
+    void broadcastMessage(uuid clientID, std::string data);
 
     int m_width = 0;
     int m_height = 0;
     double m_border = 0;
-    std::map<int, std::shared_ptr<GameObject::Snake>> m_snakesOnMap;
-    std::map<int, GameObject::Food *> m_foodOnMap;
+    std::map<uuid, std::shared_ptr<GameObject::Snake>> m_snakesOnMap;
+    std::map<int, std::shared_ptr<GameObject::Food>> m_foodOnMap;
 
 private:
     void init();
@@ -88,13 +90,13 @@ private:
 
     void removeGameObjects();
 
-    Network::TCPConnection &m_dataSender;
+    Network::Server &m_dataSender;
 
     typedef std::chrono::high_resolution_clock Time;
 
-    std::map<int, std::shared_ptr<GameObject::Snake>> m_snakesToAdd;
-    std::map<int, GameObject::Food *> m_foodToAdd;
-    std::vector<int> m_snakesToRemove;
+    std::map<uuid, std::shared_ptr<GameObject::Snake>> m_snakesToAdd;
+    std::map<int, std::shared_ptr<GameObject::Food>> m_foodToAdd;
+    std::vector<uuid> m_snakesToRemove;
     std::vector<int> m_foodToRemove;
     std::vector<std::unique_ptr<EventData>> m_eventQueue; // Hlavní event queue pro objekty na mapě
 
