@@ -31,6 +31,10 @@ void TCPStream::send(std::string data) {
 
     ssize_t n = ::send(m_sd, buff, len, 0);
 
+    if (n == -1) {
+        m_listener.onDisconnect(m_sd);
+    }
+
     assert(n == len);
 }
 
@@ -48,7 +52,7 @@ void TCPStream::receive() {
     if (len == -1) {
         if (errno != EWOULDBLOCK) {
             connectionStatus = LOST_CONNECTION;
-            m_listener.onLostConnection(m_sd);
+            m_listener.onDisconnect(m_sd);
             // Spojení bylo ztraceno
             return;
         }
@@ -67,6 +71,7 @@ void TCPStream::receive() {
     while ((index = received.find(DELIMITER)) != std::string::npos) {
         unsigned long size = received.size();
         std::string data = received.substr(0, index);
+        std::cout << "Prijate dato: " << data << std::endl;
         list.push_back(data);
 
         if (size - index + 1 > 0) {
