@@ -162,7 +162,7 @@ void World::broadcastMessage(uuid clientID, std::string data) {
             continue;
         }
 
-        sendMessage(clientID, data);
+        sendMessage(pair.first, data);
     }
 }
 
