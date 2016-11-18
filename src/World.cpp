@@ -48,8 +48,6 @@ void World::run() {
     double accumulator = 0.0;
 
     while (!m_interupt) {
-        std::unique_lock<std::mutex> lk(m_mutex);
-
         auto newTime = Time::now();
         auto delta = newTime - currentTime;
         using ms = std::chrono::milliseconds;
@@ -124,7 +122,7 @@ void World::removeFood(int id) {
 }
 
 void World::addEvent(std::unique_ptr<InputEvent> event) {
-    std::unique_lock<std::mutex> lk(m_mutex);
+    std::cout << "Applying event: " << event->getDescription() << std::endl;
     switch (event->getEventType()) {
         case EventType::LOGIN: {
             uuid clientID = event->getUserID();
