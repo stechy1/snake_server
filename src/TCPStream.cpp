@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iostream>
 #include "TCPStream.h"
+#include "SimpleLogger.h"
 
 namespace SnakeServer {
 namespace Network {
@@ -43,7 +44,7 @@ void TCPStream::receive() {
     ssize_t len = recv(m_sd, buff, BUFFER_SIZE - 1, 0);
     std::string received;
     if (len == 0) {
-        // Spojení bylo slušně ukončeno
+        LOG_DEBUG << "Spojení bylo slušně ukončeno.";
         connectionStatus = DISCONNECTED;
         m_listener.onDisconnect(m_sd);
         closeStream();
@@ -51,9 +52,9 @@ void TCPStream::receive() {
     }
     if (len == -1) {
         if (errno != EWOULDBLOCK) {
+            LOG_DEBUG << "Spojení bylo ztraceno.";
             connectionStatus = LOST_CONNECTION;
             m_listener.onDisconnect(m_sd);
-            // Spojení bylo ztraceno
             return;
         }
 
@@ -71,7 +72,6 @@ void TCPStream::receive() {
     while ((index = received.find(DELIMITER)) != std::string::npos) {
         unsigned long size = received.size();
         std::string data = received.substr(0, index);
-        std::cout << "Prijate dato: " << data << std::endl;
         list.push_back(data);
 
         if (size - index + 1 > 0) {

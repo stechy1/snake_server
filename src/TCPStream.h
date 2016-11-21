@@ -29,8 +29,6 @@ public:
     virtual void onLostConnection(int sid) = 0;
 
     virtual void onDisconnect(int sid) = 0;
-
-    virtual void onRestoreConnection(int sid) = 0;
 };
 
 enum ConnectionStatus {

@@ -1,12 +1,14 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include "World.h"
+#include "SimpleLogger.h"
 
 namespace SnakeServer {
 
 World::World(int t_width, int t_height, Network::Server &t_dataSender)
         : m_width(t_width), m_height(t_height), m_dataSender(t_dataSender) {
     m_border = std::min(m_width, m_height) / BORDER_MULTIPLIER;
+    LOG_INFO << "World is constructed.";
 }
 
 World::~World() {
@@ -14,11 +16,11 @@ World::~World() {
         m_thread.join();
     }
 
-    std::cout << "World destruct OK" << std::endl;
+    LOG_INFO << "World destruct OK.";
 }
 
 void World::init() {
-    std::cout << "Generuji svět..." << std::endl;
+    LOG_INFO << "Generating world.";
     srand(time(NULL));
     for (int i = 0; i < 10; ++i) {
         addFood(i);
@@ -28,19 +30,23 @@ void World::init() {
         m_foodOnMap.insert(newFood);
     }
     m_foodToAdd.clear();
+    LOG_INFO << "World generated";
 }
 
 void World::start() {
     init();
+    LOG_INFO << "Starting up world thread.";
     m_thread = std::thread(&World::run, this);
 }
 
 void World::stop() {
+    LOG_INFO << "Stopping server.";
     m_interupt = true;
     m_conditionVariable.notify_one();
 }
 
 void World::run() {
+    LOG_INFO << "World is evaluating";
     double t = 0.0;
     double dt = 0.01;
 
@@ -84,6 +90,7 @@ void World::run() {
 
         std::this_thread::sleep_for(ms(100-(int)(frameTime*100)));
     }
+    LOG_INFO << "World thread ended.";
 }
 
 void World::removeSnake(uuid clientID) {
@@ -91,10 +98,7 @@ void World::removeSnake(uuid clientID) {
 }
 
 std::shared_ptr<GameObject::Snake> World::addSnake(uuid clientID) {
-    if (m_snakesToAdd.find(clientID) != m_snakesToAdd.end() || m_snakesOnMap.find(clientID) != m_snakesOnMap.end()) {
-        throw new std::runtime_error("Hrac s timto hadem jiz existuje");
-    }
-    std::cout << "Přidávám nového hada do hry" << std::endl;
+    LOG_DEBUG << "Přidávám nového hada do hry";
     Vector2D pos = Vector2D::RANDOM(
             -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border);
     Vector2D dir = Vector2D::RIGHT();
@@ -122,11 +126,15 @@ void World::removeFood(int id) {
 }
 
 void World::addEvent(std::unique_ptr<InputEvent> event) {
-    std::cout << "Applying event: " << event->getDescription() << std::endl;
     switch (event->getEventType()) {
         case EventType::LOGIN: {
             uuid clientID = event->getUserID();
-            auto newSnake = addSnake(clientID);
+            std::shared_ptr<GameObject::Snake> newSnake = nullptr;
+            if (m_snakesOnMap.find(clientID) != m_snakesOnMap.end()) {
+                newSnake = m_snakesOnMap[clientID];
+            } else {
+                newSnake = addSnake(clientID);
+            }
             InitOutputEvent initOutputEvent(clientID, newSnake, m_width, m_height, m_snakesOnMap, m_foodOnMap);
             AddSnakeOutputEvent addSnakeOutputEvent(clientID, newSnake);
             sendMessage(clientID, initOutputEvent.getData());
@@ -224,7 +232,7 @@ void World::removeGameObjects() {
         auto erased = m_snakesOnMap.erase(index);
         if (erased > 0) {
             std::string uid = boost::lexical_cast<std::string>(index);
-            std::cout << "Odebiram hada z mapy s indexem: " << uid << std::endl;
+            LOG_DEBUG << "Odebiram hada " << uid << " z mapy";
         }
     }
     m_snakesToRemove.clear();

@@ -14,7 +14,7 @@ class Server;
 class SingleStreamListenerImpl : public SingleStreamListener {
 
 public:
-    SingleStreamListenerImpl(Server &t_tcpConnection, std::map<uuid, int> &t_clients_reference);
+    SingleStreamListenerImpl(Server &t_server, std::map<uuid, int> &t_clients_reference);
 
     virtual ~SingleStreamListenerImpl();
 
@@ -24,10 +24,8 @@ public:
 
     virtual void onDisconnect(int sid) override;
 
-    virtual void onRestoreConnection(int sid) override;
-
 private:
-    Server &m_tcpConnection;
+    Server &m_server;
     std::map<uuid, int> &m_clients_reference;
 };
 

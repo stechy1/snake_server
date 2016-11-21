@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <cstring>
 #include "Server.h"
+#include "SimpleLogger.h"
 
 namespace SnakeServer {
 namespace Network {
@@ -16,6 +17,8 @@ Server::Server(uint16_t t_port, IOHandler &t_ioHandler, uuid t_seed)
     FD_ZERO(&m_master_write_fds);
     FD_ZERO(&m_read_fds);
     FD_ZERO(&m_write_fds);
+
+    LOG_INFO << "Server constructed.";
 
 }
 
@@ -30,25 +33,30 @@ Server::~Server() {
         client.second->closeStream();
     }
 
-    std::cout << "Server destruct OK" << std::endl;
+    LOG_INFO << "Server destruct OK.";
 }
 
 void Server::init() {
     // Vytvoření nového socketu
     m_lsd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (m_lsd < 0) {
+        LOG_ERROR << "Can not create new socket.";
         throw std::runtime_error("Socket() error");
     }
 
     int optval = 1;
     if (ioctl(m_lsd, FIONBIO, (char *) &optval) < 0) {
         close(m_lsd);
+        LOG_ERROR << "Can not perform ioctl operation.";
         throw std::runtime_error("ioctl() error");
     }
 
     optval = 1;
     // Možnost permanentního znovupoužití stejného portu
-    setsockopt(m_lsd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+    if (setsockopt(m_lsd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0) {
+        LOG_ERROR << "Can not perform setsockopt operation.";
+        throw std::runtime_error("setsockopt() error");
+    }
 
     struct ::sockaddr_in address;
     memset(&address, 0, sizeof(address));
@@ -58,11 +66,13 @@ void Server::init() {
 
     // Nabindování socketu na port
     if (bind(m_lsd, (struct sockaddr *) &address, sizeof(address)) < 0) {
+        LOG_ERROR << "Can not bind socket.";
         throw std::runtime_error("bind() error");
     }
 
     // Otevření socketu pro poslouchání
     if (listen(m_lsd, BACKLOG) < 0) {
+        LOG_ERROR << "Can not listen on socket.";
         throw std::runtime_error("listen() error");
     }
 
@@ -73,12 +83,15 @@ void Server::init() {
 
     // Vytvoření pipy pro interní komunikaci
     if (pipe(m_pipefd) == -1) {
+        LOG_ERROR << "Can not create internal pipe.";
         throw std::runtime_error("pipe() error");
     }
 
     // Začlenění pipy do FD setu
     FD_SET(m_pipefd[0], &m_master_read_fds);
     m_fdMax = m_pipefd[0];
+
+    LOG_INFO << "Server initialized.";
 }
 
 void Server::start() {
@@ -87,12 +100,14 @@ void Server::start() {
     }
     init();
 
+    LOG_INFO << "Starting server thread.";
     m_interupt = false;
     m_listening = true;
     m_thread = std::thread(&Server::run, this);
 }
 
 void Server::run() {
+    LOG_INFO << "Server thread is running.";
     while (!m_interupt) {
         // Zkopírování seznamů se sockety
         memcpy(&m_read_fds, &m_master_read_fds, sizeof(m_master_read_fds));
@@ -100,7 +115,8 @@ void Server::run() {
 
         if (select(m_fdMax + 1, &m_read_fds, &m_write_fds, NULL, NULL) == -1) {
             close(m_lsd);
-            // Zavolad obslužný handler, který se postará o úklid
+            // Zavolat obslužný handler, který se postará o úklid
+            LOG_FATAL << "Chyba v selektu";
             m_interupt = true;
             m_listening = false;
             break;
@@ -114,7 +130,7 @@ void Server::run() {
                     try {
                         accept();
                     } catch (std::exception ex) {
-                        std::cout << "Vyskytla se chyba s připojením uživatele" << std::endl;
+                        LOG_ERROR << "Vyskytla se chyba s připojením uživatele";
                         std::cout << ex.what() << std::endl;
                     }
                 } else {
@@ -122,13 +138,14 @@ void Server::run() {
                         // Přijímám data od klienta
                         m_clients[i]->receive();
                     } catch (std::exception ex) {
-                        std::cout << "Chyba při přijímání dat od klienta" << std::endl;
+                        LOG_ERROR << "Chyba při přijímání dat od klienta";
                         std::cout << ex.what() << std::endl;
                     }
                 }
             }
         }
     }
+    LOG_INFO << "Server thread ended.";
 }
 
 void Server::accept() {
@@ -159,6 +176,7 @@ void Server::accept() {
 }
 
 void Server::stop() {
+    LOG_INFO << "Stoping server thread.";
     // Nastavení příznaku interupt
     m_interupt = true;
     // Zápis do interní pipy pro případné probuzení selectu
@@ -170,13 +188,17 @@ void Server::disconnectClient(uuid clientID) {
         auto socketID = m_clients_reference[clientID];
         m_clients[socketID]->closeStream();
         m_clients.erase(socketID);
-        m_clients_reference.erase(clientID);
+        m_clients_reference[clientID] = -1;
         FD_CLR(socketID, &m_master_read_fds);
     }
 }
 
 void Server::sendData(uuid clientID, std::string data) {
-    m_clients[m_clients_reference[clientID]]->send(data);
+    int uid = m_clients_reference[clientID];
+    if (uid == -1)
+        return;
+
+    m_clients[uid]->send(data);
 }
 
 }
