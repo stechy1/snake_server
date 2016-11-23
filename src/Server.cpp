@@ -4,6 +4,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <cstring>
+#include <boost/uuid/uuid_io.hpp>
 #include "Server.h"
 #include "SimpleLogger.h"
 

@@ -129,8 +129,10 @@ void World::addEvent(std::unique_ptr<InputEvent> event) {
             uuid clientID = event->getUserID();
             std::shared_ptr<GameObject::Snake> newSnake = nullptr;
             if (m_snakesOnMap.find(clientID) != m_snakesOnMap.end()) {
+                LOG_DEBUG << "Obnovuji spojeni s hadem";
                 newSnake = m_snakesOnMap[clientID];
             } else {
+                LOG_DEBUG << "Vytvářím nového hada";
                 newSnake = addSnake(clientID);
             }
             InitOutputEvent initOutputEvent(clientID, newSnake, m_width, m_height, m_snakesOnMap, m_foodOnMap);

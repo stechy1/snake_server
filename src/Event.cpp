@@ -165,7 +165,9 @@ SnakeChangeDirectionOutputEvent::SnakeChangeDirectionOutputEvent(uuid t_clientID
         : m_clientID(t_clientID), m_dir(t_dir) {}
 
 std::string SnakeChangeDirectionOutputEvent::getData() {
-    return "changedir:" + EVENT_TYPE_OPEN_BRACKET + formatUid(m_clientID) + joinValues(VALUE_SEPARATOR, 2, m_dir.X(), m_dir.Y()) + EVENT_TYPE_CLOSE_BRACKET + EVENT_LINE_SEPARATOR;
+    return "changedir:" + EVENT_TYPE_OPEN_BRACKET + formatUid(m_clientID)
+           + VALUE_OPEN_BRACKET + joinValues(VALUE_SEPARATOR, 2, m_dir.X(), m_dir.Y()) + VALUE_CLOSE_BRACKET
+           + EVENT_TYPE_CLOSE_BRACKET + EVENT_LINE_SEPARATOR;
 }
 
 std::string SnakeChangeDirectionOutputEvent::getDescription() {
