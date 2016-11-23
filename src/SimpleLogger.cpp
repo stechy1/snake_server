@@ -29,7 +29,7 @@ BOOST_LOG_GLOBAL_LOGGER_INIT(logger, src::severity_logger_mt) {
 
     // add a text sink
     typedef sinks::synchronous_sink<sinks::text_ostream_backend> text_sink;
-    boost::shared_ptr<text_sink> sink = boost::make_shared<text_sink>();
+    auto sink = boost::make_shared<text_sink>();
 
     // add a logfile stream to our sink
     sink->locked_backend()->add_stream(boost::make_shared<std::ofstream>(LOGFILE));
@@ -38,7 +38,7 @@ BOOST_LOG_GLOBAL_LOGGER_INIT(logger, src::severity_logger_mt) {
     sink->locked_backend()->add_stream(boost::shared_ptr<std::ostream>(&std::clog, boost::null_deleter()));
 
     // specify the format of the log message
-    logging::formatter formatter = expr::stream
+    auto formatter = expr::stream
             << std::setw(7) << std::setfill('0') << line_id << std::setfill(' ') << " | "
             << expr::format_date_time(timestamp, "%Y-%m-%d, %H:%M:%S.%f") << " "
             << "[" << logging::trivial::severity << "]"
