@@ -11,7 +11,7 @@ static const float VELOCITY_MULTIPLIER = 0.5f;
 
 class Snake {
 public:
-    Snake(Vector2D &t_pos, Vector2D &t_dir);
+    Snake(Vector2D &t_pos, Vector2D &t_dir, const std::string &t_username);
 
     std::string getDescription();
 
@@ -31,14 +31,13 @@ public:
 
     void setSize(int t_size);
 
-    const void incrementCounter();
-
-    const unsigned int getCounterValue();
+    const std::string &getUsername() const;
 
 private:
     Vector2D m_pos = Vector2D::ZERO();
     Vector2D m_dir = Vector2D::RIGHT();
     Vector2D m_vel = Vector2D::ONES();
+    const std::string m_username;
     int m_size = 25;
     unsigned int m_updateCounter = 0;
 

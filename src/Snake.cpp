@@ -4,8 +4,8 @@
 namespace SnakeServer {
 namespace GameObject {
 
-Snake::Snake(Vector2D &t_pos, Vector2D &t_dir)
-        : m_pos(t_pos), m_dir(t_dir) {
+Snake::Snake(Vector2D &t_pos, Vector2D &t_dir, const std::string &t_username)
+        : m_pos(t_pos), m_dir(t_dir), m_username(t_username) {
     m_vel = Vector2D::ONES();
     m_vel *= VELOCITY_MULTIPLIER;
 }
@@ -46,12 +46,8 @@ void Snake::setSize(int t_size) {
     Snake::m_size = t_size;
 }
 
-const void Snake::incrementCounter() {
-    m_updateCounter++;
-}
-
-const unsigned int Snake::getCounterValue() {
-    return m_updateCounter;
+const std::string &Snake::getUsername() const {
+    return m_username;
 }
 
 }

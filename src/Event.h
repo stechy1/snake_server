@@ -49,6 +49,8 @@ public:
 
     virtual std::string getDescription() override;
 
+    const std::string &getUsername() const;
+
 private:
     uuid m_clientID;
     std::string m_username;

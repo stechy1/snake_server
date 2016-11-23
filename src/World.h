@@ -57,7 +57,7 @@ public:
 
     void stop();
 
-    std::shared_ptr<GameObject::Snake> addSnake(const uuid &clientID);
+    std::shared_ptr<GameObject::Snake> addSnake(const uuid &clientID, const std::string &username);
 
     void removeSnake(const uuid &clientID);
 

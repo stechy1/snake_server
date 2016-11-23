@@ -91,13 +91,13 @@ void World::run() {
     LOG_INFO << "World thread ended.";
 }
 
-std::shared_ptr<GameObject::Snake> World::addSnake(const uuid &clientID) {
+std::shared_ptr<GameObject::Snake> World::addSnake(const uuid &clientID, const std::string &username) {
     LOG_DEBUG << "Přidávám nového hada do hry";
     Vector2D pos = Vector2D::RANDOM(
             -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border);
     Vector2D dir = Vector2D::RIGHT();
 
-    auto snake = std::make_shared<GameObject::Snake>(pos, dir);
+    auto snake = std::make_shared<GameObject::Snake>(pos, dir, username);
     std::pair<uuid, std::shared_ptr<GameObject::Snake>> pair(clientID, snake);
     m_snakesToAdd.insert(pair);
 
@@ -133,8 +133,9 @@ void World::addEvent(std::unique_ptr<InputEvent> event) {
                 newSnake = m_snakesOnMap[clientID];
             } else {
                 LOG_DEBUG << "Vytvářím nového hada";
-
-                newSnake = addSnake(clientID);
+                auto e = &(*event);
+                auto castedEvent = static_cast<LoginInputEvent *>(e);
+                newSnake = addSnake(clientID, castedEvent->getUsername());
             }
             InitOutputEvent initOutputEvent(clientID, newSnake, m_width, m_height, m_snakesOnMap, m_foodOnMap);
             AddSnakeOutputEvent addSnakeOutputEvent(clientID, newSnake);
