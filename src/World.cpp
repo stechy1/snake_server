@@ -71,20 +71,18 @@ void World::run() {
         }
         m_eventQueue.clear();
 
-        int x = 0;
-        while (accumulator >= dt) {
+//        while (accumulator >= dt) {
             for (auto &item : m_snakesOnMap) {
                 auto snake = item.second;
-                updateSnake(snake);
-                if (snake->getCounterValue() % UPDATE_PERIOD == 0) {
+                    updateSnake(snake);
+//                if (snake->getCounterValue() % UPDATE_PERIOD == 0) {
                     SyncOutputEvent syncEvent(m_snakesOnMap);
                     sendMessage(item.first, syncEvent.getData());
-                }
+//                }
             }
-            t += dt;
-            accumulator -= dt;
-            x++;
-        }
+//            t += dt;
+//            accumulator -= dt;
+//        }
 
         addGameObjects();
 
@@ -210,7 +208,7 @@ void World::updateSnake(std::shared_ptr<GameObject::Snake> snake) {
         snake->setPosition(Vector2D(position.X(), m_height));
     }
 
-    snake->incrementCounter();
+//    snake->incrementCounter();
 }
 
 void World::addGameObjects() {
