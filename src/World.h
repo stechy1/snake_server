@@ -57,19 +57,19 @@ public:
 
     void stop();
 
-    std::shared_ptr<GameObject::Snake> addSnake(uuid clientID);
+    std::shared_ptr<GameObject::Snake> addSnake(const uuid &clientID);
 
-    void removeSnake(uuid clientID);
+    void removeSnake(const uuid &clientID);
 
-    std::shared_ptr<GameObject::Food> addFood(int id);
+    std::shared_ptr<GameObject::Food> addFood(const int id);
 
-    void removeFood(int id);
+    void removeFood(const int id);
 
     void addEvent(std::unique_ptr<InputEvent> event);
 
-    void sendMessage(uuid clientID, std::string data);
+    void sendMessage(const uuid &clientID, const std::string &data);
 
-    void broadcastMessage(uuid clientID, std::string data);
+    void broadcastMessage(const uuid &clientID, const std::string &data);
 
     int m_width = 0;
     int m_height = 0;

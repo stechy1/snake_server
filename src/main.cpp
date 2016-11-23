@@ -15,13 +15,13 @@ public:
 
     virtual ~IOImpl() {}
 
-    virtual void onDataReceived(uuid clientID, std::vector<std::string> data) override {
+    virtual void onDataReceived(const uuid &clientID, const std::vector<std::string> data) const override {
         for (auto &tmp : data) {
             g_world->addEvent(SnakeServer::parseEvent(clientID, tmp));
         }
     }
 
-    virtual void onDisconnect(uuid clientID) override {
+    virtual void onDisconnect(const uuid &clientID) const override {
         LOG_INFO << "Client is disconnected";
         g_server->disconnectClient(clientID);
     }

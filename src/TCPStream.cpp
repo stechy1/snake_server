@@ -26,7 +26,7 @@ TCPStream::TCPStream(const int t_sd, const struct sockaddr_in *t_address, Single
 
 TCPStream::~TCPStream() {}
 
-void TCPStream::send(std::string data) {
+void TCPStream::send(const std::string &data) {
     const unsigned long len = data.size();
     const char *buff = data.c_str();
 

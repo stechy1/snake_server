@@ -23,9 +23,9 @@ public:
 
     virtual ~IOHandler() {}
 
-    virtual void onDataReceived(uuid clientID, std::vector<std::string> data) = 0;
+    virtual void onDataReceived(const uuid &clientID, const std::vector<std::string> data) const = 0;
 
-    virtual void onDisconnect(uuid clientID) = 0;
+    virtual void onDisconnect(const uuid &clientID) const = 0;
 };
 
 class IDataSender {
@@ -34,12 +34,12 @@ public:
 
     virtual ~IDataSender() {}
 
-    virtual void sendData(uuid clientID, std::string data) = 0;
+    virtual void sendData(const uuid &clientID, const std::string &data) = 0;
 };
 
 class Server : public IDataSender {
 public:
-    Server(uint16_t t_port, IOHandler &t_ioHandler, uuid t_seed);
+    Server(const uint16_t t_port, const IOHandler &t_ioHandler, const uuid &t_seed);
 
     ~Server();
 
@@ -49,9 +49,9 @@ public:
 
     void stop();
 
-    void disconnectClient(uuid clientID);
+    void disconnectClient(const uuid &clientID);
 
-    virtual void sendData(uuid clientID, std::string data) override;
+    virtual void sendData(const uuid &clientID, const std::string &data) override;
 
 protected:
     void init();
@@ -78,7 +78,7 @@ private:
     std::map<uuid, int> m_clients_reference;
     boost::uuids::name_generator m_uuid_generator;
 
-    IOHandler &m_ioHandler;
+    const IOHandler &m_ioHandler;
     SingleStreamListenerImpl m_streamHandler;
 
     std::thread m_thread;

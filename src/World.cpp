@@ -83,7 +83,7 @@ void World::run() {
 //            t += dt;
 //            accumulator -= dt;
 //        }
-
+        // TODO rozmyslet se, jestli nechám zjednodušenou herní smyčku
         addGameObjects();
 
         std::this_thread::sleep_for(ms(100-(int)(frameTime*100)));
@@ -91,11 +91,7 @@ void World::run() {
     LOG_INFO << "World thread ended.";
 }
 
-void World::removeSnake(uuid clientID) {
-    m_snakesToRemove.push_back(clientID);
-}
-
-std::shared_ptr<GameObject::Snake> World::addSnake(uuid clientID) {
+std::shared_ptr<GameObject::Snake> World::addSnake(const uuid &clientID) {
     LOG_DEBUG << "Přidávám nového hada do hry";
     Vector2D pos = Vector2D::RANDOM(
             -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border);
@@ -108,7 +104,11 @@ std::shared_ptr<GameObject::Snake> World::addSnake(uuid clientID) {
     return snake;
 }
 
-std::shared_ptr<GameObject::Food> World::addFood(int id) {
+void World::removeSnake(const uuid &clientID) {
+        m_snakesToRemove.push_back(clientID);
+    }
+
+std::shared_ptr<GameObject::Food> World::addFood(const int id) {
     std::shared_ptr<GameObject::Food> food = std::make_shared<GameObject::Food>(id, Vector2D::RANDOM(
             -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border
     ));
@@ -119,7 +119,7 @@ std::shared_ptr<GameObject::Food> World::addFood(int id) {
     return food;
 }
 
-void World::removeFood(int id) {
+void World::removeFood(const int id) {
     m_foodToRemove.push_back(id);
 }
 
@@ -133,6 +133,7 @@ void World::addEvent(std::unique_ptr<InputEvent> event) {
                 newSnake = m_snakesOnMap[clientID];
             } else {
                 LOG_DEBUG << "Vytvářím nového hada";
+
                 newSnake = addSnake(clientID);
             }
             InitOutputEvent initOutputEvent(clientID, newSnake, m_width, m_height, m_snakesOnMap, m_foodOnMap);
@@ -157,12 +158,12 @@ void World::addEvent(std::unique_ptr<InputEvent> event) {
     }
 }
 
-void World::sendMessage(uuid clientID, std::string data) {
+void World::sendMessage(const uuid &clientID, const std::string &data) {
     std::string msg = "(" + boost::uuids::to_string(clientID) + ")" + data;
     m_dataSender.sendData(clientID, msg);
 }
 
-void World::broadcastMessage(uuid clientID, std::string data) {
+void World::broadcastMessage(const uuid &clientID, const std::string &data) {
     for (auto &pair : m_snakesOnMap) {
         if (pair.first == clientID) {
             continue;

@@ -11,7 +11,7 @@
 namespace SnakeServer {
 namespace Network {
 
-Server::Server(uint16_t t_port, IOHandler &t_ioHandler, uuid t_seed)
+Server::Server(const uint16_t t_port, const IOHandler &t_ioHandler, const uuid &t_seed)
         : m_port(t_port), m_ioHandler(t_ioHandler),
           m_streamHandler(*this, m_clients_reference), m_uuid_generator(t_seed) {
     FD_ZERO(&m_master_read_fds);
@@ -184,7 +184,7 @@ void Server::stop() {
     write(m_pipefd[1], "x", 1);
 }
 
-void Server::disconnectClient(uuid clientID) {
+void Server::disconnectClient(const uuid &clientID) {
     if (m_clients_reference.find(clientID) != m_clients_reference.end()) {
         auto socketID = m_clients_reference[clientID];
         m_clients[socketID]->closeStream();
@@ -194,7 +194,7 @@ void Server::disconnectClient(uuid clientID) {
     }
 }
 
-void Server::sendData(uuid clientID, std::string data) {
+void Server::sendData(const uuid &clientID, const std::string &data) {
     int uid = m_clients_reference[clientID];
     if (uid == -1)
         return;

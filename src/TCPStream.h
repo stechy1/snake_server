@@ -43,7 +43,7 @@ public:
 
     virtual ~TCPStream();
 
-    void send(std::string data);
+    void send(const std::string &data);
 
     void receive();
 
