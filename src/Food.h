@@ -10,10 +10,13 @@ public:
 
     Food(int t_uid, const Vector2D &m_pos);
 
-    Vector2D m_pos = Vector2D::ZERO();
-    const int m_uid = -1;
+    const Vector2D &getPosition() const;
+
+    const int getUid() const;
 
 private:
+    Vector2D m_pos = Vector2D::ZERO();
+    const int m_uid = -1;
 };
 
 }

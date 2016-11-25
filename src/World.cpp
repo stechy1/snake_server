@@ -22,7 +22,7 @@ World::~World() {
 void World::init() {
     LOG_INFO << "Generating world.";
     srand(time(NULL));
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 30; ++i) {
         addFood(i);
     }
 
@@ -72,21 +72,22 @@ void World::run() {
         m_eventQueue.clear();
 
 //        while (accumulator >= dt) {
-            for (auto &item : m_snakesOnMap) {
-                auto snake = item.second;
-                    updateSnake(snake);
+        for (auto &item : m_snakesOnMap) {
+            auto snake = item.second;
+            checkFoodCollision(item.first, snake);
+            updateSnake(snake);
 //                if (snake->getCounterValue() % UPDATE_PERIOD == 0) {
-                    SyncOutputEvent syncEvent(m_snakesOnMap);
-                    sendMessage(item.first, syncEvent.getData());
+            SyncOutputEvent syncEvent(m_snakesOnMap);
+            sendMessage(item.first, syncEvent.getData());
 //                }
-            }
+        }
 //            t += dt;
 //            accumulator -= dt;
 //        }
         // TODO rozmyslet se, jestli nechám zjednodušenou herní smyčku
         addGameObjects();
 
-        std::this_thread::sleep_for(ms(100-(int)(frameTime*100)));
+        std::this_thread::sleep_for(ms(100 - (int) (frameTime * 100)));
     }
     LOG_INFO << "World thread ended.";
 }
@@ -105,15 +106,15 @@ std::shared_ptr<GameObject::Snake> World::addSnake(const uuid &clientID, const s
 }
 
 void World::removeSnake(const uuid &clientID) {
-        m_snakesToRemove.push_back(clientID);
-    }
+    m_snakesToRemove.push_back(clientID);
+}
 
 std::shared_ptr<GameObject::Food> World::addFood(const int id) {
     std::shared_ptr<GameObject::Food> food = std::make_shared<GameObject::Food>(id, Vector2D::RANDOM(
             -m_width + m_border, -m_height + m_border, m_width - m_border, m_height - m_border
     ));
 
-    std::pair<int, std::shared_ptr<GameObject::Food>> pair(food->m_uid, food);
+    std::pair<int, std::shared_ptr<GameObject::Food>> pair(id, food);
     m_foodToAdd.insert(pair);
 
     return food;
@@ -161,6 +162,7 @@ void World::addEvent(std::unique_ptr<InputEvent> event) {
 
 void World::sendMessage(const uuid &clientID, const std::string &data) {
     std::string msg = "(" + boost::uuids::to_string(clientID) + ")" + data;
+    std::cout << msg << std::endl;
     m_dataSender.sendData(clientID, msg);
 }
 
@@ -212,7 +214,24 @@ void World::updateSnake(std::shared_ptr<GameObject::Snake> snake) {
         snake->setPosition(Vector2D(position.X(), m_height));
     }
 
-//    snake->incrementCounter();
+}
+
+void World::checkFoodCollision(const uuid &uuid, std::shared_ptr<GameObject::Snake> snake) {
+    for (auto &&foodPair : m_foodOnMap) {
+        auto foodId = foodPair.first;
+        auto food = foodPair.second;
+
+        auto foodPosition = food->getPosition();
+        auto snakePosition = snake->getPosition();
+
+        if (snakePosition.dist(foodPosition) < 10) {
+            EatFoodOutputEvent removeFoodOutputEvent(foodId, uuid);
+            broadcastMessage(uuid, removeFoodOutputEvent.getData());
+            sendMessage(uuid, removeFoodOutputEvent.getData());
+            removeFood(foodId);
+            return;
+        }
+    }
 }
 
 void World::addGameObjects() {
@@ -240,7 +259,9 @@ void World::removeGameObjects() {
     m_snakesToRemove.clear();
 
     for (int index : m_foodToRemove) {
+        std::cout << "Odebiram jidlo" << std::endl;
         m_foodOnMap.erase(index);
+
     }
     m_foodToRemove.clear();
 }

@@ -135,6 +135,21 @@ private:
     uuid m_clientID;
 };
 
+class EatFoodOutputEvent : public OutputEvent {
+public:
+    EatFoodOutputEvent(int t_id, const uuid &clientId);
+
+    std::string getData() override;
+
+    std::string getDescription() override;
+
+    int getM_id() const;
+
+private:
+    int m_id;
+    const uuid &m_clientId;
+};
+
 class SnakeChangeDirectionOutputEvent : public OutputEvent {
 public:
     SnakeChangeDirectionOutputEvent(uuid t_clientID, const Vector2D &t_dir);
@@ -159,6 +174,8 @@ public:
 private:
     std::string m_data = "";
 };
+
+
 
 }
 

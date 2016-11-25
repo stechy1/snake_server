@@ -86,6 +86,8 @@ private:
 
     void updateSnake(std::shared_ptr<GameObject::Snake> snake);
 
+    void checkFoodCollision(const uuid &uuid, std::shared_ptr<GameObject::Snake> snake);
+
     void addGameObjects();
 
     void removeGameObjects();
