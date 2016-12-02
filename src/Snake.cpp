@@ -10,6 +10,10 @@ Snake::Snake(Vector2D &t_pos, Vector2D &t_dir, const std::string &t_username)
     m_vel *= VELOCITY_MULTIPLIER;
 }
 
+void Snake::incrementSize() {
+    m_size += SNAKE_INCREMENT_CONSTANT;
+}
+
 std::string Snake::getDescription() {
     return "SnakeObject";
 }

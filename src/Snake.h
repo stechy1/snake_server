@@ -8,10 +8,13 @@ namespace SnakeServer {
 namespace GameObject {
 
 static const float VELOCITY_MULTIPLIER = 0.5f;
+static const int SNAKE_INCREMENT_CONSTANT = 3;
 
 class Snake {
 public:
     Snake(Vector2D &t_pos, Vector2D &t_dir, const std::string &t_username);
+
+    void incrementSize();
 
     std::string getDescription();
 

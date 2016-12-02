@@ -42,9 +42,8 @@ int main(int argc, char *argv[]) {
     uuid seed;
     SnakeServer::Network::Server server(10000, handler, seed);
     g_server = &server;
-    SnakeServer::World world(300, 300, server);
+    SnakeServer::World world(600, 600, server);
     g_world = &world;
-
     server.start();
     world.start();
     LOG_INFO << "Server running";

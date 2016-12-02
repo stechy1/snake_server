@@ -22,7 +22,7 @@ World::~World() {
 void World::init() {
     LOG_INFO << "Generating world.";
     srand(time(NULL));
-    for (int i = 0; i < 30; ++i) {
+    for (int i = 0; i < 300; ++i) {
         addFood(i);
     }
 
@@ -162,7 +162,6 @@ void World::addEvent(std::unique_ptr<InputEvent> event) {
 
 void World::sendMessage(const uuid &clientID, const std::string &data) {
     std::string msg = "(" + boost::uuids::to_string(clientID) + ")" + data;
-    std::cout << msg << std::endl;
     m_dataSender.sendData(clientID, msg);
 }
 
@@ -229,6 +228,7 @@ void World::checkFoodCollision(const uuid &uuid, std::shared_ptr<GameObject::Sna
             broadcastMessage(uuid, removeFoodOutputEvent.getData());
             sendMessage(uuid, removeFoodOutputEvent.getData());
             removeFood(foodId);
+            snake->incrementSize();
             return;
         }
     }
