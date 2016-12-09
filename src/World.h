@@ -21,6 +21,7 @@ static const double BORDER_MULTIPLIER = 0.7;
 static const unsigned int SNAKE_SIZE = 15;
 static const double UPS = 0.25;
 static const int UPDATE_PERIOD = 1; // TODO najít optimální hodnotu
+static const bool HANDLE_WALL_CRASH = true;
 
 struct EventData {
     std::shared_ptr<GameObject::Snake> snake;
@@ -84,7 +85,7 @@ private:
 
     void applySnakeEvent(std::unique_ptr<EventData> eventData);
 
-    void updateSnake(std::shared_ptr<GameObject::Snake> snake);
+    void updateSnake(std::shared_ptr<GameObject::Snake> snake, bool &crash);
 
     void checkFoodCollision(const uuid &uuid, std::shared_ptr<GameObject::Snake> snake);
 

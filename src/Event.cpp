@@ -231,4 +231,14 @@ std::string SyncOutputEvent::getDescription() {
     return "SyncEvent";
 }
 
+GameOverOutputEvent::GameOverOutputEvent(const uuid &t_clientID) : m_clientID(t_clientID) {}
+
+std::string GameOverOutputEvent::getData() {
+    return "gameover:" + EVENT_TYPE_OPEN_BRACKET + (boost::uuids::to_string(m_clientID)) + EVENT_TYPE_CLOSE_BRACKET +
+           EVENT_LINE_SEPARATOR;
+}
+
+std::string GameOverOutputEvent::getDescription() {
+    return "GameOverEvent";
+}
 }

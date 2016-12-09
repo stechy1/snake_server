@@ -73,12 +73,22 @@ void World::run() {
 
 //        while (accumulator >= dt) {
         for (auto &item : m_snakesOnMap) {
+            bool crash = false;
             auto snake = item.second;
-            checkFoodCollision(item.first, snake);
-            updateSnake(snake);
+            auto uid = item.first;
+            checkFoodCollision(uid, snake);
+            updateSnake(snake, crash);
+            if (crash) {
+                GameOverOutputEvent event(uid);
+                sendMessage(uid, event.getData());
+                removeSnake(uid);
+                RemoveSnakeOutputEvent removeSnakeOutputEvent(uid);
+                broadcastMessage(uid, removeSnakeOutputEvent.getData());
+                continue;
+            }
 //                if (snake->getCounterValue() % UPDATE_PERIOD == 0) {
             SyncOutputEvent syncEvent(m_snakesOnMap);
-            sendMessage(item.first, syncEvent.getData());
+            sendMessage(uid, syncEvent.getData());
 //                }
         }
 //            t += dt;
@@ -193,7 +203,7 @@ void World::applySnakeEvent(std::unique_ptr<EventData> eventData) {
     }
 }
 
-void World::updateSnake(std::shared_ptr<GameObject::Snake> snake) {
+void World::updateSnake(std::shared_ptr<GameObject::Snake> snake, bool &crash) {
     Vector2D direction = snake->getDirection();
     Vector2D velocity = snake->getVelocity();
     Vector2D position = snake->getPosition();
@@ -201,16 +211,36 @@ void World::updateSnake(std::shared_ptr<GameObject::Snake> snake) {
     snake->setPosition(newPos);
 
     if (snake->getPosition().X() > m_width) {
-        snake->setPosition(Vector2D(-m_width, position.Y()));
+        if (HANDLE_WALL_CRASH) {
+            crash = true;
+            return;
+        } else {
+            snake->setPosition(Vector2D(-m_width, position.Y()));
+        }
     }
     if (snake->getPosition().X() < -m_width) {
-        snake->setPosition(Vector2D(m_width, position.Y()));
+        if (HANDLE_WALL_CRASH) {
+            crash = true;
+            return;
+        } else {
+            snake->setPosition(Vector2D(m_width, position.Y()));
+        }
     }
     if (snake->getPosition().Y() > m_height) {
-        snake->setPosition(Vector2D(position.X(), -m_height));
+        if (HANDLE_WALL_CRASH) {
+            crash = true;
+            return;
+        } else {
+            snake->setPosition(Vector2D(position.X(), -m_height));
+        }
     }
     if (snake->getPosition().Y() < -m_height) {
-        snake->setPosition(Vector2D(position.X(), m_height));
+        if (HANDLE_WALL_CRASH) {
+            crash = true;
+            return;
+        } else {
+            snake->setPosition(Vector2D(position.X(), m_height));
+        }
     }
 
 }

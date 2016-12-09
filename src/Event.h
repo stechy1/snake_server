@@ -175,7 +175,17 @@ private:
     std::string m_data = "";
 };
 
+class GameOverOutputEvent : public OutputEvent {
+public:
+    GameOverOutputEvent(const uuid &m_clientID);
 
+    std::string getData() override;
+
+    std::string getDescription() override;
+
+private:
+    uuid m_clientID;
+};
 
 }
 
