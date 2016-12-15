@@ -11,8 +11,8 @@
 namespace SnakeServer {
 namespace Network {
 
-Server::Server(const uint16_t t_port, const IOHandler &t_ioHandler, const uuid &t_seed)
-        : m_port(t_port), m_ioHandler(t_ioHandler),
+Server::Server(const std::string &t_address, const uint16_t t_port, const IOHandler &t_ioHandler, const uuid &t_seed)
+        : m_address(t_address), m_port(t_port), m_ioHandler(t_ioHandler),
           m_streamHandler(*this, m_clients_reference), m_uuid_generator(t_seed) {
     FD_ZERO(&m_master_read_fds);
     FD_ZERO(&m_master_write_fds);
@@ -63,7 +63,11 @@ void Server::init() {
     memset(&address, 0, sizeof(address));
     address.sin_family = PF_INET;
     address.sin_port = htons(m_port);
-    address.sin_addr.s_addr = htonl(INADDR_ANY); // Poslouchám na jekémkoliv interfacu
+    if (m_address.empty()) {
+        address.sin_addr.s_addr = htonl(INADDR_ANY); // Poslouchám na jekémkoliv interfacu
+    } else {
+        address.sin_addr.s_addr = inet_addr(m_address.c_str());
+    }
 
 
     // Nabindování socketu na port

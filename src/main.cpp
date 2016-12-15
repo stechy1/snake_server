@@ -35,6 +35,12 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    std::string address("");
+
+    if (argc > 2) {
+        address = argv[2];
+    }
+
     int port = atoi(argv[1]);
 
 
@@ -50,7 +56,7 @@ int main(int argc, char *argv[]) {
     LOG_INFO << "Starting up...";
     IOImpl handler;
     uuid seed;
-    SnakeServer::Network::Server server(port, handler, seed);
+    SnakeServer::Network::Server server(address, port, handler, seed);
     g_server = &server;
     SnakeServer::World world(600, 600, server);
     g_world = &world;

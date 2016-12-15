@@ -39,7 +39,7 @@ public:
 
 class Server : public IDataSender {
 public:
-    Server(const uint16_t t_port, const IOHandler &t_ioHandler, const uuid &t_seed);
+    Server(const std::string &t_address, const uint16_t t_port, const IOHandler &t_ioHandler, const uuid &t_seed);
 
     ~Server();
 
@@ -63,6 +63,7 @@ protected:
 private:
 
     int m_lsd = -1; // Listen socket descriptor
+    std::string m_address;
     uint16_t m_port = 0;
 
     fd_set m_master_read_fds;  // Master file descriptor list for read events
