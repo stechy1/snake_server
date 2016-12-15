@@ -65,6 +65,7 @@ void Server::init() {
     address.sin_port = htons(m_port);
     address.sin_addr.s_addr = htonl(INADDR_ANY); // Poslouchám na jekémkoliv interfacu
 
+
     // Nabindování socketu na port
     if (bind(m_lsd, (struct sockaddr *) &address, sizeof(address)) < 0) {
         LOG_ERROR << "Can not bind socket.";
@@ -93,6 +94,7 @@ void Server::init() {
     m_fdMax = m_pipefd[0];
 
     LOG_INFO << "Server initialized.";
+    LOG_INFO << "Server is listening on port: " << m_port;
 }
 
 void Server::start() {

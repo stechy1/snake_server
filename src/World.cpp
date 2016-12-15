@@ -47,8 +47,6 @@ void World::stop() {
 
 void World::run() {
     LOG_INFO << "World is evaluating";
-    double t = 0.0;
-    double dt = 0.01;
 
     auto currentTime = Time::now();
     double accumulator = 0.0;
@@ -71,7 +69,6 @@ void World::run() {
         }
         m_eventQueue.clear();
 
-//        while (accumulator >= dt) {
         for (auto &item : m_snakesOnMap) {
             bool crash = false;
             auto snake = item.second;
@@ -86,15 +83,9 @@ void World::run() {
                 broadcastMessage(uid, removeSnakeOutputEvent.getData());
                 continue;
             }
-//                if (snake->getCounterValue() % UPDATE_PERIOD == 0) {
             SyncOutputEvent syncEvent(m_snakesOnMap);
             sendMessage(uid, syncEvent.getData());
-//                }
         }
-//            t += dt;
-//            accumulator -= dt;
-//        }
-        // TODO rozmyslet se, jestli nechám zjednodušenou herní smyčku
         addGameObjects();
 
         std::this_thread::sleep_for(ms(100 - (int) (frameTime * 100)));
@@ -289,7 +280,6 @@ void World::removeGameObjects() {
     m_snakesToRemove.clear();
 
     for (int index : m_foodToRemove) {
-        std::cout << "Odebiram jidlo" << std::endl;
         m_foodOnMap.erase(index);
 
     }

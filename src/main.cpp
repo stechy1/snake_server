@@ -28,6 +28,16 @@ public:
 };
 
 int main(int argc, char *argv[]) {
+
+    if (argc < 2) {
+        std::cout << "Nesprávný počet parametrů" << std::endl;
+        std::cout << "./snake_server port [ip]" << std::endl;
+        exit(1);
+    }
+
+    int port = atoi(argv[1]);
+
+
     LOG_INFO << "╔════════════════════════════════════════════════════════════════════╗";
     LOG_INFO << "║	   _____             _                                        	║";
     LOG_INFO << "║	  / ____|           | |                                      	║";
@@ -40,7 +50,7 @@ int main(int argc, char *argv[]) {
     LOG_INFO << "Starting up...";
     IOImpl handler;
     uuid seed;
-    SnakeServer::Network::Server server(10000, handler, seed);
+    SnakeServer::Network::Server server(port, handler, seed);
     g_server = &server;
     SnakeServer::World world(600, 600, server);
     g_world = &world;

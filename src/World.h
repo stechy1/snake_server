@@ -20,8 +20,7 @@ using namespace std::chrono_literals;
 static const double BORDER_MULTIPLIER = 0.7;
 static const unsigned int SNAKE_SIZE = 15;
 static const double UPS = 0.25;
-static const int UPDATE_PERIOD = 1; // TODO najít optimální hodnotu
-static const bool HANDLE_WALL_CRASH = true;
+static const bool HANDLE_WALL_CRASH = false;
 
 struct EventData {
     std::shared_ptr<GameObject::Snake> snake;
