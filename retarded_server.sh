@@ -1,0 +1,7 @@
+#!/bin/bash
+
+export LD_PRELOAD=libsocket_retarder.so
+export SOCKET_RETARDER_DEBUG=2
+export SOCKET_RETARDER_NORMALDIST_MEAN=2000
+export SOCKET_RETARDER_NORMALDIST_VARIANCE=2000
+./snake_server 10000
