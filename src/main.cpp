@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
     }
 
     int port = atoi(argv[1]);
-    if (port < 0 || port > 65535) {
+    if (port >> 16) {
         std::cout << "Špatná hodnota portu" << std::endl;
         exit(1);
     }
