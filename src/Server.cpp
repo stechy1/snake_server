@@ -146,7 +146,8 @@ void Server::run() {
                         m_clients[i]->receive();
                     } catch (std::exception ex) {
                         LOG_ERROR << "Chyba při přijímání dat od klienta";
-                        std::cout << ex.what() << std::endl;
+                        std::string error = "Invalid message";
+                        send(i, error.c_str(), error.size(), 0);
                     }
                 }
             }
