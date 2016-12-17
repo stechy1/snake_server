@@ -5,7 +5,6 @@
 #include <boost/log/sinks/sync_frontend.hpp>
 #include <boost/log/sinks/text_ostream_backend.hpp>
 #include <boost/log/support/date_time.hpp>
-#include <boost/core/null_deleter.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/make_shared.hpp>
 #include <fstream>
@@ -35,7 +34,7 @@ BOOST_LOG_GLOBAL_LOGGER_INIT(logger, src::severity_logger_mt) {
     sink->locked_backend()->add_stream(boost::make_shared<std::ofstream>(LOGFILE));
 
     // add "console" output stream to our sink
-    sink->locked_backend()->add_stream(boost::shared_ptr<std::ostream>(&std::clog, boost::null_deleter()));
+    sink->locked_backend()->add_stream(boost::shared_ptr<std::ostream>(&std::clog));
 
     // specify the format of the log message
     auto formatter = expr::stream

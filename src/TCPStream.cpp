@@ -65,6 +65,11 @@ void TCPStream::receive() {
 
     // Vyzvednout z bufferu dříve přijatá data
     received = m_inputBuffer + ltrim(received);
+
+    if (received.size() > BUFFER_SIZE) {
+        received = received.substr(received.size() - BUFFER_SIZE - 1);
+    }
+
     unsigned long index = 0;
 
     // Naparsovat přijatá data
